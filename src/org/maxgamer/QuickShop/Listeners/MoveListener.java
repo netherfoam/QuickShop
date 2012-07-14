@@ -1,5 +1,6 @@
 package org.maxgamer.QuickShop.Listeners;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,10 +28,10 @@ public class MoveListener implements Listener{
 			
 			if(loc1.distanceSquared(loc2) > 25){
 				if(info.getAction() == ShopAction.CREATE){
-					p.sendMessage("Shop creation cancelled");
+					p.sendMessage(ChatColor.RED + "Shop creation cancelled");
 				}
 				else if(info.getAction() == ShopAction.BUY){
-					p.sendMessage("Shop purchase cancelled");
+					p.sendMessage(ChatColor.RED + "Shop purchase cancelled");
 				}
 				plugin.getActions().remove(p.getName());
 				return;
