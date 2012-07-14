@@ -78,11 +78,14 @@ public class ClickListener implements Listener{
 		
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Shop Information:");
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + stock + " " + items.getType());
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Item: " + ChatColor.YELLOW + items.getType());
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Stock: " + ChatColor.YELLOW + stock);
+		
 		if(plugin.isTool(items.getType())) p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + plugin.getToolPercentage(items) + "% Remaining"); 
 		
 		Map<Enchantment, Integer> enchs = items.getEnchantments();
-		if(enchs!= null){
+		if(enchs != null && enchs.size() > 0){
+			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------ENCHANTS-----------------------+");
 			for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
 				p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
 			}
