@@ -1,0 +1,8 @@
+name: QuickShop
+version: 0.1
+main: org.maxgamer.QuickShop.QuickShop
+author: Netherfoam
+
+description: The real shop plugin.
+website: http://maxgamer.org
+depend: [Vault]
