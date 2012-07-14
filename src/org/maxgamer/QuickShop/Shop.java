@@ -2,6 +2,7 @@ package org.maxgamer.QuickShop;
 
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
@@ -17,12 +18,20 @@ public class Shop{
 	private double price;
 	private String owner;
 	private ItemStack item;
-	
+	private QuickShop plugin;
+	/**
+	 * Adds a new shop.
+	 * @param loc The location of the chest block
+	 * @param price The cost per item
+	 * @param item The itemstack with the properties we want. This is .cloned, no need to worry about references
+	 * @param owner The player who owns this shop.
+	 */
 	public Shop(Location loc, double price, ItemStack item, String owner){
 		this.loc = loc;
 		this.price = price;
 		this.owner = owner;
 		this.item = item.clone();
+		this.plugin = (QuickShop) Bukkit.getPluginManager().getPlugin("QuickShop");
 		spawnItem();
 	}
 	/**
@@ -97,5 +106,6 @@ public class Shop{
 		Item item = this.loc.getWorld().dropItem(sLoc, this.item.clone());
 		item.setVelocity(new Vector(0, 0.1, 0));
 		item.setPickupDelay(6000);  
+		plugin.getProtectedItems().add(item);
 	}
 }
