@@ -15,9 +15,6 @@ import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Shop;
 import org.maxgamer.QuickShop.ShopAction;
 /**
- * HashMap<Name, Info>
- * 
- * 
  * 
  * @author Netherfoam
  *
@@ -46,14 +43,14 @@ public class ChatListener implements Listener{
 					//Price per item
 					double price = Double.parseDouble(e.getMessage());
 					if(price < 0.01){
-						p.sendMessage("Price must be greater than $0.01");
+						p.sendMessage(ChatColor.RED + "Price must be greater than " + ChatColor.YELLOW + "$0.01");
 						e.setCancelled(true);
 						return;
 					}
 					//Add the shop to the list.
 					Shop shop = new Shop(info.getLocation(), price, info.getItem(), p.getName());
 					plugin.getShops().put(info.getLocation(), shop);
-					p.sendMessage("Created a shop");
+					p.sendMessage(ChatColor.GREEN + "Created a shop");
 					
 					//ToDo: save it to database
 					
@@ -65,7 +62,7 @@ public class ChatListener implements Listener{
 				 */
 				catch(NumberFormatException ex){
 					actions.remove(p.getName());
-					p.sendMessage("Cancelled Shop Creation");
+					p.sendMessage(ChatColor.RED + "Cancelled Shop Creation");
 					return;
 				}
 			}
@@ -110,13 +107,13 @@ public class ChatListener implements Listener{
 							e.setCancelled(true);
 						}
 						else{
-							p.sendMessage("That costs " + amount * shop.getPrice() + ", but you only have " + plugin.getEcon().getBalance(p.getName()));
+							p.sendMessage(ChatColor.RED + "That costs " + ChatColor.YELLOW + amount * shop.getPrice() + ChatColor.RED + ", but you only have " + ChatColor.YELLOW + plugin.getEcon().getBalance(p.getName()));
 							e.setCancelled(true);
 							return;
 						}
 					}
 					else{
-						p.sendMessage("The shop only has " + shop.getRemainingStock() + " " + shop.getMaterial().toString() + " left.");
+						p.sendMessage(ChatColor.RED + "The shop only has " + ChatColor.YELLOW + shop.getRemainingStock() + " " + shop.getMaterial().toString() + ChatColor.RED + " left.");
 						e.setCancelled(true);
 						return;
 					}
@@ -133,16 +130,8 @@ public class ChatListener implements Listener{
 			/*
 			 * If it was already cancelled (from destroyed)
 			 */
-			else if(info.getAction() == ShopAction.CANCELLED){
-				return; //It was cancelled, go away.
-			}
-			/*
-			 * Debug: Should never happen.
-			 */
 			else{
-				//Impossibru
-				p.sendMessage("Impossibru");
-				return;
+				return; //It was cancelled, go away.
 			}
 		}
 	}

@@ -17,7 +17,7 @@ import org.maxgamer.QuickShop.Listeners.BlockListener;
 import org.maxgamer.QuickShop.Listeners.ChatListener;
 import org.maxgamer.QuickShop.Listeners.ClickListener;
 import org.maxgamer.QuickShop.Listeners.MoveListener;
-import org.maxgamer.QuickShop.Listeners.PickupListener;
+//import org.maxgamer.QuickShop.Listeners.PickupListener;
 
 public class QuickShop extends JavaPlugin{
 	private Economy economy;
@@ -133,31 +133,31 @@ public class QuickShop extends JavaPlugin{
 	        return (economy != null);
     }
 	 
-	 public Shop getShop(Location loc){
-		 return this.shops.get(loc);
-	 }
+	public Shop getShop(Location loc){
+		return this.shops.get(loc);
+	}
 	 
-	 public boolean isTool(Material mat){
-		 return this.tools.contains(mat);
-	 }
+	public boolean isTool(Material mat){
+		return this.tools.contains(mat);
+	}
 	 
 	 /**
 	  * Gets the percentage (Without trailing %) damage on a tool.
 	  * @param item The ItemStack of tools to check
 	  * @return The percentage 'health' the tool has. (Opposite of total damage)
 	  */
-	 public String getToolPercentage(ItemStack item){
-		 double dura = item.getDurability();
-		 double max = item.getType().getMaxDurability();
-		 
-		 DecimalFormat formatter = new DecimalFormat("0");
-		 return formatter.format((1 - dura/max)* 100.0);
-	 }
-	 
-	 public boolean isProtectedItem(Item item){
-		 return this.spawnedItems.contains(item);
-	 }
-	 public HashSet<Item> getProtectedItems(){
-		 return this.spawnedItems;
-	 }
+	public String getToolPercentage(ItemStack item){
+		double dura = item.getDurability();
+		double max = item.getType().getMaxDurability();
+		
+		DecimalFormat formatter = new DecimalFormat("0");
+		return formatter.format((1 - dura/max)* 100.0);
+	}
+	
+	public boolean isProtectedItem(Item item){
+		return this.spawnedItems.contains(item);
+	}
+	public HashSet<Item> getProtectedItems(){
+		return this.spawnedItems;
+	}
 }
