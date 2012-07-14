@@ -112,7 +112,9 @@ public class QuickShop extends JavaPlugin{
 		}, 0, 1200);
 	}
 	public void onDisable(){
-		
+		for(Shop shop : shops.values()){
+			shop.deleteDisplayItem();
+		}
 	}
 	public Economy getEcon(){
 		return economy;
