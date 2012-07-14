@@ -32,6 +32,7 @@ public class Shop{
 		this.owner = owner;
 		this.item = item.clone();
 		this.plugin = (QuickShop) Bukkit.getPluginManager().getPlugin("QuickShop");
+		this.item.setAmount(1);
 		spawnItem();
 	}
 	/**
@@ -102,10 +103,12 @@ public class Shop{
 	public void spawnItem(){
 		Location sLoc = this.loc.clone();
 		sLoc.add(0.5, 1, 0.5);
-		item.setAmount(1);
+		
 		Item item = this.loc.getWorld().dropItem(sLoc, this.item.clone());
 		item.setVelocity(new Vector(0, 0.1, 0));
+		//Actually not possible.
 		item.setPickupDelay(6000);  
+		//Protects the item from decay.
 		plugin.getProtectedItems().add(item);
 	}
 }
