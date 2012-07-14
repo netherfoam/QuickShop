@@ -18,7 +18,10 @@ public class Shop{
 	private double price;
 	private String owner;
 	private ItemStack item;
+	private Item displayItem;
+	
 	private QuickShop plugin;
+	
 	/**
 	 * Adds a new shop.
 	 * @param loc The location of the chest block
@@ -33,7 +36,7 @@ public class Shop{
 		this.item = item.clone();
 		this.plugin = (QuickShop) Bukkit.getPluginManager().getPlugin("QuickShop");
 		this.item.setAmount(1);
-		spawnItem();
+		spawnDisplayItem();
 	}
 	/**
 	 * Returns the number of items this shop has in stock.
@@ -100,7 +103,7 @@ public class Shop{
 	/**
 	 * Spawns the dummy item on top of the shop.
 	 */
-	public void spawnItem(){
+	public void spawnDisplayItem(){
 		Location sLoc = this.loc.clone();
 		sLoc.add(0.5, 1, 0.5);
 		
@@ -110,5 +113,13 @@ public class Shop{
 		item.setPickupDelay(6000);  
 		//Protects the item from decay.
 		plugin.getProtectedItems().add(item);
+		this.displayItem = item;
+	}
+	/**
+	 * Removes the display item entirely.
+	 */
+	public void deleteDisplayItem(){
+		plugin.getProtectedItems().remove(item);
+		this.displayItem.remove();
 	}
 }
