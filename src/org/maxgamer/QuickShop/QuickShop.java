@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
 
 import net.milkbowl.vault.economy.Economy;
@@ -18,6 +19,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
@@ -26,6 +28,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.maxgamer.QuickShop.Database.Database;
 import org.maxgamer.QuickShop.Listeners.BlockListener;
 import org.maxgamer.QuickShop.Listeners.ChatListener;
+import org.maxgamer.QuickShop.Listeners.ChunkListener;
 import org.maxgamer.QuickShop.Listeners.ClickListener;
 import org.maxgamer.QuickShop.Listeners.MoveListener;
 //import org.maxgamer.QuickShop.Listeners.PickupListener;
@@ -36,7 +39,7 @@ public class QuickShop extends JavaPlugin{
 	private HashMap<String, Info> actions = new HashMap<String, Info>(30);
 	private HashSet<Material> tools = new HashSet<Material>(50);
 	
-	private HashSet<Item> spawnedItems = new HashSet<Item>(50);
+	private HashMap<Shop, Item> spawnedItems = new HashMap<Shop, Item>(30);
 	
 	private Database database;
 	public HashSet<String> queries = new HashSet<String>(5);
@@ -46,6 +49,7 @@ public class QuickShop extends JavaPlugin{
 	private ClickListener clickListener = new ClickListener(this);
 	private BlockListener blockListener = new BlockListener(this);
 	private MoveListener moveListener = new MoveListener(this);
+	private ChunkListener chunkListener = new ChunkListener(this);
 	//private PickupListener pickupListener = new PickupListener(this);
 	
 	public void onEnable(){
@@ -56,6 +60,7 @@ public class QuickShop extends JavaPlugin{
 		Bukkit.getServer().getPluginManager().registerEvents(clickListener, this);
 		Bukkit.getServer().getPluginManager().registerEvents(blockListener, this);
 		Bukkit.getServer().getPluginManager().registerEvents(moveListener, this);
+		Bukkit.getServer().getPluginManager().registerEvents(chunkListener, this);
 		//Bukkit.getServer().getPluginManager().registerEvents(pickupListener, this);
 		
 		if(!this.getDataFolder().exists()){
@@ -130,13 +135,12 @@ public class QuickShop extends JavaPlugin{
 		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable(){
 			@Override
 			public void run() {
-				for(Item item : spawnedItems){
-					if(item == null) return; //Can't help you.
-					item.setTicksLived(1);
+				for(Entry<Shop, Item> entry : spawnedItems.entrySet()){
+					entry.getValue().setTicksLived(1);
 				}
 			}
 			
-		}, 0, 1200);
+		}, 0, 20);
 		
 		if(!getDB().hasTable()){
 			try {
@@ -268,9 +272,9 @@ public class QuickShop extends JavaPlugin{
 	}
 	
 	public boolean isProtectedItem(Item item){
-		return this.spawnedItems.contains(item);
+		return this.spawnedItems.containsValue(item);
 	}
-	public HashSet<Item> getProtectedItems(){
+	public HashMap<Shop, Item> getProtectedItems(){
 		return this.spawnedItems;
 	}
 	/**

@@ -3,10 +3,13 @@ package org.maxgamer.QuickShop;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -59,6 +62,11 @@ public class Shop{
 	public Location getLocation(){
 		return this.loc;
 	}
+	public Location getDisplayLocation(){
+		Location dispLoc = this.loc.clone();
+		dispLoc.add(0.5, 1, 0.5);
+		return dispLoc;
+	}
 	
 	public double getPrice(){
 		return this.price;
@@ -104,17 +112,26 @@ public class Shop{
 	 * Spawns the dummy item on top of the shop.
 	 */
 	public void spawnDisplayItem(){
-		Location sLoc = this.loc.clone();
-		sLoc.add(0.5, 1, 0.5);
+		Location sLoc = this.getDisplayLocation();
 		
 		Item item = this.loc.getWorld().dropItem(sLoc, this.item.clone());
 		item.setVelocity(new Vector(0, 0.1, 0));
 		//Actually not possible.
 		item.setPickupDelay(6000);  
 		//Protects the item from decay.
-		plugin.getProtectedItems().add(item);
+		plugin.getProtectedItems().put(this, item);
 		this.displayItem = item;
 	}
+	public void removeDupeItem(Block b){
+		Chunk c = b.getChunk();
+		for (Entity e : c.getEntities()) {
+			if (e.getLocation().getBlock().equals(b) && e instanceof Item && !e.equals(item)) {
+				e.remove();
+			}
+		}
+	}
+	
+	
 	/**
 	 * Removes the display item entirely.
 	 */
