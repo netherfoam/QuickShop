@@ -3,6 +3,8 @@ package org.maxgamer.QuickShop.Listeners;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -27,7 +29,7 @@ public class ChatListener implements Listener{
 	}
 	
 	@EventHandler
-	public void onChat(PlayerChatEvent e){
+	public void onChat(final PlayerChatEvent e){
 		if(e.isCancelled()) return;
 		Player p = e.getPlayer();
 		HashMap<String, Info> actions = plugin.getActions();
@@ -48,11 +50,33 @@ public class ChatListener implements Listener{
 						return;
 					}
 					//Add the shop to the list.
-					Shop shop = new Shop(info.getLocation(), price, info.getItem(), p.getName());
+					final Shop shop = new Shop(info.getLocation(), price, info.getItem(), p.getName());
 					plugin.getShops().put(info.getLocation(), shop);
 					p.sendMessage(ChatColor.GREEN + "Created a shop");
 					
-					//ToDo: save it to database
+					//Save it to the database.
+					Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable(){
+
+						@Override
+						public void run() {
+							int x = shop.getLocation().getBlockX();
+							int y = shop.getLocation().getBlockY();
+							int z = shop.getLocation().getBlockZ();
+							String world = shop.getLocation().getWorld().getName();
+							double price = shop.getPrice();
+							
+							String itemString = plugin.makeString(shop.getItem());
+							
+							while(plugin.queriesInUse){
+								//Wait
+							}
+							
+							plugin.queriesInUse = true;
+							plugin.queries.add("INSERT INTO shops VALUES ('"+e.getPlayer().getName()+"', '"+price+"', '"+itemString+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"')");
+							plugin.queriesInUse = false;
+						}
+						
+					}, 0);
 					
 					e.setCancelled(true); //Don't send to chat.
 					plugin.getActions().remove(p.getName());

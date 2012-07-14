@@ -1,5 +1,6 @@
 package org.maxgamer.QuickShop.Listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -17,7 +18,7 @@ public class BlockListener implements Listener{
 		this.plugin = plugin;
 	}
 	@EventHandler(priority = EventPriority.HIGH)
-	public void onBreak(BlockBreakEvent e){
+	public void onBreak(final BlockBreakEvent e){
 		if(e.isCancelled() || e.getBlock().getType() != Material.CHEST) return;
 		if(plugin.getShops().containsKey(e.getBlock().getLocation())){
 			for(Info info : plugin.getActions().values()){
@@ -27,6 +28,25 @@ public class BlockListener implements Listener{
 			shop.deleteDisplayItem();
 			plugin.getShops().remove(e.getBlock().getLocation());
 			e.getPlayer().sendMessage(ChatColor.GREEN + "Shop Removed");
+			Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable(){
+
+				@Override
+				public void run() {
+					String world = e.getBlock().getWorld().getName();
+					int x = e.getBlock().getX();
+					int y = e.getBlock().getY();
+					int z = e.getBlock().getZ();
+					
+					while(plugin.queriesInUse){
+						//Wait
+					}
+					
+					plugin.queriesInUse = true;
+					plugin.queries.add("DELETE FROM shops WHERE x = '"+x+"' AND y = '"+y+"' AND z = '"+z+"' AND world = '"+world+"'");
+					plugin.queriesInUse = false;
+				}
+				
+			}, 0);
 		}
 	}
 }
