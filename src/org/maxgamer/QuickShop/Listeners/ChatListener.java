@@ -52,7 +52,10 @@ public class ChatListener implements Listener{
 					//Add the shop to the list.
 					final Shop shop = new Shop(info.getLocation(), price, info.getItem(), p.getName());
 					plugin.getShops().put(info.getLocation(), shop);
-					p.sendMessage(ChatColor.GREEN + "Created a shop");
+					if(plugin.getConfig().getInt("shop.cost") == 0) p.sendMessage(ChatColor.GREEN + "Created a shop");
+					else{
+						//ToDo.  Charge them for creating a chest.
+					}
 					
 					//Save it to the database.
 					Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable(){

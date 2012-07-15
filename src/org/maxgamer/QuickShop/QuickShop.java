@@ -9,7 +9,6 @@ import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map.Entry;
 
 import net.milkbowl.vault.economy.Economy;
@@ -19,7 +18,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
@@ -66,67 +64,16 @@ public class QuickShop extends JavaPlugin{
 		if(!this.getDataFolder().exists()){
 			this.getDataFolder().mkdir();
 		}
+		File configFile = new File(this.getDataFolder(), "config.yml");
+		if(!configFile.exists()){
+			this.saveConfig();
+		}
+		this.getConfig().options().copyDefaults(true);
 		
 		this.database = new Database(this, this.getDataFolder() + File.separator + "shops.db");
 		
 		getLogger().info("Loading tools");
-		tools.add(Material.BOW);
-		tools.add(Material.SHEARS);
-		tools.add(Material.FISHING_ROD);
-		tools.add(Material.FLINT_AND_STEEL);
-
-		tools.add(Material.CHAINMAIL_BOOTS);
-		tools.add(Material.CHAINMAIL_CHESTPLATE);
-		tools.add(Material.CHAINMAIL_HELMET);
-		tools.add(Material.CHAINMAIL_LEGGINGS);
-		
-		tools.add(Material.WOOD_AXE);
-		tools.add(Material.WOOD_HOE);
-		tools.add(Material.WOOD_PICKAXE);
-		tools.add(Material.WOOD_SPADE);
-		tools.add(Material.WOOD_SWORD);
-		
-		tools.add(Material.LEATHER_BOOTS);
-		tools.add(Material.LEATHER_CHESTPLATE);
-		tools.add(Material.LEATHER_HELMET);
-		tools.add(Material.LEATHER_LEGGINGS);
-		
-		tools.add(Material.DIAMOND_AXE); 
-		tools.add(Material.DIAMOND_HOE);
-		tools.add(Material.DIAMOND_PICKAXE);
-		tools.add(Material.DIAMOND_SPADE);
-		tools.add(Material.DIAMOND_SWORD);
-
-		tools.add(Material.DIAMOND_BOOTS);
-		tools.add(Material.DIAMOND_CHESTPLATE);
-		tools.add(Material.DIAMOND_HELMET);
-		tools.add(Material.DIAMOND_LEGGINGS);
-		tools.add(Material.STONE_AXE); 
-		tools.add(Material.STONE_HOE);
-		tools.add(Material.STONE_PICKAXE);
-		tools.add(Material.STONE_SPADE);
-		tools.add(Material.STONE_SWORD);
-
-		tools.add(Material.GOLD_AXE); 
-		tools.add(Material.GOLD_HOE);
-		tools.add(Material.GOLD_PICKAXE);
-		tools.add(Material.GOLD_SPADE);
-		tools.add(Material.GOLD_SWORD);
-
-		tools.add(Material.GOLD_BOOTS);
-		tools.add(Material.GOLD_CHESTPLATE);
-		tools.add(Material.GOLD_HELMET);
-		tools.add(Material.GOLD_LEGGINGS);
-		tools.add(Material.IRON_AXE); 
-		tools.add(Material.IRON_HOE);
-		tools.add(Material.IRON_PICKAXE);
-		tools.add(Material.IRON_SPADE);
-		tools.add(Material.IRON_SWORD);
-
-		tools.add(Material.IRON_BOOTS);
-		tools.add(Material.IRON_CHESTPLATE);
-		tools.add(Material.IRON_HELMET);
-		tools.add(Material.IRON_LEGGINGS);
+		loadTools();
 		
 		getLogger().info("Starting item scheduler");
 		
@@ -166,17 +113,17 @@ public class QuickShop extends JavaPlugin{
 					while(plugin.queriesInUse){
 						//Nothing
 					}
-					plugin.getLogger().info("Locking queries buffer");
-					long t1 = System.nanoTime();
+					//plugin.getLogger().info("Locking queries buffer");
+					//long t1 = System.nanoTime();
 					plugin.queriesInUse = true;
 					for(String q : plugin.queries){
 						st.addBatch(q);
 					}
 					plugin.queries.clear();
 					plugin.queriesInUse = false;
-					long t2 = System.nanoTime();
-					plugin.getLogger().info("Unlocked queries buffer");
-					plugin.getLogger().info(t2 - t1 + " nanoseconds locked.");
+					//long t2 = System.nanoTime();
+					//plugin.getLogger().info("Unlocked queries buffer");
+					//plugin.getLogger().info(t2 - t1 + " nanoseconds locked.");
 					st.executeBatch();
 					st.close();
 					
@@ -234,11 +181,18 @@ public class QuickShop extends JavaPlugin{
 	public HashMap<Location, Shop> getShops(){
 		return this.shops;
 	}
+	/**
+	 * @return Returns the HashMap<Player name, shopInfo>. Info contains what their last question etc was.
+	 */
 	public HashMap<String, Info> getActions(){
 		return this.actions;
 	}
 	
-	 private boolean setupEconomy(){
+	/**
+	 * Sets up the vault economy for hooking into & purchases.
+	 * @return True is success
+	 */
+	private boolean setupEconomy(){
 	        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
 	        if (economyProvider != null) {
 	            economy = economyProvider.getProvider();
@@ -246,14 +200,25 @@ public class QuickShop extends JavaPlugin{
 
 	        return (economy != null);
     }
-	 
+	
+	 /**
+	  * Fetches a shop in a particular location, or null.
+	  * @param loc The location to check.
+	  * @return The shop at the location.
+	  */
 	public Shop getShop(Location loc){
 		return this.shops.get(loc);
 	}
-	 
+	/**
+	 * @param mat The material to check
+	 * @return Returns true if the item is a tool (Has durability) or false if it doesn't.
+	 */
 	public boolean isTool(Material mat){
 		return this.tools.contains(mat);
 	}
+	/**
+	 * @return Returns the database handler for queries etc.
+	 */
 	public Database getDB(){
 		return this.database;
 	}
@@ -274,6 +239,10 @@ public class QuickShop extends JavaPlugin{
 	public boolean isProtectedItem(Item item){
 		return this.spawnedItems.containsValue(item);
 	}
+	
+	/**
+	 * @return Returns a hashmap<shop, item> of the protected items.
+	 */
 	public HashMap<Shop, Item> getProtectedItems(){
 		return this.spawnedItems;
 	}
@@ -310,5 +279,65 @@ public class QuickShop extends JavaPlugin{
 			itemString += ench.getKey().getName() + ":" + ench.getValue() + ":";
 		}
 		return itemString;
+	}
+	
+	public void loadTools(){
+		tools.add(Material.BOW);
+		tools.add(Material.SHEARS);
+		tools.add(Material.FISHING_ROD);
+		tools.add(Material.FLINT_AND_STEEL);
+
+		tools.add(Material.CHAINMAIL_BOOTS);
+		tools.add(Material.CHAINMAIL_CHESTPLATE);
+		tools.add(Material.CHAINMAIL_HELMET);
+		tools.add(Material.CHAINMAIL_LEGGINGS);
+		
+		tools.add(Material.WOOD_AXE);
+		tools.add(Material.WOOD_HOE);
+		tools.add(Material.WOOD_PICKAXE);
+		tools.add(Material.WOOD_SPADE);
+		tools.add(Material.WOOD_SWORD);
+		
+		tools.add(Material.LEATHER_BOOTS);
+		tools.add(Material.LEATHER_CHESTPLATE);
+		tools.add(Material.LEATHER_HELMET);
+		tools.add(Material.LEATHER_LEGGINGS);
+		
+		tools.add(Material.DIAMOND_AXE); 
+		tools.add(Material.DIAMOND_HOE);
+		tools.add(Material.DIAMOND_PICKAXE);
+		tools.add(Material.DIAMOND_SPADE);
+		tools.add(Material.DIAMOND_SWORD);
+
+		tools.add(Material.DIAMOND_BOOTS);
+		tools.add(Material.DIAMOND_CHESTPLATE);
+		tools.add(Material.DIAMOND_HELMET);
+		tools.add(Material.DIAMOND_LEGGINGS);
+		tools.add(Material.STONE_AXE); 
+		tools.add(Material.STONE_HOE);
+		tools.add(Material.STONE_PICKAXE);
+		tools.add(Material.STONE_SPADE);
+		tools.add(Material.STONE_SWORD);
+
+		tools.add(Material.GOLD_AXE); 
+		tools.add(Material.GOLD_HOE);
+		tools.add(Material.GOLD_PICKAXE);
+		tools.add(Material.GOLD_SPADE);
+		tools.add(Material.GOLD_SWORD);
+
+		tools.add(Material.GOLD_BOOTS);
+		tools.add(Material.GOLD_CHESTPLATE);
+		tools.add(Material.GOLD_HELMET);
+		tools.add(Material.GOLD_LEGGINGS);
+		tools.add(Material.IRON_AXE); 
+		tools.add(Material.IRON_HOE);
+		tools.add(Material.IRON_PICKAXE);
+		tools.add(Material.IRON_SPADE);
+		tools.add(Material.IRON_SWORD);
+
+		tools.add(Material.IRON_BOOTS);
+		tools.add(Material.IRON_CHESTPLATE);
+		tools.add(Material.IRON_HELMET);
+		tools.add(Material.IRON_LEGGINGS);
 	}
 }

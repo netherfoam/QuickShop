@@ -1,0 +1,8 @@
+#Tax amount (decimal)
+tax: 0.05
+tax-account: tax
+
+shop:
+    #Cost to make a stall
+    cost: 10
+    refund: false
