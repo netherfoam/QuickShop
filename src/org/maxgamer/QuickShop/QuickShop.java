@@ -89,7 +89,7 @@ public class QuickShop extends JavaPlugin{
 			@Override
 			public void run() {
 				for(Entry<Shop, Item> entry : spawnedItems.entrySet()){
-					if(entry.getValue().getTicksLived() >= 5000){
+					if(entry.getKey().getLocation().getChunk().isLoaded() && entry.getValue().getTicksLived() >= 5000){
 						entry.getKey().removeDupeItem();
 						entry.getKey().deleteDisplayItem();
 						entry.getKey().spawnDisplayItem();
@@ -119,23 +119,19 @@ public class QuickShop extends JavaPlugin{
 				Database db = plugin.getDB();
 				
 				Connection con = db.getConnection();
-				//plugin.getLogger().info("Updating DB");
 				try {
 					Statement st = con.createStatement();
 					while(plugin.queriesInUse){
 						//Nothing
 					}
-					//plugin.getLogger().info("Locking queries buffer");
-					//long t1 = System.nanoTime();
+					
 					plugin.queriesInUse = true;
 					for(String q : plugin.queries){
 						st.addBatch(q);
 					}
 					plugin.queries.clear();
 					plugin.queriesInUse = false;
-					//long t2 = System.nanoTime();
-					//plugin.getLogger().info("Unlocked queries buffer");
-					//plugin.getLogger().info(t2 - t1 + " nanoseconds locked.");
+					
 					st.executeBatch();
 					st.close();
 					
