@@ -10,6 +10,7 @@ import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -35,16 +36,16 @@ public class ClickListener implements Listener{
 	}
 	@EventHandler
 	public void onClick(PlayerInteractEvent e){
-		if(e.isCancelled() || e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_AIR || e.getClickedBlock().getType() != Material.CHEST) return;
+		if(e.isCancelled() || e.getAction() != Action.LEFT_CLICK_BLOCK || e.getClickedBlock().getType() != Material.CHEST) return;
 		
 		Block b = e.getClickedBlock();
 		Player p = e.getPlayer();
 		ItemStack item = e.getItem();
 		
-		/* ToDo: Move action check to first line of event
+		/* 
 		 * Purchase Handling
 		 */
-		if(e.getAction() == Action.LEFT_CLICK_BLOCK && plugin.getShops().containsKey(e.getClickedBlock().getLocation())){
+		if(plugin.getShops().containsKey(e.getClickedBlock().getLocation()) && p.hasPermission("quickshop.buy")){
 			Shop shop = plugin.getShop(b.getLocation());
 			
 			//Text menu
@@ -62,7 +63,13 @@ public class ClickListener implements Listener{
 		/*
 		 * Creation handling
 		 */
-		else if(e.getAction() == Action.LEFT_CLICK_BLOCK && item != null && item.getType() != Material.AIR){
+		else if(item != null && item.getType() != Material.AIR && p.hasPermission("quickshop.create")){
+			if(plugin.getChestNextTo(b) != null){
+				p.sendMessage(ChatColor.RED + "Double chest shops are disabled.");
+				e.setCancelled(true);
+				return;
+			}
+			
 			//Send creation menu.
 			Info info = new Info(b.getLocation(), ShopAction.CREATE, e.getItem());
 			plugin.getActions().put(p.getName(), info);
@@ -78,10 +85,13 @@ public class ClickListener implements Listener{
 		
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Shop Information:");
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Item: " + ChatColor.YELLOW + items.getType());
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Item: " + ChatColor.YELLOW + plugin.getDataName(items.getType(), items.getDurability()));
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Stock: " + ChatColor.YELLOW + stock);
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Price per "+ChatColor.YELLOW + items.getType() + ChatColor.GREEN + " - " + ChatColor.YELLOW + shop.getPrice() + ChatColor.GREEN + " credits");
 		
-		if(plugin.isTool(items.getType())) p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + plugin.getToolPercentage(items) + "% Remaining"); 
+		if(plugin.isTool(items.getType())){
+			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + plugin.getToolPercentage(items) + "% Remaining"); 
+		}
 		
 		Map<Enchantment, Integer> enchs = items.getEnchantments();
 		if(enchs != null && enchs.size() > 0){
@@ -91,5 +101,17 @@ public class ClickListener implements Listener{
 			}
 		}
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
+	}
+	//Untested
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onChestUse(PlayerInteractEvent e){
+		if(e.isCancelled() || e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getClickedBlock().getType() != Material.CHEST) return;
+		if(plugin.getConfig().getBoolean("lock-shops")){
+			Shop shop = plugin.getShop(e.getClickedBlock().getLocation());
+			if(shop != null && !shop.getOwner().equalsIgnoreCase(e.getPlayer().getName())){
+				e.setCancelled(true);
+				return;
+			}
+		}
 	}
 }

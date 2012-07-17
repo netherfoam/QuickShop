@@ -1,6 +1,7 @@
 #Tax amount (decimal)
 tax: 0.05
 tax-account: tax
+lock-shops: false
 
 shop:
     #Cost to make a stall

@@ -125,10 +125,19 @@ public class Shop{
 	public void removeDupeItem(Block b){
 		Chunk c = b.getChunk();
 		for (Entity e : c.getEntities()) {
-			if (e.getLocation().getBlock().equals(b) && e instanceof Item && !e.equals(item)) {
+			if (e.getLocation().getBlock().equals(b) && e instanceof Item && ((Item) e) != this.displayItem) {
 				e.remove();
 			}
 		}
+	}
+	
+	public void respawnDisplayItem(){
+		spawnDisplayItem();
+		removeDupeItem();
+	}
+	
+	public void removeDupeItem(){
+		removeDupeItem(this.getLocation().getBlock().getRelative(0, 1, 0));
 	}
 	
 	

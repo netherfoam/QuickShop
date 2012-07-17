@@ -20,6 +20,7 @@ public class Database{
 	}
 	
 	public Connection getConnection(){
+		//Handles first creation
 		if(!this.getFile().exists()){
 			plugin.getLogger().info("Database does not exist");
 			try {
@@ -54,11 +55,16 @@ public class Database{
 		}
 		return null;
 	}
-	
+	/**
+	 * @return Returns the database file
+	 */
 	public File getFile(){
 		return this.file;
 	}
 	
+	/**
+	 * @return Returns true if the shops table exists 
+	 */
 	public boolean hasTable(){
 		try {
 			PreparedStatement ps = this.getConnection().prepareStatement("SELECT name FROM sqlite_master WHERE type='table' AND name='shops';");
