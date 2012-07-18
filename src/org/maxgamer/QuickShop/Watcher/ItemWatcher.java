@@ -18,7 +18,7 @@ public class ItemWatcher implements Runnable{
 		QuickShop plugin = (QuickShop) Bukkit.getServer().getPluginManager().getPlugin("QuickShop");
 		for(Entry<Location, Shop> entry : plugin.getShops().entrySet()){
 			DisplayItem disItem = entry.getValue().getDisplayItem();
-			if(entry.getKey().getChunk().isLoaded() && disItem.getItem().getTicksLived() >= 5000 || disItem.getItem().isDead()){
+			if(entry.getKey().getChunk().isLoaded() && disItem.getItem().getTicksLived() >= 5000 || disItem.getItem().isDead() || disItem.getDisplayLocation().distanceSquared(disItem.getItem().getLocation()) > 1){
 				
 				disItem.removeDupe();
 				disItem.respawn();

@@ -25,7 +25,7 @@ public class BlockListener implements Listener{
 	/**
 	 * Removes chests when they're destroyed.
 	 */
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBreak(final BlockBreakEvent e){
 		if(e.isCancelled() || e.getBlock().getType() != Material.CHEST) return;
 		Shop shop = plugin.getShops().get(e.getBlock().getLocation());
@@ -82,14 +82,31 @@ public class BlockListener implements Listener{
 			e.getPlayer().sendMessage(ChatColor.RED + "Double Chest shops are disabled.");
 		}
 	}
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onExplode(EntityExplodeEvent e){
+		if(e.isCancelled()) return;
 		for(int i = 0; i < e.blockList().size(); i++){
 			Block b = e.blockList().get(i);
 			if(plugin.getShops().containsKey(b.getLocation())){
-				e.blockList().remove(b);
-				DisplayItem disItem = plugin.getShop(b.getLocation()).getDisplayItem();
-				disItem.remove();
+				if(plugin.getConfig().getBoolean("lock-shops")){
+					e.blockList().remove(b);
+					DisplayItem disItem = plugin.getShop(b.getLocation()).getDisplayItem();
+					disItem.remove();
+				}
+				else{
+					Shop shop = plugin.getShop(b.getLocation());
+					shop.getDisplayItem().remove();
+					int x = shop.getLocation().getBlockX();
+					int y = shop.getLocation().getBlockY();
+					int z = shop.getLocation().getBlockZ();
+					String world = shop.getLocation().getWorld().getName();
+					
+					if(plugin.getConfig().getBoolean("shop.refund")){
+						plugin.getEcon().depositPlayer(shop.getOwner(), plugin.getConfig().getDouble("shop.cost"));
+					}
+					
+					plugin.queries.add("DELETE FROM shops WHERE x = '"+x+"' AND y = '"+y+"' AND z = '"+z+"' AND world = '"+world+"'");
+				}
 			}
 		}
 	}
