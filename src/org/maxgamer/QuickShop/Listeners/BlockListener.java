@@ -9,7 +9,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.maxgamer.QuickShop.QuickShop;
+import org.maxgamer.QuickShop.Shop.DisplayItem;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.ShopAction;
@@ -78,6 +80,17 @@ public class BlockListener implements Listener{
 		if(plugin.getChestNextTo(b) != null && plugin.getShop(plugin.getChestNextTo(b).getLocation()) != null){
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(ChatColor.RED + "Double Chest shops are disabled.");
+		}
+	}
+	@EventHandler
+	public void onExplode(EntityExplodeEvent e){
+		for(int i = 0; i < e.blockList().size(); i++){
+			Block b = e.blockList().get(i);
+			if(plugin.getShops().containsKey(b.getLocation())){
+				e.blockList().remove(b);
+				DisplayItem disItem = plugin.getShop(b.getLocation()).getDisplayItem();
+				disItem.remove();
+			}
 		}
 	}
 }

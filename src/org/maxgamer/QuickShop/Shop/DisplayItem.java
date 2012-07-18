@@ -67,6 +67,7 @@ public class DisplayItem{
 					&& (eLoc.equals(displayLoc) || eLoc.equals(shop.getLocation())) 
 					&& e instanceof Item) {
 				ItemStack near = ((Item) e).getItemStack();
+				
 				if(near.getType() == iStack.getType() && 
 						(this.item == null || near.getAmount() == iStack.getAmount()) &&
 						near.getDurability() == iStack.getDurability()){

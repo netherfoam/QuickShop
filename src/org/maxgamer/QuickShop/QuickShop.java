@@ -73,7 +73,8 @@ public class QuickShop extends JavaPlugin{
 		File configFile = new File(this.getDataFolder(), "config.yml");
 		this.getConfig().options().copyDefaults(true);
 		if(!configFile.exists()){
-			this.saveConfig();
+			//Copy config with comments
+			this.saveDefaultConfig();
 		}
 		
 		/* Start database - Also creates DB file. */
@@ -132,7 +133,7 @@ public class QuickShop extends JavaPlugin{
 		/**
 		 * Display item handler thread
 		 */
-		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new ItemWatcher(), 300, 300);
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new ItemWatcher(), 150, 150);
 		
 	}
 	public void onDisable(){
@@ -144,6 +145,10 @@ public class QuickShop extends JavaPlugin{
 		
 		/* Empty the buffer */
 		new BufferWatcher().run();
+		
+		this.actions.clear();
+		this.shops.clear();
+		this.tools.clear();
 	}
 	/**
 	 * Returns the vault economy
