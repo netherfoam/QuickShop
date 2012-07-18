@@ -152,8 +152,23 @@ public class ChatListener implements Listener{
 								if(shop.getRemainingStock() == amount) owner.sendMessage(ChatColor.DARK_PURPLE + "Your shop at " + shop.getLocation().getBlockX() + ", " + shop.getLocation().getBlockY() + ", " + shop.getLocation().getBlockZ() + " has run out of " + shop.getItem().getType().toString());
 							}
 							
-							//Give player items
-							HashMap<Integer, ItemStack> floor = p.getInventory().addItem(transfer);
+							//Items to drop on floor
+							HashMap<Integer, ItemStack> floor = new HashMap<Integer, ItemStack>(30);
+							int amt = amount;
+							while(amt > 0){
+								int temp = Math.min(amt, transfer.getMaxStackSize());
+								if(temp == -1){
+									//Uh oh, don't know stacksize.
+									transfer.setAmount(amt);
+									floor.putAll(p.getInventory().addItem(transfer));
+									break;
+								}
+								transfer.setAmount(temp);
+								floor.putAll(p.getInventory().addItem(transfer));
+								amt = amt - temp;
+							}
+							//Give the player items
+							
 							//Drop the remainder on the floor.
 							for(int i = 0; i < floor.size(); i++){
 								p.getWorld().dropItem(p.getLocation(), floor.get(i));								
