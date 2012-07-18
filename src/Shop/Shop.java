@@ -1,4 +1,4 @@
-package org.maxgamer.QuickShop;
+package Shop;
 
 import java.util.Map;
 
@@ -9,6 +9,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.maxgamer.QuickShop.QuickShop;
 
 public class Shop{
 	private Location loc;

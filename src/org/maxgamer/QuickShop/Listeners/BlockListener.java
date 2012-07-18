@@ -9,10 +9,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.maxgamer.QuickShop.Info;
 import org.maxgamer.QuickShop.QuickShop;
-import org.maxgamer.QuickShop.Shop;
-import org.maxgamer.QuickShop.ShopAction;
+
+import Shop.Info;
+import Shop.Shop;
+import Shop.ShopAction;
 
 public class BlockListener implements Listener{
 	QuickShop plugin;

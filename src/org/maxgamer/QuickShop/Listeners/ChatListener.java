@@ -12,10 +12,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
-import org.maxgamer.QuickShop.Info;
 import org.maxgamer.QuickShop.QuickShop;
-import org.maxgamer.QuickShop.Shop;
-import org.maxgamer.QuickShop.ShopAction;
+
+import Shop.Info;
+import Shop.Shop;
+import Shop.ShopAction;
 /**
  * 
  * @author Netherfoam

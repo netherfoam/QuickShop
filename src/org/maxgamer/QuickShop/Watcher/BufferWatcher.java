@@ -1,10 +1,11 @@
-package org.maxgamer.QuickShop;
+package org.maxgamer.QuickShop.Watcher;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.bukkit.Bukkit;
+import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Database.Database;
 
 public class BufferWatcher implements Runnable{

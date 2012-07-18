@@ -8,7 +8,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.maxgamer.QuickShop.QuickShop;
-import org.maxgamer.QuickShop.Shop;
+
+import Shop.Shop;
 
 public class ChunkListener implements Listener{
 	QuickShop plugin;

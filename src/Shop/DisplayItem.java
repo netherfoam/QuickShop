@@ -1,4 +1,4 @@
-package org.maxgamer.QuickShop;
+package Shop;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -6,6 +6,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.maxgamer.QuickShop.QuickShop;
 
 public class DisplayItem{
 	QuickShop plugin;

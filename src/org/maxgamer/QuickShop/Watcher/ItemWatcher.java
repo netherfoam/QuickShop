@@ -1,9 +1,13 @@
-package org.maxgamer.QuickShop;
+package org.maxgamer.QuickShop.Watcher;
 
 import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.maxgamer.QuickShop.QuickShop;
+
+import Shop.DisplayItem;
+import Shop.Shop;
 
 public class ItemWatcher implements Runnable{
 	public void run(){

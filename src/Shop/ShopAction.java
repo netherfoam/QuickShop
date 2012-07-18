@@ -1,4 +1,4 @@
-package org.maxgamer.QuickShop;
+package Shop;
 
 public enum ShopAction{
 	BUY(),
