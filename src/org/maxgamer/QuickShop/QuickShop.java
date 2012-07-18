@@ -111,12 +111,6 @@ public class QuickShop extends JavaPlugin{
 				double price = rs.getDouble("price");
 				Location loc = new Location(world, x, y, z);
 				
-				if(loc.getBlock().getType() != Material.CHEST){
-					getLogger().info("Shop is not a chest at: " + x + ", " + y + ", " + z + ".  Removing from DB.");
-					getDB().writeToBuffer("DELETE FROM shops WHERE x = "+x+" AND y = "+y+" AND z = "+z+"");
-					continue;
-				}
-				
 				Shop shop = new Shop(loc, price, item, owner);
 				
 				this.getShops().put(loc, shop);
