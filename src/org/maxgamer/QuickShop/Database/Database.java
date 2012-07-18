@@ -128,7 +128,7 @@ public class Database{
 				"\"y\"  INTEGER(32) NOT NULL, " +
 				"\"z\"  INTEGER(32) NOT NULL, " +
 				"\"world\"  TEXT(30) NOT NULL, " +
-				"PRIMARY KEY ('x', 'y','z') " +
+				"PRIMARY KEY ('x', 'y','z','world') " +
 				");";
 		st.execute(createTable);
 	}
