@@ -31,18 +31,4 @@ public class ChunkListener implements Listener{
 			}
 		}
 	}
-	/*
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onChunkUnload(ChunkUnloadEvent e){
-		for(Entry<Location, Shop> map:plugin.getShops().entrySet()){
-			Location loc = map.getKey();
-			Shop shop = map.getValue();
-			
-			if(loc.getChunk().equals(e.getChunk())){
-				//This is a shop chunk.
-				shop.removeDupeItem();
-				shop.deleteDisplayItem();
-			}
-		}
-	}*/
 }

@@ -8,6 +8,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.maxgamer.QuickShop.QuickShop;
 
+/**
+ * @author Netherfoam
+ * A display item, that spawns a block above the chest and cannot be interacted with.
+ */
 public class DisplayItem{
 	QuickShop plugin;
 	Shop shop;
@@ -15,7 +19,13 @@ public class DisplayItem{
 	Item item;
 	Location displayLoc;
 	
-	DisplayItem(QuickShop plugin, Shop shop, ItemStack iStack){
+	/**
+	 * Creates a new display item.
+	 * @param plugin The plugin creating the display item.
+	 * @param shop The shop (See Shop)
+	 * @param iStack The item stack to clone properties of the display item from.
+	 */
+	public DisplayItem(QuickShop plugin, Shop shop, ItemStack iStack){
 		this.plugin = plugin;
 		this.shop = shop;
 		this.iStack = iStack.clone();
@@ -57,7 +67,9 @@ public class DisplayItem{
 					&& (eLoc.equals(displayLoc) || eLoc.equals(shop.getLocation())) 
 					&& e instanceof Item) {
 				ItemStack near = ((Item) e).getItemStack();
-				if(near.getType() == iStack.getType() && near.getAmount() == 1 && near.getDurability() == iStack.getDurability()){
+				if(near.getType() == iStack.getType() && 
+						(this.item == null || near.getAmount() == iStack.getAmount()) &&
+						near.getDurability() == iStack.getDurability()){
 					e.remove();
 				}
 			}

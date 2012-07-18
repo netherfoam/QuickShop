@@ -9,6 +9,10 @@ import org.maxgamer.QuickShop.QuickShop;
 import Shop.DisplayItem;
 import Shop.Shop;
 
+/**
+ * @author Netherfoam
+ * Maintains the display items, restoring them when needed.
+ */
 public class ItemWatcher implements Runnable{
 	public void run(){
 		QuickShop plugin = (QuickShop) Bukkit.getServer().getPluginManager().getPlugin("QuickShop");

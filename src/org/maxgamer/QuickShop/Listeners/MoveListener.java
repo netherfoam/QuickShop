@@ -18,6 +18,9 @@ public class MoveListener implements Listener{
 		this.plugin = plugin;
 	}
 	@EventHandler(priority = EventPriority.HIGH)
+	/**
+	 * Waits for a player to move too far from a shop, then cancels the menu.
+	 */
 	public void onMove(PlayerMoveEvent e){
 		if(e.isCancelled()) return;
 		Info info = plugin.getActions().get(e.getPlayer().getName());

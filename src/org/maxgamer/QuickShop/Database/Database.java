@@ -15,11 +15,19 @@ import org.maxgamer.QuickShop.QuickShop;
 public class Database{
 	QuickShop plugin;
 	File file;
+	/**
+	 * Creates a new database handler.
+	 * @param plugin The plugin creating the database.
+	 * @param file The name of the DB file, including path.
+	 */
 	public Database(QuickShop plugin, String file){
 		this.plugin = plugin;
 		this.file = new File(file);
 	}
-	
+	/**
+	 * Returns a new connection to execute SQL statements on.
+	 * @return A new connection to execute SQL statements on.
+	 */
 	public Connection getConnection(){
 		//Handles first creation
 		if(!this.getFile().exists()){
@@ -82,6 +90,10 @@ public class Database{
 		}
 	}
 	
+	/**
+	 * Writes a query to the buffer safely.
+	 * @param s The String to write to the buffer (In SQL syntax... E.g. UPDATE table SET x = 'y', owner = 'bob'
+	 */
 	public void writeToBuffer(final String s){
 		Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable(){
 			
@@ -101,6 +113,10 @@ public class Database{
 		}, 0);
 	}
 	
+	/**
+	 * Creates the database table 'shops'.
+	 * @throws SQLException If the connection is invalid.
+	 */
 	public void createTable() throws SQLException{
 		Statement st = getConnection().createStatement();
 		String createTable = 

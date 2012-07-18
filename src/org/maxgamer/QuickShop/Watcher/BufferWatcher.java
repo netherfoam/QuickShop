@@ -8,6 +8,10 @@ import org.bukkit.Bukkit;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Database.Database;
 
+/**
+ * @author Netherfoam
+ * Maintains the buffer, and safely puts it in the database when possible.
+ */
 public class BufferWatcher implements Runnable{
 	public void run(){
 		QuickShop plugin = (QuickShop) Bukkit.getPluginManager().getPlugin("QuickShop");

@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,7 +31,6 @@ import org.maxgamer.QuickShop.Listeners.ChatListener;
 import org.maxgamer.QuickShop.Listeners.ChunkListener;
 import org.maxgamer.QuickShop.Listeners.ClickListener;
 import org.maxgamer.QuickShop.Listeners.MoveListener;
-//import org.maxgamer.QuickShop.Listeners.PickupListener;
 import org.maxgamer.QuickShop.Watcher.BufferWatcher;
 import org.maxgamer.QuickShop.Watcher.ItemWatcher;
 
@@ -56,7 +54,6 @@ public class QuickShop extends JavaPlugin{
 	private BlockListener blockListener = new BlockListener(this);
 	private MoveListener moveListener = new MoveListener(this);
 	private ChunkListener chunkListener = new ChunkListener(this);
-	//private PickupListener pickupListener = new PickupListener(this);
 	
 	public void onEnable(){
 		getLogger().info("Hooking Vault");
@@ -67,18 +64,19 @@ public class QuickShop extends JavaPlugin{
 		Bukkit.getServer().getPluginManager().registerEvents(blockListener, this);
 		Bukkit.getServer().getPluginManager().registerEvents(moveListener, this);
 		Bukkit.getServer().getPluginManager().registerEvents(chunkListener, this);
-		//Bukkit.getServer().getPluginManager().registerEvents(pickupListener, this);
 		
+		/* Create plugin folder */
 		if(!this.getDataFolder().exists()){
 			this.getDataFolder().mkdir();
 		}
+		/* Create config file */
 		File configFile = new File(this.getDataFolder(), "config.yml");
 		this.getConfig().options().copyDefaults(true);
 		if(!configFile.exists()){
 			this.saveConfig();
 		}
 		
-		
+		/* Start database - Also creates DB file. */
 		this.database = new Database(this, this.getDataFolder() + File.separator + "shops.db");
 		
 		getLogger().info("Loading tools");
@@ -86,9 +84,7 @@ public class QuickShop extends JavaPlugin{
 		
 		getLogger().info("Starting item scheduler");
 		
-		getDB().getConnection();
-		
-		
+		/* Creates DB table 'shops' */
 		if(!getDB().hasTable()){
 			try {
 				getDB().createTable();
@@ -97,7 +93,7 @@ public class QuickShop extends JavaPlugin{
 				getLogger().severe("Could not create database table");
 			}
 		}
-		
+		/* Load shops from database to memory */
 		Connection con = database.getConnection();
 		try {
 			PreparedStatement ps = con.prepareStatement("SELECT * FROM shops");
@@ -140,40 +136,26 @@ public class QuickShop extends JavaPlugin{
 		
 	}
 	public void onDisable(){
+		/* Remove all display items, and any dupes we can find */
 		for(Shop shop : shops.values()){
 			shop.getDisplayItem().removeDupe();
 			shop.getDisplayItem().remove();
 		}
 		
+		/* Empty the buffer */
 		new BufferWatcher().run();
-		
-		Connection con = this.getDB().getConnection();
-		//plugin.getLogger().info("Updating DB");
-		try {
-			Statement st = con.createStatement();
-			while(this.queriesInUse){
-				//Nothing
-			}
-			//this.getLogger().info("Locking queries buffer");
-			//long t1 = System.nanoTime();
-			this.queriesInUse = true;
-			for(String q : this.queries){
-				st.addBatch(q);
-			}
-			this.queries.clear();
-			this.queriesInUse = false;
-			st.executeBatch();
-			st.close();
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
-			this.getLogger().severe("Could not execute query");
-		}
-		
 	}
+	/**
+	 * Returns the vault economy
+	 * @return The vault economy
+	 */
 	public Economy getEcon(){
 		return economy;
 	}
+	/**
+	 * Returns a hashmap of (key: location) and (value: shop)'s.
+	 * @return A hashmap of (key: location) and (value: shop)'s.
+	 */
 	public HashMap<Location, Shop> getShops(){
 		return this.shops;
 	}
@@ -420,7 +402,7 @@ public class QuickShop extends JavaPlugin{
 			case 3: return "CHISELED_STONE_BRICKS";
 			}
 		case 373:
-			//Always one.
+			//Special case
 			if(damage == 64) return "MUNDANE_POTION";
 			Potion pot = null;
 			try{
@@ -436,7 +418,6 @@ public class QuickShop extends JavaPlugin{
 			if(pot.hasExtendedDuration()) prefix += "EXTENDED_";
 			if(pot.isSplash()) prefix += "SPLASH_";
 			
-			//Type
 			switch((int) pot.getNameId()){
 			case 0: return prefix + "WATER_BOTTLE" + suffix;
 			case 1: return prefix + "POTION_OF_REGENERATION" + suffix;
@@ -549,24 +530,4 @@ public class QuickShop extends JavaPlugin{
 		if(damage == 0 || isTool(mat)) return mat.toString();
 		else return mat.toString()+ ":" + damage;
 	}
-	
-	public void addToBuffer(final String s){
-		Bukkit.getScheduler().scheduleAsyncDelayedTask(this, new Runnable(){
-
-			@Override
-			public void run() {
-				QuickShop plugin = (QuickShop) Bukkit.getPluginManager().getPlugin("QuickShop");
-				
-				while(plugin.queriesInUse){
-					//Wait
-				}
-				
-				plugin.queriesInUse = true;
-				plugin.queries.add(s);
-				plugin.queriesInUse = false;
-			}
-			
-		}, 0);
-	}
-
 }

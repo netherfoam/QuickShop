@@ -121,6 +121,10 @@ public class Shop{
 		}
 	}
 	
+	/**
+	 * Returns the display item associated with this shop.
+	 * @return The display item associated with this shop.
+	 */
 	public DisplayItem getDisplayItem(){
 		return this.displayItem;
 	}

@@ -90,7 +90,7 @@ public class ChatListener implements Listener{
 					int z = shop.getLocation().getBlockZ();
 					String world = shop.getLocation().getWorld().getName();
 					String itemString = plugin.makeString(shop.getItem());
-					plugin.addToBuffer("INSERT INTO shops VALUES ('"+e.getPlayer().getName()+"', '"+price+"', '"+itemString+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"')");
+					plugin.getDB().writeToBuffer("INSERT INTO shops VALUES ('"+e.getPlayer().getName()+"', '"+price+"', '"+itemString+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"')");
 					
 					e.setCancelled(true); //Don't send to chat.
 					plugin.getActions().remove(p.getName());

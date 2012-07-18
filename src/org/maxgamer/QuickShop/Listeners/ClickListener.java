@@ -36,6 +36,11 @@ public class ClickListener implements Listener{
 		this.plugin = plugin;
 	}
 	@EventHandler
+	/**
+	 * Handles players left clicking a chest.
+	 * Left click a NORMAL chest with item	: Send creation menu
+	 * Left click a SHOP   chest			: Send purchase menu
+	 */
 	public void onClick(PlayerInteractEvent e){
 		if(e.isCancelled() || e.getAction() != Action.LEFT_CLICK_BLOCK || e.getClickedBlock().getType() != Material.CHEST) return;
 		
@@ -103,13 +108,17 @@ public class ClickListener implements Listener{
 		}
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 	}
-	//Untested
+
 	@EventHandler(priority = EventPriority.HIGH)
+	/**
+	 * Locks chests if enabled in config.
+	 */
 	public void onChestUse(PlayerInteractEvent e){
 		if(e.isCancelled() || e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getClickedBlock().getType() != Material.CHEST) return;
 		if(plugin.getConfig().getBoolean("lock-shops")){
 			Shop shop = plugin.getShop(e.getClickedBlock().getLocation());
 			if(shop != null && !shop.getOwner().equalsIgnoreCase(e.getPlayer().getName())){
+				e.getPlayer().sendMessage(ChatColor.RED + "[QuickShop] That shop is locked.  Left click if you wish to buy!");
 				e.setCancelled(true);
 				return;
 			}
