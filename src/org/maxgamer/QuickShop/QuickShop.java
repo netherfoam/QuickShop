@@ -145,6 +145,8 @@ public class QuickShop extends JavaPlugin{
 			shop.getDisplayItem().remove();
 		}
 		
+		new BufferWatcher().run();
+		
 		Connection con = this.getDB().getConnection();
 		//plugin.getLogger().info("Updating DB");
 		try {

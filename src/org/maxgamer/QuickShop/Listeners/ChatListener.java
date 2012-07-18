@@ -91,29 +91,6 @@ public class ChatListener implements Listener{
 					String world = shop.getLocation().getWorld().getName();
 					String itemString = plugin.makeString(shop.getItem());
 					plugin.addToBuffer("INSERT INTO shops VALUES ('"+e.getPlayer().getName()+"', '"+price+"', '"+itemString+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"')");
-					/*
-					Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable(){
-
-						@Override
-						public void run() {
-							int x = shop.getLocation().getBlockX();
-							int y = shop.getLocation().getBlockY();
-							int z = shop.getLocation().getBlockZ();
-							String world = shop.getLocation().getWorld().getName();
-							double price = shop.getPrice();
-							
-							String itemString = plugin.makeString(shop.getItem());
-							
-							while(plugin.queriesInUse){
-								//Wait
-							}
-							
-							plugin.queriesInUse = true;
-							plugin.queries.add("INSERT INTO shops VALUES ('"+e.getPlayer().getName()+"', '"+price+"', '"+itemString+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"')");
-							plugin.queriesInUse = false;
-						}
-						
-					}, 0);*/
 					
 					e.setCancelled(true); //Don't send to chat.
 					plugin.getActions().remove(p.getName());
