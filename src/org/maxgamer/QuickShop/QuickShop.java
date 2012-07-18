@@ -525,6 +525,8 @@ public class QuickShop extends JavaPlugin{
 			case 200: return "ENDER_CRYSTAL_EGG";
 			case 14: return "PRIMED_TNT_EGG";
 			}
+		case 76:
+			return "REDSTONE_TORCH";
 		}
 		if(damage == 0 || isTool(mat)) return mat.toString();
 		else return mat.toString()+ ":" + damage;
