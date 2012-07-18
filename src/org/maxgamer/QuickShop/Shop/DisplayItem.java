@@ -1,4 +1,4 @@
-package Shop;
+package org.maxgamer.QuickShop.Shop;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;

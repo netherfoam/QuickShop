@@ -8,9 +8,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.maxgamer.QuickShop.QuickShop;
+import org.maxgamer.QuickShop.Shop.Info;
+import org.maxgamer.QuickShop.Shop.ShopAction;
 
-import Shop.Info;
-import Shop.ShopAction;
 
 public class MoveListener implements Listener{
 	QuickShop plugin;

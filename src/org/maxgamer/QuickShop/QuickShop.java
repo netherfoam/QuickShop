@@ -31,11 +31,11 @@ import org.maxgamer.QuickShop.Listeners.ChatListener;
 import org.maxgamer.QuickShop.Listeners.ChunkListener;
 import org.maxgamer.QuickShop.Listeners.ClickListener;
 import org.maxgamer.QuickShop.Listeners.MoveListener;
+import org.maxgamer.QuickShop.Shop.Info;
+import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Watcher.BufferWatcher;
 import org.maxgamer.QuickShop.Watcher.ItemWatcher;
 
-import Shop.Info;
-import Shop.Shop;
 
 public class QuickShop extends JavaPlugin{
 	private Economy economy;

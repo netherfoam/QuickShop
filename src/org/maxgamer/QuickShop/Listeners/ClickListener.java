@@ -16,10 +16,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.maxgamer.QuickShop.QuickShop;
+import org.maxgamer.QuickShop.Shop.Info;
+import org.maxgamer.QuickShop.Shop.Shop;
+import org.maxgamer.QuickShop.Shop.ShopAction;
 
-import Shop.Info;
-import Shop.Shop;
-import Shop.ShopAction;
 
 /**
  * Handles players clicking on chests:

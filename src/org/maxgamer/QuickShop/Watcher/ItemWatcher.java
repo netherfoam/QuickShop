@@ -5,9 +5,9 @@ import java.util.Map.Entry;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.maxgamer.QuickShop.QuickShop;
+import org.maxgamer.QuickShop.Shop.DisplayItem;
+import org.maxgamer.QuickShop.Shop.Shop;
 
-import Shop.DisplayItem;
-import Shop.Shop;
 
 /**
  * @author Netherfoam
