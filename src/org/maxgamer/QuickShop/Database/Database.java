@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.bukkit.Bukkit;
 import org.maxgamer.QuickShop.QuickShop;
 
 public class Database{
@@ -79,6 +80,25 @@ public class Database{
 		} catch (SQLException e) {
 			return false;
 		}
+	}
+	
+	public void writeToBuffer(final String s){
+		Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable(){
+			
+			@Override
+			public void run() {
+				QuickShop plugin = (QuickShop) Bukkit.getPluginManager().getPlugin("QuickShop");
+				
+				while(plugin.queriesInUse){
+					//Wait
+				}
+				
+				plugin.queriesInUse = true;
+				plugin.queries.add(s);
+				plugin.queriesInUse = false;
+			}
+			
+		}, 0);
 	}
 	
 	public void createTable() throws SQLException{

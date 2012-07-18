@@ -82,22 +82,7 @@ public class QuickShop extends JavaPlugin{
 		getLogger().info("Starting item scheduler");
 		
 		getDB().getConnection();
-		/**
-		 * Display item handler thread
-		 */
-		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable(){
-			@Override
-			public void run() {
-				for(Entry<Shop, Item> entry : spawnedItems.entrySet()){
-					if(entry.getKey().getLocation().getChunk().isLoaded() && entry.getValue().getTicksLived() >= 5000){
-						entry.getKey().removeDupeItem();
-						entry.getKey().deleteDisplayItem();
-						entry.getKey().spawnDisplayItem();
-					}
-				}
-			}
-			
-		}, 300, 300);
+		
 		
 		if(!getDB().hasTable()){
 			try {
@@ -107,43 +92,6 @@ public class QuickShop extends JavaPlugin{
 				getLogger().severe("Could not create database table");
 			}
 		}
-		/**
-		 * Database query handler thread
-		 */
-		Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, new Runnable(){
-		
-			@Override
-			public void run() {
-				QuickShop plugin = (QuickShop) Bukkit.getPluginManager().getPlugin("QuickShop");
-				
-				Database db = plugin.getDB();
-				
-				Connection con = db.getConnection();
-				try {
-					Statement st = con.createStatement();
-					while(plugin.queriesInUse){
-						//Nothing
-					}
-					
-					plugin.queriesInUse = true;
-					for(String q : plugin.queries){
-						st.addBatch(q);
-					}
-					plugin.queries.clear();
-					plugin.queriesInUse = false;
-					
-					st.executeBatch();
-					st.close();
-					
-				} catch (SQLException e) {
-					e.printStackTrace();
-					plugin.getLogger().severe("Could not execute query");
-				}
-				
-			}
-			
-		}, 300, 300);
-		
 		
 		Connection con = database.getConnection();
 		try {
@@ -162,8 +110,8 @@ public class QuickShop extends JavaPlugin{
 				Location loc = new Location(world, x, y, z);
 				
 				if(loc.getBlock().getType() != Material.CHEST){
-					getLogger().info("Shop is not a chest at: " + x + ", " + y + ", " + z);
-					//ToDo:  Delete the entry from the database.
+					getLogger().info("Shop is not a chest at: " + x + ", " + y + ", " + z + ".  Removing from DB.");
+					getDB().writeToBuffer("DELETE FROM shops WHERE x = "+x+" AND y = "+y+" AND z = "+z+"");
 					continue;
 				}
 				
@@ -176,11 +124,20 @@ public class QuickShop extends JavaPlugin{
 			e.printStackTrace();
 			getLogger().severe("Could not load shops.");
 		}
+		/**
+		 * Database query handler thread
+		 */
+		Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, new BufferWatcher(), 300, 300);
+		/**
+		 * Display item handler thread
+		 */
+		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new ItemWatcher(), 300, 300);
 		
 	}
 	public void onDisable(){
 		for(Shop shop : shops.values()){
-			shop.deleteDisplayItem();
+			shop.getDisplayItem().removeDupe();
+			shop.getDisplayItem().remove();
 		}
 		
 		Connection con = this.getDB().getConnection();
@@ -604,4 +561,5 @@ public class QuickShop extends JavaPlugin{
 			
 		}, 0);
 	}
+
 }

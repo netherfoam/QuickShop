@@ -3,23 +3,19 @@ package org.maxgamer.QuickShop;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
 public class Shop{
 	private Location loc;
 	private double price;
 	private String owner;
 	private ItemStack item;
-	private Item displayItem;
+	private DisplayItem displayItem;
 	
 	private QuickShop plugin;
 	
@@ -37,7 +33,7 @@ public class Shop{
 		this.item = item.clone();
 		this.plugin = (QuickShop) Bukkit.getPluginManager().getPlugin("QuickShop");
 		this.item.setAmount(1);
-		spawnDisplayItem();
+		this.displayItem = new DisplayItem(plugin, this, this.item);
 	}
 	/**
 	 * Returns the number of items this shop has in stock.
@@ -61,14 +57,6 @@ public class Shop{
 	 */
 	public Location getLocation(){
 		return this.loc;
-	}
-	/**
-	 * @return The display item location.  Not block location.
-	 */
-	public Location getDisplayLocation(){
-		Location dispLoc = this.loc.clone();
-		dispLoc.add(0.5, 1, 0.5);
-		return dispLoc;
 	}
 	
 	/**
@@ -132,54 +120,7 @@ public class Shop{
 		}
 	}
 	
-	/**
-	 * Spawns the dummy item on top of the shop.
-	 */
-	public void spawnDisplayItem(){
-		Location sLoc = this.getDisplayLocation();
-		
-		Item item = this.loc.getWorld().dropItem(sLoc, this.item.clone());
-		item.setVelocity(new Vector(0, 0.1, 0));
-		//Actually not possible.
-		item.setPickupDelay(Integer.MAX_VALUE);  
-		//Protects the item from decay.
-		plugin.getProtectedItems().put(this, item);
-		this.displayItem = item;
-	}
-	
-	/**
-	 * Spawns the new display item and removes duplicate items.
-	 */
-	public void respawnDisplayItem(){
-		spawnDisplayItem();
-		removeDupeItem();
-	}
-	
-	/**
-	 * Removes all items floating ontop of the chest
-	 * that aren't the display item.
-	 */
-	public void removeDupeItem(){
-		Location displayLoc = this.getLocation().getBlock().getRelative(0, 1, 0).getLocation();
-		
-		Chunk c = displayLoc.getChunk();
-		for (Entity e : c.getEntities()) {
-			if(e.getEntityId() != this.displayItem.getEntityId() && (e.getLocation().getBlock().getLocation().equals(displayLoc) || e.getLocation().getBlock().getLocation().equals(this.loc)) && e instanceof Item) {
-				ItemStack itm = ((Item) e).getItemStack();
-				if(itm.getType() == item.getType() && itm.getAmount() == 1 && itm.getDurability() == item.getDurability()){
-					e.remove();
-				}
-				
-			}
-		}
-	}
-	
-	
-	/**
-	 * Removes the display item entirely.
-	 */
-	public void deleteDisplayItem(){
-		plugin.getProtectedItems().remove(item);
-		this.displayItem.remove();
+	public DisplayItem getDisplayItem(){
+		return this.displayItem;
 	}
 }

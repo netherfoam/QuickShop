@@ -23,10 +23,10 @@ public class ChunkListener implements Listener{
 			
 			if(loc.getChunk().equals(e.getChunk())){
 				//This is a shop chunk.
-				shop.removeDupeItem();
-				shop.deleteDisplayItem();
 				
-				shop.spawnDisplayItem();
+				shop.getDisplayItem().removeDupe();
+				shop.getDisplayItem().remove();
+				shop.getDisplayItem().spawn();
 			}
 		}
 	}

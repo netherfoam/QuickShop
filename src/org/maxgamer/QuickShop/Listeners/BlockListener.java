@@ -39,7 +39,7 @@ public class BlockListener implements Listener{
 			}
 			
 			//Remove the item on top
-			shop.deleteDisplayItem();
+			shop.getDisplayItem().remove();
 			
 			//Remove the shop from the cache
 			plugin.getShops().remove(e.getBlock().getLocation());
