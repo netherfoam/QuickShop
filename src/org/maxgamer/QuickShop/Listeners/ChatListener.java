@@ -84,6 +84,13 @@ public class ChatListener implements Listener{
 					}
 					
 					//Save it to the database.
+					int x = shop.getLocation().getBlockX();
+					int y = shop.getLocation().getBlockY();
+					int z = shop.getLocation().getBlockZ();
+					String world = shop.getLocation().getWorld().getName();
+					String itemString = plugin.makeString(shop.getItem());
+					plugin.addToBuffer("INSERT INTO shops VALUES ('"+e.getPlayer().getName()+"', '"+price+"', '"+itemString+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"')");
+					/*
 					Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable(){
 
 						@Override
@@ -105,7 +112,7 @@ public class ChatListener implements Listener{
 							plugin.queriesInUse = false;
 						}
 						
-					}, 0);
+					}, 0);*/
 					
 					e.setCancelled(true); //Don't send to chat.
 					plugin.getActions().remove(p.getName());

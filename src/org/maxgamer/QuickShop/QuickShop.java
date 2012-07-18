@@ -308,14 +308,18 @@ public class QuickShop extends JavaPlugin{
 	 * @return A new string with the properties of the item.
 	 */
 	public String makeString(ItemStack item){
-		String itemString = item.getType().toString() + ":" + item.getData().getData() + ":" + item.getDurability() + ":" + item.getAmount() + ":";
+		String itemString = item.getType().toString() + ":" + item.getData().getData() + ":" + item.getDurability() + ":" + item.getAmount();
 		
 		for(Entry<Enchantment, Integer> ench : item.getEnchantments().entrySet()){
-			itemString += ench.getKey().getName() + ":" + ench.getValue() + ":";
+			itemString += ":" + ench.getKey().getName() + ":" + ench.getValue();
 		}
 		return itemString;
 	}
 	
+	/**
+	 * Stores all the tools in a hashset to easily check if an item is a tool.
+	 * Data on tools is converted to durability %.
+	 */
 	public void loadTools(){
 		tools.add(Material.BOW);
 		tools.add(Material.SHEARS);
@@ -580,5 +584,24 @@ public class QuickShop extends JavaPlugin{
 		}
 		if(damage == 0 || isTool(mat)) return mat.toString();
 		else return mat.toString()+ ":" + damage;
+	}
+	
+	public void addToBuffer(final String s){
+		Bukkit.getScheduler().scheduleAsyncDelayedTask(this, new Runnable(){
+
+			@Override
+			public void run() {
+				QuickShop plugin = (QuickShop) Bukkit.getPluginManager().getPlugin("QuickShop");
+				
+				while(plugin.queriesInUse){
+					//Wait
+				}
+				
+				plugin.queriesInUse = true;
+				plugin.queries.add(s);
+				plugin.queriesInUse = false;
+			}
+			
+		}, 0);
 	}
 }
