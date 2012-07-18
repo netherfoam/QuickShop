@@ -89,6 +89,7 @@ public class ClickListener implements Listener{
 	private void sendShopInfo(Player p, Shop shop, int stock){
 		ItemStack items = shop.getItem();
 		p.sendMessage("");
+		p.sendMessage("");
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Shop Information:");
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Item: " + ChatColor.YELLOW + plugin.getDataName(items.getType(), items.getDurability()));
