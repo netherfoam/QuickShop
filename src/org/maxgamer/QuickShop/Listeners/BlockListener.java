@@ -74,10 +74,16 @@ public class BlockListener implements Listener{
 	 */
 	@EventHandler
 	public void onPlace(BlockPlaceEvent e){
-		if(e.isCancelled() || e.getBlock().getType() != Material.CHEST) return;
-		
+		if(e.isCancelled()) return;
 		Block b = e.getBlock();
-		if(plugin.getChestNextTo(b) != null && plugin.getShop(plugin.getChestNextTo(b).getLocation()) != null){
+		
+		if(plugin.getShop(b.getRelative(0, -1, 0).getLocation()) != null){
+			e.setCancelled(true);
+			e.getPlayer().sendMessage(ChatColor.RED + "You may not place a block ontop of a QuickShop chest.");
+			return;
+		}
+		
+		if(b.getType() == Material.CHEST && plugin.getChestNextTo(b) != null && plugin.getShop(plugin.getChestNextTo(b).getLocation()) != null){
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(ChatColor.RED + "Double Chest shops are disabled.");
 		}
