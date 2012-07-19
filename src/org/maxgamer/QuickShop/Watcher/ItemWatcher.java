@@ -21,6 +21,8 @@ public class ItemWatcher implements Runnable{
 		QuickShop plugin = (QuickShop) Bukkit.getServer().getPluginManager().getPlugin("QuickShop");
 		HashSet<Location> toRemove = new HashSet<Location>(5);
 		for(Entry<Location, Shop> entry : plugin.getShops().entrySet()){
+			if(entry.getValue().getLocation().getWorld() == null) continue;
+			
 			DisplayItem disItem = entry.getValue().getDisplayItem();
 			if(entry.getValue().getLocation().getBlock() != null && entry.getValue().getLocation().getBlock().getType() != Material.CHEST){
 				/* Shop is invalid */
@@ -28,14 +30,13 @@ public class ItemWatcher implements Runnable{
 				int x = loc.getBlockX();
 				int y = loc.getBlockY();
 				int z = loc.getBlockZ();
+				String world = loc.getWorld().getName();
 				
-				plugin.getLogger().info("Shop is not a chest at: " + x + ", " + y + ", " + z + ".  Removing from DB.");
-				plugin.getDB().writeToBuffer("DELETE FROM shops WHERE x = "+x+" AND y = "+y+" AND z = "+z+"");
+				plugin.getLogger().info("Shop is not a chest in " +world + " at: " + x + ", " + y + ", " + z + ".  Removing from DB.");
+				plugin.getDB().writeToBuffer("DELETE FROM shops WHERE x = "+x+" AND y = "+y+" AND z = "+z+" AND world = '"+world+"'");
 				//We can't remove it yet, we're still iterating!
 				toRemove.add(loc);
-				//continue;
 			}
-			//else if(entry.getKey().getBlock().getRelative(0, 1, 0).getType() !=)
 			else if(entry.getKey().getChunk().isLoaded() && disItem.getItem().getTicksLived() >= 5000 || disItem.getItem().isDead() || disItem.getDisplayLocation().distanceSquared(disItem.getItem().getLocation()) > 1){
 				disItem.removeDupe();
 				disItem.respawn();

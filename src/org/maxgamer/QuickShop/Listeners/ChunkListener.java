@@ -21,8 +21,8 @@ public class ChunkListener implements Listener{
 		for(Entry<Location, Shop> map:plugin.getShops().entrySet()){
 			Location loc = map.getKey();
 			Shop shop = map.getValue();
-			
-			if(loc.getChunk().equals(e.getChunk())){
+			if(loc.getWorld() == null) continue;
+			if(e.getChunk().equals(loc.getChunk())/*loc.getChunk().equals(e.getChunk())*/){
 				//This is a shop chunk.
 				
 				shop.getDisplayItem().removeDupe();

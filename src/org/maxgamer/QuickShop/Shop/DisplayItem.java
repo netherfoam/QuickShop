@@ -39,6 +39,8 @@ public class DisplayItem{
 	 * Spawns the dummy item on top of the shop.
 	 */
 	public void spawn(){
+		if(shop.getLocation().getWorld() == null) return;
+		
 		this.item = shop.getLocation().getWorld().dropItem(this.getDisplayLocation(), this.iStack);
 		this.item.setVelocity(new Vector(0, 0.1, 0));
 		this.item.setPickupDelay(Integer.MAX_VALUE);  
@@ -57,6 +59,8 @@ public class DisplayItem{
 	 * that aren't the display item.
 	 */
 	public void removeDupe(){
+		if(shop.getLocation().getWorld() == null) return;
+		
 		Location displayLoc = shop.getLocation().getBlock().getRelative(0, 1, 0).getLocation();
 		
 		Chunk c = displayLoc.getChunk();
