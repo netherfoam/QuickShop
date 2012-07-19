@@ -87,6 +87,7 @@ public class DisplayItem{
 	 * Removes the display item.
 	 */
 	public void remove(){
+		if(this.item == null) return;
 		this.item.remove();
 	}
 	
