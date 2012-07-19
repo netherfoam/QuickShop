@@ -35,6 +35,7 @@ public class ItemWatcher implements Runnable{
 				toRemove.add(loc);
 				//continue;
 			}
+			//else if(entry.getKey().getBlock().getRelative(0, 1, 0).getType() !=)
 			else if(entry.getKey().getChunk().isLoaded() && disItem.getItem().getTicksLived() >= 5000 || disItem.getItem().isDead() || disItem.getDisplayLocation().distanceSquared(disItem.getItem().getLocation()) > 1){
 				disItem.removeDupe();
 				disItem.respawn();

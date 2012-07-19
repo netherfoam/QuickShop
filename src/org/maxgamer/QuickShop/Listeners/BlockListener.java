@@ -76,12 +76,12 @@ public class BlockListener implements Listener{
 	public void onPlace(BlockPlaceEvent e){
 		if(e.isCancelled()) return;
 		Block b = e.getBlock();
-		
+		/*
 		if(plugin.getShop(b.getRelative(0, -1, 0).getLocation()) != null){
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(ChatColor.RED + "You may not place a block ontop of a QuickShop chest.");
 			return;
-		}
+		}*/
 		
 		if(b.getType() == Material.CHEST && plugin.getChestNextTo(b) != null && plugin.getShop(plugin.getChestNextTo(b).getLocation()) != null){
 			e.setCancelled(true);
