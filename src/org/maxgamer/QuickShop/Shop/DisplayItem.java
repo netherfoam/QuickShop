@@ -31,8 +31,10 @@ public class DisplayItem{
 		this.iStack = iStack.clone();
 		this.displayLoc = shop.getLocation().clone().add(0.5, 1, 0.5);
 		
-		this.removeDupe();
-		this.spawn();
+		if(displayLoc.getWorld() != null){
+			this.removeDupe();
+			this.spawn();
+		}
 	}
 	
 	/**
