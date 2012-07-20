@@ -100,9 +100,11 @@ public class ChatListener implements Listener{
 					String itemString = plugin.makeString(shop.getItem());
 					plugin.getDB().writeToBuffer("INSERT INTO shops VALUES ('"+e.getPlayer().getName()+"', '"+price+"', '"+itemString+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"')");
 					
-					//Warn them if they havent been warned since reboot
-					if(!plugin.warnings.contains(p.getName())){
-						p.sendMessage(ChatColor.DARK_RED + "[QuickShop] " +ChatColor.RED+"Remember, shops are NOT protected from theft! If you want to stop thieves, lock it!");
+					if(plugin.getConfig().getBoolean("shop.lock")){
+						//Warn them if they havent been warned since reboot
+						if(!plugin.warnings.contains(p.getName())){
+							p.sendMessage(ChatColor.DARK_RED + "[QuickShop] " +ChatColor.RED+"Remember, shops are NOT protected from theft! If you want to stop thieves, lock it!");
+						}
 					}
 					
 					e.setCancelled(true); //Don't send to chat.
