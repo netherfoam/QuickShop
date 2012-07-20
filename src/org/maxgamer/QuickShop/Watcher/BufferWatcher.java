@@ -21,16 +21,16 @@ public class BufferWatcher implements Runnable{
 		Connection con = db.getConnection();
 		try {
 			Statement st = con.createStatement();
-			while(plugin.queriesInUse){
+			while(plugin.getDB().queriesInUse){
 				//Nothing
 			}
 			
-			plugin.queriesInUse = true;
-			for(String q : plugin.queries){
+			plugin.getDB().queriesInUse = true;
+			for(String q : plugin.getDB().queries){
 				st.addBatch(q);
 			}
-			plugin.queries.clear();
-			plugin.queriesInUse = false;
+			plugin.getDB().queries.clear();
+			plugin.getDB().queriesInUse = false;
 			
 			st.executeBatch();
 			st.close();

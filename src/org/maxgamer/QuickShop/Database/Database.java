@@ -8,13 +8,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashSet;
 
 import org.bukkit.Bukkit;
 import org.maxgamer.QuickShop.QuickShop;
+import org.maxgamer.QuickShop.Watcher.BufferWatcher;
 
 public class Database{
 	QuickShop plugin;
 	File file;
+	public HashSet<String> queries = new HashSet<String>(5);
+	public boolean queriesInUse = false;
+	
 	/**
 	 * Creates a new database handler.
 	 * @param plugin The plugin creating the database.
@@ -23,6 +28,11 @@ public class Database{
 	public Database(QuickShop plugin, String file){
 		this.plugin = plugin;
 		this.file = new File(file);
+		
+		/**
+		 * Database query handler thread
+		 */
+		Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, new BufferWatcher(), 300, 300);
 	}
 	/**
 	 * Returns a new connection to execute SQL statements on.
@@ -101,13 +111,13 @@ public class Database{
 			public void run() {
 				QuickShop plugin = (QuickShop) Bukkit.getPluginManager().getPlugin("QuickShop");
 				
-				while(plugin.queriesInUse){
+				while(plugin.getDB().queriesInUse){
 					//Wait
 				}
 				
-				plugin.queriesInUse = true;
-				plugin.queries.add(s);
-				plugin.queriesInUse = false;
+				plugin.getDB().queriesInUse = true;
+				plugin.getDB().queries.add(s);
+				plugin.getDB().queriesInUse = false;
 			}
 			
 		}, 0);

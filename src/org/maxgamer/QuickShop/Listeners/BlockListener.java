@@ -57,13 +57,7 @@ public class BlockListener implements Listener{
 					int y = e.getBlock().getY();
 					int z = e.getBlock().getZ();
 					
-					while(plugin.queriesInUse){
-						//Wait
-					}
-					
-					plugin.queriesInUse = true;
-					plugin.queries.add("DELETE FROM shops WHERE x = '"+x+"' AND y = '"+y+"' AND z = '"+z+"' AND world = '"+world+"'");
-					plugin.queriesInUse = false;
+					plugin.getDB().writeToBuffer("DELETE FROM shops WHERE x = '"+x+"' AND y = '"+y+"' AND z = '"+z+"' AND world = '"+world+"'");
 				}
 				
 			}, 0);
@@ -105,7 +99,7 @@ public class BlockListener implements Listener{
 						plugin.getEcon().depositPlayer(shop.getOwner(), plugin.getConfig().getDouble("shop.cost"));
 					}
 					
-					plugin.queries.add("DELETE FROM shops WHERE x = '"+x+"' AND y = '"+y+"' AND z = '"+z+"' AND world = '"+world+"'");
+					plugin.getDB().writeToBuffer("DELETE FROM shops WHERE x = '"+x+"' AND y = '"+y+"' AND z = '"+z+"' AND world = '"+world+"'");
 				}
 			}
 		}

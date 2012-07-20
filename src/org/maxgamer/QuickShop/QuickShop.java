@@ -62,8 +62,6 @@ public class QuickShop extends JavaPlugin{
 	private HashMap<Shop, Item> spawnedItems = new HashMap<Shop, Item>(30);
 	
 	private Database database;
-	public HashSet<String> queries = new HashSet<String>(5);
-	public boolean queriesInUse = false;
 	
 	/* Hooking into plugins */
 	//PreciousStones
@@ -192,10 +190,7 @@ public class QuickShop extends JavaPlugin{
 			e.printStackTrace();
 			getLogger().severe("Could not load shops.");
 		}
-		/**
-		 * Database query handler thread
-		 */
-		Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, new BufferWatcher(), 300, 300);
+		
 		/**
 		 * Display item handler thread
 		 */
