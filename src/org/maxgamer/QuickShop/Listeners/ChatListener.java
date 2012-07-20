@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -52,6 +53,13 @@ public class ChatListener implements Listener{
 					
 					if(plugin.getChestNextTo(info.getLocation().getBlock()) != null){
 						p.sendMessage(ChatColor.RED + "Double chest shops are disabled.");
+						e.setCancelled(true);
+						actions.remove(p.getName());
+						return;
+					}
+					
+					if(info.getLocation().getBlock().getType() != Material.CHEST){
+						p.sendMessage(ChatColor.RED + "That chest was removed.");
 						e.setCancelled(true);
 						actions.remove(p.getName());
 						return;
@@ -112,6 +120,13 @@ public class ChatListener implements Listener{
 				try{
 					int amount = Integer.parseInt(e.getMessage());
 					Shop shop = plugin.getShops().get(info.getLocation());
+					
+					if(info.getLocation().getBlock().getType() != Material.CHEST){
+						p.sendMessage(ChatColor.RED + "That shop was removed.");
+						e.setCancelled(true);
+						actions.remove(p.getName());
+						return;
+					}
 					
 					if(shop.getRemainingStock() >=  amount){
 						if(plugin.getEcon().has(p.getName(), amount * shop.getPrice())){
