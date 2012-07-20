@@ -666,7 +666,7 @@ public class QuickShop extends JavaPlugin{
 		}
 		if(getGriefPrevention() != null){
 			Claim claim = getGriefPrevention().dataStore.getClaimAt(b.getLocation(), false, null);
-			if(claim.allowContainers(p) != null){
+			if(claim != null && claim.allowContainers(p) != null){
 				//Not trusted with containers.
 				return false;
 			}
