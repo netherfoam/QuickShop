@@ -172,8 +172,8 @@ public class ChatListener implements Listener{
 								}
 								
 								Player owner = Bukkit.getPlayerExact(shop.getOwner());
-								if(owner != null) owner.sendMessage(ChatColor.GREEN + p.getName() + " just purchased " + amount + " " + shop.getItem().getType().toString() + " from your store.");
-								if(shop.getRemainingStock() == amount) owner.sendMessage(ChatColor.DARK_PURPLE + "Your shop at " + shop.getLocation().getBlockX() + ", " + shop.getLocation().getBlockY() + ", " + shop.getLocation().getBlockZ() + " has run out of " + shop.getItem().getType().toString());
+								if(owner != null) owner.sendMessage(ChatColor.GREEN + p.getName() + " just purchased " + amount + " " + ChatColor.YELLOW + plugin.getDataName(shop.getItem().getType(), shop.getItem().getDurability()) + ChatColor.GREEN + " from your store.");
+								if(shop.getRemainingStock() == amount) owner.sendMessage(ChatColor.DARK_PURPLE + "Your shop at " + shop.getLocation().getBlockX() + ", " + shop.getLocation().getBlockY() + ", " + shop.getLocation().getBlockZ() + " has run out of " + plugin.getDataName(shop.getItem().getType(), shop.getItem().getDurability()));
 							}
 							
 							//Items to drop on floor
