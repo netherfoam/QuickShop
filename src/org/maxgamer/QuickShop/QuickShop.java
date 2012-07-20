@@ -104,17 +104,17 @@ public class QuickShop extends JavaPlugin{
 				int y = rs.getInt("y");
 				int z = rs.getInt("z");
 				World world = Bukkit.getWorld(rs.getString("world"));
-				/*
-				if(world == null){
-					getLogger().info("Shop is not a chest in " +rs.getString("world") + " at: " + x + ", " + y + ", " + z + ".  Removing from DB.");
-					getDB().writeToBuffer("DELETE FROM shops WHERE x = "+x+" AND y = "+y+" AND z = "+z+" AND world = '"+rs.getString("world")+"'");
-				}*/
-				
+
 				ItemStack item = this.makeItem(rs.getString("itemString"));				
 				
 				String owner = rs.getString("owner");
 				double price = rs.getDouble("price");
 				Location loc = new Location(world, x, y, z);
+				
+				if(world != null && loc.getBlock().getType() != Material.CHEST){
+					getLogger().info("Shop is not a chest in " +rs.getString("world") + " at: " + x + ", " + y + ", " + z + ".  Removing from DB.");
+					getDB().writeToBuffer("DELETE FROM shops WHERE x = "+x+" AND y = "+y+" AND z = "+z+" AND world = '"+rs.getString("world")+"'");
+				}
 				
 				Shop shop = new Shop(loc, price, item, owner);
 				
