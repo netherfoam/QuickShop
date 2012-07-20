@@ -72,12 +72,12 @@ public class ClickListener implements Listener{
 		else if(item != null && item.getType() != Material.AIR && p.hasPermission("quickshop.create")){
 			if(!plugin.canBuildShop(p, b)){
 				p.sendMessage(ChatColor.RED + "You may not create a shop here.");
-				e.setCancelled(true);
+				//e.setCancelled(true);
 				return;
 			}
 			if(plugin.getChestNextTo(b) != null){
 				p.sendMessage(ChatColor.RED + "Double chest shops are disabled.");
-				e.setCancelled(true);
+				//e.setCancelled(true);
 				return;
 			}
 			
