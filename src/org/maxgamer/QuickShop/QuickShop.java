@@ -57,6 +57,7 @@ public class QuickShop extends JavaPlugin{
 	private HashMap<Location, Shop> shops = new HashMap<Location, Shop>(30);
 	private HashMap<String, Info> actions = new HashMap<String, Info>(30);
 	private HashSet<Material> tools = new HashSet<Material>(50);
+	public HashSet<String> warnings = new HashSet<String>(10);
 	
 	private HashMap<Shop, Item> spawnedItems = new HashMap<Shop, Item>(30);
 	
@@ -214,6 +215,7 @@ public class QuickShop extends JavaPlugin{
 		this.actions.clear();
 		this.shops.clear();
 		this.tools.clear();
+		this.warnings.clear();
 	}
 	/**
 	 * Returns the vault economy
