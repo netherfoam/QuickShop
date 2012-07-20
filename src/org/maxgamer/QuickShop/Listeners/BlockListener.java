@@ -88,7 +88,7 @@ public class BlockListener implements Listener{
 		for(int i = 0; i < e.blockList().size(); i++){
 			Block b = e.blockList().get(i);
 			if(plugin.getShops().containsKey(b.getLocation())){
-				if(plugin.getConfig().getBoolean("lock-shops")){
+				if(plugin.getConfig().getBoolean("shops.lock")){
 					e.blockList().remove(b);
 					DisplayItem disItem = plugin.getShop(b.getLocation()).getDisplayItem();
 					disItem.remove();

@@ -121,7 +121,7 @@ public class ClickListener implements Listener{
 	 */
 	public void onChestUse(PlayerInteractEvent e){
 		if(e.isCancelled() || e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getClickedBlock().getType() != Material.CHEST) return;
-		if(plugin.getConfig().getBoolean("lock-shops")){
+		if(plugin.getConfig().getBoolean("shops.lock")){
 			Shop shop = plugin.getShop(e.getClickedBlock().getLocation());
 			if(shop != null && !shop.getOwner().equalsIgnoreCase(e.getPlayer().getName())){
 				e.getPlayer().sendMessage(ChatColor.RED + "[QuickShop] That shop is locked.  Left click if you wish to buy!");
