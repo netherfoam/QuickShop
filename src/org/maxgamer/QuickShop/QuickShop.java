@@ -109,31 +109,40 @@ public class QuickShop extends JavaPlugin{
 		/* Hook into other plugins */
 		Plugin plug;
 		
-		plug = Bukkit.getPluginManager().getPlugin("PreciousStones");
-		if(plug != null){
-			this.preciousStones = (PreciousStones) plug;
+		if(getConfig().getBoolean("plugins.preciousstones")){
+			plug = Bukkit.getPluginManager().getPlugin("PreciousStones");
+			if(plug != null){
+				this.preciousStones = (PreciousStones) plug;
+			}
 		}
 		
-		plug = Bukkit.getPluginManager().getPlugin("Towny");
-		if(plug != null){
-			this.towny = (Towny) plug;
-		}	
-		
-		plug = Bukkit.getPluginManager().getPlugin("Lockette");
-		if(plug != null){
-			this.lockette = (Lockette) plug;
+		if(getConfig().getBoolean("plugins.towny")){
+			plug = Bukkit.getPluginManager().getPlugin("Towny");
+			if(plug != null){
+				this.towny = (Towny) plug;
+			}	
 		}
 		
-		plug = Bukkit.getPluginManager().getPlugin("WorldGuard");
-		if(plug != null){
-			this.worldGuardPlugin = (WorldGuardPlugin) plug;
+		if(getConfig().getBoolean("plugins.lockette")){
+			plug = Bukkit.getPluginManager().getPlugin("Lockette");
+			if(plug != null){
+				this.lockette = (Lockette) plug;
+			}
 		}
 		
-		plug = Bukkit.getPluginManager().getPlugin("GriefPrevention");
-		if(plug != null){
-			this.griefPrevention = (GriefPrevention) plug;
+		if(getConfig().getBoolean("plugins.worldguard")){
+			plug = Bukkit.getPluginManager().getPlugin("WorldGuard");
+			if(plug != null){
+				this.worldGuardPlugin = (WorldGuardPlugin) plug;
+			}
 		}
 		
+		if(getConfig().getBoolean("plugins.griefprevention")){
+			plug = Bukkit.getPluginManager().getPlugin("GriefPrevention");
+			if(plug != null){
+				this.griefPrevention = (GriefPrevention) plug;
+			}
+		}
 		/* Start database - Also creates DB file. */
 		this.database = new Database(this, this.getDataFolder() + File.separator + "shops.db");
 		
