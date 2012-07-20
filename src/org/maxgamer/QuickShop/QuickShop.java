@@ -610,6 +610,8 @@ public class QuickShop extends JavaPlugin{
 			return "IRON_BARS";
 		case 58:
 			return "CRAFTING_TABLE";
+		case 123:
+			return "REDSTONE_LAMP";
 		}
 		if(damage == 0 || isTool(mat)) return mat.toString();
 		else return mat.toString()+ ":" + damage;
