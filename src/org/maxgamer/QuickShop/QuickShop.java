@@ -600,6 +600,16 @@ public class QuickShop extends JavaPlugin{
 			}
 		case 76:
 			return "REDSTONE_TORCH";
+		case 115:
+			return "NETHER_WART";
+		case 30:
+			return "COBWEB";
+		case 102:
+			return "GLASS_PANE";
+		case 101:
+			return "IRON_BARS";
+		case 58:
+			return "CRAFTING_TABLE";
 		}
 		if(damage == 0 || isTool(mat)) return mat.toString();
 		else return mat.toString()+ ":" + damage;
