@@ -2,6 +2,9 @@
 tax: 0.05
 tax-account: tax
 
+#If a player has the shop menu open, and says something that isn't a number, should we send it to chat?
+always-chat: false
+
 shop:
     #Cost to make a stall
     cost: 10

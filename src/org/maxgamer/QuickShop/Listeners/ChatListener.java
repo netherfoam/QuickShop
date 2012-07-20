@@ -109,7 +109,9 @@ public class ChatListener implements Listener{
 				catch(NumberFormatException ex){
 					actions.remove(p.getName());
 					p.sendMessage(ChatColor.RED + "Cancelled Shop Creation");
-					e.setCancelled(true);
+					if(!plugin.getConfig().getBoolean("always-chat")){
+						e.setCancelled(true);
+					}
 					return;
 				}
 			}
@@ -206,7 +208,9 @@ public class ChatListener implements Listener{
 					else{
 						p.sendMessage(ChatColor.RED + "The shop only has " + ChatColor.YELLOW + shop.getRemainingStock() + " " + shop.getMaterial().toString() + ChatColor.RED + " left.");
 						actions.remove(p.getName());
-						e.setCancelled(true);
+						if(!plugin.getConfig().getBoolean("always-chat")){
+							e.setCancelled(true);
+						}
 						return;
 					}
 				}
