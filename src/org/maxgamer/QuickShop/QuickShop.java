@@ -8,9 +8,15 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
 
+import me.ryanhamshire.GriefPrevention.Claim;
+import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import net.milkbowl.vault.economy.Economy;
+import net.sacredlabyrinth.Phaed.PreciousStones.FieldFlag;
+import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
+import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -19,8 +25,10 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.Potion;
@@ -35,6 +43,13 @@ import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Watcher.BufferWatcher;
 import org.maxgamer.QuickShop.Watcher.ItemWatcher;
+import org.yi.acru.bukkit.Lockette.Lockette;
+
+import com.palmergames.bukkit.towny.Towny;
+
+import com.palmergames.bukkit.towny.object.TownBlock;
+import com.palmergames.bukkit.towny.object.TownyUniverse;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 
 public class QuickShop extends JavaPlugin{
@@ -49,11 +64,25 @@ public class QuickShop extends JavaPlugin{
 	public HashSet<String> queries = new HashSet<String>(5);
 	public boolean queriesInUse = false;
 	
+	/* Hooking into plugins */
+	//PreciousStones
+	private PreciousStones preciousStones;
+	//Towny
+	private Towny towny;
+	//WorldGuard
+	private WorldGuardPlugin worldGuardPlugin;
+	//GriefPrevention
+	private GriefPrevention griefPrevention; 
+	//Lockette
+	private Lockette lockette;
+	
 	private ChatListener chatListener = new ChatListener(this);
 	private ClickListener clickListener = new ClickListener(this);
 	private BlockListener blockListener = new BlockListener(this);
 	private MoveListener moveListener = new MoveListener(this);
 	private ChunkListener chunkListener = new ChunkListener(this);
+	
+	
 	
 	public void onEnable(){
 		getLogger().info("Hooking Vault");
@@ -75,6 +104,34 @@ public class QuickShop extends JavaPlugin{
 		if(!configFile.exists()){
 			//Copy config with comments
 			this.saveDefaultConfig();
+		}
+		
+		/* Hook into other plugins */
+		Plugin plug;
+		
+		plug = Bukkit.getPluginManager().getPlugin("PreciousStones");
+		if(plug != null){
+			this.preciousStones = (PreciousStones) plug;
+		}
+		
+		plug = Bukkit.getPluginManager().getPlugin("Towny");
+		if(plug != null){
+			this.towny = (Towny) plug;
+		}	
+		
+		plug = Bukkit.getPluginManager().getPlugin("Lockette");
+		if(plug != null){
+			this.lockette = (Lockette) plug;
+		}
+		
+		plug = Bukkit.getPluginManager().getPlugin("WorldGuard");
+		if(plug != null){
+			this.worldGuardPlugin = (WorldGuardPlugin) plug;
+		}
+		
+		plug = Bukkit.getPluginManager().getPlugin("GriefPrevention");
+		if(plug != null){
+			this.griefPrevention = (GriefPrevention) plug;
 		}
 		
 		/* Start database - Also creates DB file. */
@@ -110,7 +167,7 @@ public class QuickShop extends JavaPlugin{
 				String owner = rs.getString("owner");
 				double price = rs.getDouble("price");
 				Location loc = new Location(world, x, y, z);
-				
+				/* Delete invalid shops, if we know of any */
 				if(world != null && loc.getBlock().getType() != Material.CHEST){
 					getLogger().info("Shop is not a chest in " +rs.getString("world") + " at: " + x + ", " + y + ", " + z + ".  Removing from DB.");
 					getDB().writeToBuffer("DELETE FROM shops WHERE x = "+x+" AND y = "+y+" AND z = "+z+" AND world = '"+rs.getString("world")+"'");
@@ -535,5 +592,78 @@ public class QuickShop extends JavaPlugin{
 		}
 		if(damage == 0 || isTool(mat)) return mat.toString();
 		else return mat.toString()+ ":" + damage;
+	}
+	
+	public WorldGuardPlugin getWorldGuard(){
+		return this.worldGuardPlugin;
+	}
+	public Lockette getLockette(){
+		return this.lockette;
+	}
+	public PreciousStones getPreciousStones(){
+		return this.preciousStones;
+	}
+	public Towny getTowny(){
+		return this.towny;
+	}
+	public GriefPrevention getGriefPrevention(){
+		return this.griefPrevention;
+	}
+	/**
+	 * Checks other plugins to make sure they can use the chest they're making a shop.
+	 * @param p The player to check
+	 * @param b The block to check
+	 * @return True if they're allowed to place a shop there.
+	 */
+	public boolean canBuildShop(Player p, Block b){
+		if(getWorldGuard() != null){
+			if(!getWorldGuard().canBuild(p, b)){
+				getLogger().info("WG blocked");
+				//Can't build.
+				return false;
+			}
+		}
+		
+		if(getLockette() != null){
+			if(!Lockette.isUser(b, p.getName(), true)){
+				//Can't use
+				return false;
+			}
+		}
+		
+		if(getPreciousStones() != null){
+			List<Field> fields = getPreciousStones().getForceFieldManager().getSourceFields(b.getLocation(), FieldFlag.PREVENT_USE);
+				for(Field field : fields){
+					if(!field.isAllowed(p.getName()) && !field.isOwner(p.getName())){
+						//Not ps-allowed
+						return false;
+					}
+				}
+		}
+		if(getTowny() != null){
+			TownBlock tb = TownyUniverse.getTownBlock(b.getLocation());
+			if(tb != null){
+				try {
+					if(!tb.getTown().getResidents().contains(TownyUniverse.getDataSource().getResident(p.getName()))){
+						//Not a resident of the town. (Maybe I should check individual plots? How?)
+						return false;
+					}
+				} catch (Exception e) {
+				} 
+				finally{
+					
+				}
+			}
+		}
+		if(getGriefPrevention() != null){
+			Claim claim = getGriefPrevention().dataStore.getClaimAt(b.getLocation(), false, null);
+			if(claim.allowContainers(p) != null){
+				//Not trusted with containers.
+				return false;
+			}
+			
+		}
+		
+		return true;
 	}
 }

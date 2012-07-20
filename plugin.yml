@@ -6,3 +6,4 @@ author: Netherfoam
 description: The real shop plugin.
 website: http://maxgamer.org
 depend: [Vault]
+soft-depend: [Towny, PreciousStones, Lockette, WorldGuard, GriefPrevention]
