@@ -81,7 +81,7 @@ public class QuickShop extends JavaPlugin{
 	private MoveListener moveListener = new MoveListener(this);
 	private ChunkListener chunkListener = new ChunkListener(this);
 	
-	
+	private int itemWatcherID;
 	
 	public void onEnable(){
 		getLogger().info("Hooking Vault");
@@ -194,10 +194,11 @@ public class QuickShop extends JavaPlugin{
 		/**
 		 * Display item handler thread
 		 */
-		Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new ItemWatcher(), 150, 150);
+		itemWatcherID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new ItemWatcher(), 150, 150);
 		
 	}
 	public void onDisable(){
+		Bukkit.getScheduler().cancelTask(itemWatcherID);
 		/* Remove all display items, and any dupes we can find */
 		for(Shop shop : shops.values()){
 			shop.getDisplayItem().removeDupe();
@@ -206,6 +207,7 @@ public class QuickShop extends JavaPlugin{
 		
 		/* Empty the buffer */
 		new BufferWatcher().run();
+		this.database.stopBuffer();
 		
 		this.actions.clear();
 		this.shops.clear();

@@ -19,6 +19,7 @@ public class Database{
 	File file;
 	public HashSet<String> queries = new HashSet<String>(5);
 	public boolean queriesInUse = false;
+	private int bufferWatcherID;
 	
 	/**
 	 * Creates a new database handler.
@@ -32,7 +33,7 @@ public class Database{
 		/**
 		 * Database query handler thread
 		 */
-		Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, new BufferWatcher(), 300, 300);
+		bufferWatcherID = Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, new BufferWatcher(), 300, 300);
 	}
 	/**
 	 * Returns a new connection to execute SQL statements on.
@@ -141,5 +142,9 @@ public class Database{
 				"PRIMARY KEY ('x', 'y','z','world') " +
 				");";
 		st.execute(createTable);
+	}
+	
+	public void stopBuffer(){
+		Bukkit.getScheduler().cancelTask(bufferWatcherID);
 	}
 }
