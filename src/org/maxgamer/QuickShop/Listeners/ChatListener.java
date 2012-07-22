@@ -31,9 +31,10 @@ public class ChatListener implements Listener{
 		this.plugin = plugin;
 	}
 	
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onChat(final PlayerChatEvent e){
-		if(e.isCancelled()) return;
+		//Don't care if its cancelled.
+		//if(e.isCancelled()) return;
 		Player p = e.getPlayer();
 		HashMap<String, Info> actions = plugin.getActions();
 		if(actions.containsKey(p.getName())){
