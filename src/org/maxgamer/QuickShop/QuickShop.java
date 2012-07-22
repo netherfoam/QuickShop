@@ -40,6 +40,7 @@ import org.maxgamer.QuickShop.Listeners.ChatListener;
 import org.maxgamer.QuickShop.Listeners.ChunkListener;
 import org.maxgamer.QuickShop.Listeners.ClickListener;
 import org.maxgamer.QuickShop.Listeners.MoveListener;
+import org.maxgamer.QuickShop.Listeners.QuitListener;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Watcher.BufferWatcher;
@@ -81,6 +82,7 @@ public class QuickShop extends JavaPlugin{
 	private BlockListener blockListener = new BlockListener(this);
 	private MoveListener moveListener = new MoveListener(this);
 	private ChunkListener chunkListener = new ChunkListener(this);
+	private QuitListener quitListener = new QuitListener(this);
 	
 	private int itemWatcherID;
 	
@@ -93,6 +95,7 @@ public class QuickShop extends JavaPlugin{
 		Bukkit.getServer().getPluginManager().registerEvents(blockListener, this);
 		Bukkit.getServer().getPluginManager().registerEvents(moveListener, this);
 		Bukkit.getServer().getPluginManager().registerEvents(chunkListener, this);
+		Bukkit.getServer().getPluginManager().registerEvents(quitListener, this);
 		
 		/* Create plugin folder */
 		if(!this.getDataFolder().exists()){
