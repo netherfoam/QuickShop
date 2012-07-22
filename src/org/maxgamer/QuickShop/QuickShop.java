@@ -1,6 +1,7 @@
 package org.maxgamer.QuickShop;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -99,10 +100,14 @@ public class QuickShop extends JavaPlugin{
 		}
 		/* Create config file */
 		File configFile = new File(this.getDataFolder(), "config.yml");
-		this.getConfig().options().copyDefaults(true);
 		if(!configFile.exists()){
 			//Copy config with comments
+			getLogger().info("Generating config");
 			this.saveDefaultConfig();
+		}
+		else{
+			getConfig().options().copyDefaults(true);
+			saveConfig();
 		}
 		
 		/* Hook into other plugins */
