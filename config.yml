@@ -10,6 +10,7 @@ shop:
     cost: 10
     refund: false
     lock: false
+    sneak-only: false
 
 plugins:
     #Whether or not to hook into these plugins, and stop players claiming chests as shops when they can't use the chest.

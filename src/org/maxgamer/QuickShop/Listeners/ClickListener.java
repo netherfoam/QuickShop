@@ -48,6 +48,11 @@ public class ClickListener implements Listener{
 		Player p = e.getPlayer();
 		ItemStack item = e.getItem();
 		
+		if(plugin.getConfig().getBoolean("shop.sneak-only") && !p.isSneaking()){
+			//Sneak only
+			return;
+		}
+		
 		/* 
 		 * Purchase Handling
 		 */
