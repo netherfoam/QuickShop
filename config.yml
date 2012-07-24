@@ -18,3 +18,7 @@ plugins:
     worldguard: true
     lockette: true
     griefprevention: true
+
+#List of items to disallow selling of.  Anyone with quickshop.bypass.<itemID> can bypass it    
+blacklist:
+    - 7

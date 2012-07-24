@@ -1,6 +1,8 @@
 package org.maxgamer.QuickShop.Listeners;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -32,8 +34,24 @@ import org.maxgamer.QuickShop.Shop.ShopAction;
  */
 public class ClickListener implements Listener{
 	QuickShop plugin;
+	HashSet<Material> blacklist = new HashSet<Material>(10);
+	
 	public ClickListener(QuickShop plugin){
 		this.plugin = plugin;
+		List<String> configBlacklist = plugin.getConfig().getStringList("blacklist");
+		
+		for(String s : configBlacklist){
+			Material mat = Material.getMaterial(s);
+			if(mat == null){
+				mat = Material.getMaterial(Integer.parseInt(s));
+				if(mat == null){
+					plugin.getLogger().info(s + " is not a valid material.  Check your spelling or ID");
+					continue;
+				}
+			}
+			this.blacklist.add(mat);
+		}
+		
 	}
 	@EventHandler
 	/**
@@ -83,6 +101,11 @@ public class ClickListener implements Listener{
 			if(plugin.getChestNextTo(b) != null){
 				p.sendMessage(ChatColor.RED + "Double chest shops are disabled.");
 				//e.setCancelled(true);
+				return;
+			}
+			
+			if(blacklist.contains(item.getType()) && !p.hasPermission("quickshop.bypass."+item.getTypeId())){
+				p.sendMessage(ChatColor.RED + "That item is blacklisted. You may not sell it.");
 				return;
 			}
 			
