@@ -42,7 +42,7 @@ public class Shop{
 	 * @return The number of items available for purchase.
 	 */
 	public int getRemainingStock(){
-		if(this.unlimited) return 999;
+		if(this.unlimited) return 9999;
 		
 		Chest chest = (Chest) loc.getBlock().getState();
 		int stock = 0;
