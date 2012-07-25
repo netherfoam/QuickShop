@@ -7,3 +7,8 @@ description: The real shop plugin.
 website: http://maxgamer.org
 depend: [Vault]
 soft-depend: [Towny, PreciousStones, Lockette, WorldGuard, GriefPrevention]
+
+commands:
+    qs:
+        description: QuickShop command
+        usage: /qs unlimited

@@ -17,6 +17,7 @@ public class Shop{
 	private String owner;
 	private ItemStack item;
 	private DisplayItem displayItem;
+	private boolean unlimited;
 	
 	private QuickShop plugin;
 	
@@ -41,6 +42,8 @@ public class Shop{
 	 * @return The number of items available for purchase.
 	 */
 	public int getRemainingStock(){
+		if(this.unlimited) return 999;
+		
 		Chest chest = (Chest) loc.getBlock().getState();
 		int stock = 0;
 		
@@ -109,6 +112,7 @@ public class Shop{
 	 * @param amount The amount to remove from the shop.
 	 */
 	public void remove(ItemStack item, int amount){
+		if(this.unlimited) return;
 		Inventory inv = this.getChest().getInventory();
 		
 		int remains = amount;
@@ -127,5 +131,12 @@ public class Shop{
 	 */
 	public DisplayItem getDisplayItem(){
 		return this.displayItem;
+	}
+	
+	public void setUnlimited(boolean unlimited){
+		this.unlimited = unlimited;
+	}
+	public boolean isUnlimited(){
+		return this.unlimited;
 	}
 }

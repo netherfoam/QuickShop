@@ -1,7 +1,6 @@
 package org.maxgamer.QuickShop;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,6 +33,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionType;
+import org.maxgamer.QuickShop.Command.QS;
 import org.maxgamer.QuickShop.Database.Database;
 import org.maxgamer.QuickShop.Listeners.BlockListener;
 import org.maxgamer.QuickShop.Listeners.ChatListener;
@@ -78,7 +78,7 @@ public class QuickShop extends JavaPlugin{
 	private Lockette lockette;
 	
 	private ChatListener chatListener = new ChatListener(this);
-	private ClickListener clickListener = new ClickListener(this);
+	private ClickListener clickListener;
 	private BlockListener blockListener = new BlockListener(this);
 	private MoveListener moveListener = new MoveListener(this);
 	private ChunkListener chunkListener = new ChunkListener(this);
@@ -89,6 +89,9 @@ public class QuickShop extends JavaPlugin{
 	public void onEnable(){
 		getLogger().info("Hooking Vault");
 		setupEconomy();
+		
+		//Safe to initialize now - It accesses config!
+		this.clickListener = new ClickListener(this);
 		getLogger().info("Registering Listeners");
 		Bukkit.getServer().getPluginManager().registerEvents(chatListener, this);
 		Bukkit.getServer().getPluginManager().registerEvents(clickListener, this);
@@ -96,6 +99,9 @@ public class QuickShop extends JavaPlugin{
 		Bukkit.getServer().getPluginManager().registerEvents(moveListener, this);
 		Bukkit.getServer().getPluginManager().registerEvents(chunkListener, this);
 		Bukkit.getServer().getPluginManager().registerEvents(quitListener, this);
+		
+		QS commandExecutor = new QS(this);
+		getCommand("qs").setExecutor(commandExecutor);
 		
 		/* Create plugin folder */
 		if(!this.getDataFolder().exists()){
@@ -167,6 +173,8 @@ public class QuickShop extends JavaPlugin{
 				getLogger().severe("Could not create database table");
 			}
 		}
+		getDB().checkColumns();
+		
 		/* Load shops from database to memory */
 		Connection con = database.getConnection();
 		try {
@@ -190,6 +198,9 @@ public class QuickShop extends JavaPlugin{
 				}
 				
 				Shop shop = new Shop(loc, price, item, owner);
+				if(rs.getBoolean("unlimited")){
+					shop.setUnlimited(true);
+				}
 				
 				this.getShops().put(loc, shop);
 			}
@@ -292,10 +303,6 @@ public class QuickShop extends JavaPlugin{
 		
 		DecimalFormat formatter = new DecimalFormat("0");
 		return formatter.format((1 - dura/max)* 100.0);
-	}
-	
-	public boolean isProtectedItem(Item item){
-		return this.spawnedItems.containsValue(item);
 	}
 	
 	/**

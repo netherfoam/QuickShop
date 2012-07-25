@@ -100,7 +100,7 @@ public class ChatListener implements Listener{
 					int z = shop.getLocation().getBlockZ();
 					String world = shop.getLocation().getWorld().getName();
 					String itemString = plugin.makeString(shop.getItem());
-					plugin.getDB().writeToBuffer("INSERT INTO shops VALUES ('"+e.getPlayer().getName()+"', '"+price+"', '"+itemString+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"')");
+					plugin.getDB().writeToBuffer("INSERT INTO shops VALUES ('"+e.getPlayer().getName()+"', '"+price+"', '"+itemString+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"', '"+0+"')");
 					
 					if(!plugin.getConfig().getBoolean("shop.lock")){
 						//Warn them if they havent been warned since reboot
@@ -218,9 +218,7 @@ public class ChatListener implements Listener{
 					else{
 						p.sendMessage(ChatColor.RED + "The shop only has " + ChatColor.YELLOW + shop.getRemainingStock() + " " + shop.getMaterial().toString() + ChatColor.RED + " left.");
 						actions.remove(p.getName());
-						if(!plugin.getConfig().getBoolean("always-chat")){
-							e.setCancelled(true);
-						}
+						e.setCancelled(true);
 						return;
 					}
 				}

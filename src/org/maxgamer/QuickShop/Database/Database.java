@@ -139,9 +139,21 @@ public class Database{
 				"\"y\"  INTEGER(32) NOT NULL, " +
 				"\"z\"  INTEGER(32) NOT NULL, " +
 				"\"world\"  TEXT(30) NOT NULL, " +
+				"\"unlimited\"  boolean, " +
 				"PRIMARY KEY ('x', 'y','z','world') " +
 				");";
 		st.execute(createTable);
+	}
+	
+	public void checkColumns(){
+		PreparedStatement ps = null;
+		try {
+			ps = this.getConnection().prepareStatement(" ALTER TABLE shops ADD unlimited boolean");
+			ps.execute();
+			ps.close();
+		} catch (SQLException e) {
+			plugin.getLogger().info("Found all columns");
+		}
 	}
 	
 	public void stopBuffer(){
