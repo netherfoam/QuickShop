@@ -114,7 +114,7 @@ public class ChatListener implements Listener{
 						}
 					}
 					
-					if(info.getSignBlock() != null && info.getSignBlock().getType() == Material.AIR){
+					if(info.getSignBlock() != null && info.getSignBlock().getType() == Material.AIR && plugin.getConfig().getBoolean("shop.auto-sign")){
 						BlockState bs = info.getSignBlock().getState();
 						BlockFace bf = info.getLocation().getBlock().getFace(info.getSignBlock());
 						bs.setType(Material.WALL_SIGN);
