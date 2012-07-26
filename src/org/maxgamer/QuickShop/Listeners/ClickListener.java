@@ -10,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -62,22 +63,27 @@ public class ClickListener implements Listener{
 	 * Left click a SHOP   chest			: Send purchase menu
 	 */
 	public void onClick(PlayerInteractEvent e){
-		if(e.isCancelled() || e.getAction() != Action.LEFT_CLICK_BLOCK || e.getClickedBlock().getType() != Material.CHEST) return;
+		if(e.isCancelled() || e.getAction() != Action.LEFT_CLICK_BLOCK || (e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.WALL_SIGN)) return;
 		
 		Block b = e.getClickedBlock();
 		Player p = e.getPlayer();
 		ItemStack item = e.getItem();
+		Location loc = b.getLocation();
 		
+		Shop shop = plugin.getShop(loc);
+		if(shop == null) shop = getShopNextTo(loc);
+
 		/* 
 		 * Purchase Handling
 		 */
-		if(plugin.getShops().containsKey(e.getClickedBlock().getLocation()) && p.hasPermission("quickshop.buy")){
+		if(shop != null && p.hasPermission("quickshop.buy")){
 			if(plugin.getConfig().getBoolean("shop.sneak-only") && !p.isSneaking()){
 				//Sneak only
 				return;
 			}
 			
-			Shop shop = plugin.getShop(b.getLocation());
+			//Shop shop = plugin.getShop(b.getLocation());
+			//if(shop == null) shop = this.getShopNextTo(loc);
 			
 			//Text menu
 			sendShopInfo(p, shop);
@@ -86,7 +92,7 @@ public class ClickListener implements Listener{
 			//Add the new action
 			HashMap<String, Info> actions = plugin.getActions();
 			actions.remove(p.getName());
-			Info info = new Info(b.getLocation(), ShopAction.BUY, null, null);
+			Info info = new Info(shop.getLocation(), ShopAction.BUY, null, null);
 			actions.put(p.getName(), info);
 			
 			return;
@@ -94,7 +100,7 @@ public class ClickListener implements Listener{
 		/*
 		 * Creation handling
 		 */
-		else if(item != null && item.getType() != Material.AIR && p.hasPermission("quickshop.create")){
+		else if(item != null && item.getType() != Material.AIR && p.hasPermission("quickshop.create") && b.getType() == Material.CHEST && shop == null){
 			if(!plugin.canBuildShop(p, b)){
 				p.sendMessage(ChatColor.RED + "You may not create a shop here.");
 				//e.setCancelled(true);
@@ -180,5 +186,21 @@ public class ClickListener implements Listener{
 				return;
 			}
 		}
+	}
+	
+	private Shop getShopNextTo(Location loc){
+		Block[] blocks = new Block[4];
+		blocks[0] = loc.getBlock().getRelative(1, 0, 0);
+		blocks[1] = loc.getBlock().getRelative(-1, 0, 0);
+		blocks[2] = loc.getBlock().getRelative(0, 0, 1);
+		blocks[3] = loc.getBlock().getRelative(0, 0, -1);
+		
+		for(Block b : blocks){
+			plugin.getLogger().info(b.getType() + " testing as shop");
+			if(b.getType() != Material.CHEST) continue;
+			Shop shop = plugin.getShop(b.getLocation());
+			if(shop != null) return shop;
+		}
+		return null;
 	}
 }
