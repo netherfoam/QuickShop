@@ -7,6 +7,10 @@ import java.util.Map.Entry;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -108,6 +112,33 @@ public class ChatListener implements Listener{
 							p.sendMessage(ChatColor.DARK_RED + "[QuickShop] " +ChatColor.RED+"Remember, shops are NOT protected from theft! If you want to stop thieves, lock it!");
 							plugin.warnings.add(p.getName());
 						}
+					}
+					
+					if(info.getSignBlock() != null && info.getSignBlock().getType() == Material.AIR){
+						BlockState bs = info.getSignBlock().getState();
+						BlockFace bf = info.getLocation().getBlock().getFace(info.getSignBlock());
+						bs.setType(Material.WALL_SIGN);
+						
+						if(bf == BlockFace.NORTH){
+							bs.setRawData((byte)4);
+						}
+						else if(bf == BlockFace.SOUTH){
+							bs.setRawData((byte) 5);
+						}
+						else if(bf == BlockFace.EAST){
+							bs.setRawData((byte) 2);
+						}
+						else if(bf == BlockFace.WEST){
+							bs.setRawData((byte) 3);
+						}
+						
+						bs.update(true);
+						
+						Sign sign = (Sign) info.getSignBlock().getState();
+						sign.setLine(0, "Selling:");
+						sign.setLine(1, plugin.getDataName(shop.getMaterial(), shop.getDurability()));
+						sign.setLine(2, "For $" + shop.getPrice());
+						sign.update(true);
 					}
 					
 					e.setCancelled(true); //Don't send to chat.

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
@@ -17,6 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.BlockIterator;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
@@ -84,7 +86,7 @@ public class ClickListener implements Listener{
 			//Add the new action
 			HashMap<String, Info> actions = plugin.getActions();
 			actions.remove(p.getName());
-			Info info = new Info(b.getLocation(), ShopAction.BUY, null);
+			Info info = new Info(b.getLocation(), ShopAction.BUY, null, null);
 			actions.put(p.getName(), info);
 			
 			return;
@@ -109,8 +111,27 @@ public class ClickListener implements Listener{
 				return;
 			}
 			
+			Block last = null;
+			Location from = p.getLocation().clone();
+			from.setY(b.getY());
+			from.setPitch(0);
+			BlockIterator bIt = new BlockIterator(from);
+			int safety = 0;
+			while(bIt.hasNext()){
+				Block n = bIt.next();
+				if(n.getLocation().distanceSquared(b.getLocation()) < 0.1){
+					break;
+				}
+				last = n;
+				safety++;
+				if(safety > 12){
+					last = null;
+				}
+			}
+			
+			
 			//Send creation menu.
-			Info info = new Info(b.getLocation(), ShopAction.CREATE, e.getItem());
+			Info info = new Info(b.getLocation(), ShopAction.CREATE, e.getItem(), last);
 			plugin.getActions().put(p.getName(), info);
 			p.sendMessage(ChatColor.GREEN + "Enter how much you wish to sell one "+ ChatColor.YELLOW  + item.getType().toString() + ChatColor.GREEN + " for.");
 		}
