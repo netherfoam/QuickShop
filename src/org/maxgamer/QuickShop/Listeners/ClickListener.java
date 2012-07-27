@@ -118,7 +118,7 @@ public class ClickListener implements Listener{
 			Location from = p.getLocation().clone();
 			from.setY(b.getY());
 			from.setPitch(0);
-			BlockIterator bIt = new BlockIterator(from, 7);
+			BlockIterator bIt = new BlockIterator(from, 0, 7);
 			while(bIt.hasNext()){
 				Block n = bIt.next();
 				if(n.getLocation().distanceSquared(b.getLocation()) < 0.1){
@@ -170,7 +170,7 @@ public class ClickListener implements Listener{
 	 */
 	public void onChestUse(PlayerInteractEvent e){
 		if(e.isCancelled() || e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getClickedBlock().getType() != Material.CHEST) return;
-		if(plugin.getConfig().getBoolean("shops.lock")){
+		if(plugin.getConfig().getBoolean("shop.lock")){
 			Shop shop = plugin.getShop(e.getClickedBlock().getLocation());
 			if(shop != null && !shop.getOwner().equalsIgnoreCase(e.getPlayer().getName())){
 				e.getPlayer().sendMessage(ChatColor.RED + "[QuickShop] That shop is locked.  Left click if you wish to buy!");
