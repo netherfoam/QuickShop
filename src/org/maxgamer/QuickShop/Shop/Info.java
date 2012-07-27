@@ -3,7 +3,6 @@ package org.maxgamer.QuickShop.Shop;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 
 public class Info{

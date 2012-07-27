@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
@@ -199,10 +198,16 @@ public class ChatListener implements Listener{
 								double total = amount * shop.getPrice();
 								
 								plugin.getEcon().withdrawPlayer(p.getName(), total);
-								plugin.getEcon().depositPlayer(shop.getOwner(), total * (1 - tax));
 								
-								if(tax != 0){
-									plugin.getEcon().depositPlayer(plugin.getConfig().getString("tax-account"), total * tax);
+								if(shop.isUnlimited() && !plugin.getConfig().getBoolean("shop.pay-unlimited-shop-owners")){
+									
+								}
+								if(!shop.isUnlimited() || (shop.isUnlimited() && plugin.getConfig().getBoolean("shop.pay-unlimited-shop-owners"))){
+									plugin.getEcon().depositPlayer(shop.getOwner(), total * (1 - tax));
+									
+									if(tax != 0){
+										plugin.getEcon().depositPlayer(plugin.getConfig().getString("tax-account"), total * tax);
+									}
 								}
 								
 								Player owner = Bukkit.getPlayerExact(shop.getOwner());
@@ -213,6 +218,7 @@ public class ChatListener implements Listener{
 							//Items to drop on floor
 							HashMap<Integer, ItemStack> floor = new HashMap<Integer, ItemStack>(30);
 							int amt = amount;
+							int n = 0;
 							while(amt > 0){
 								int temp = Math.min(amt, transfer.getMaxStackSize());
 								if(temp == -1){
@@ -222,7 +228,16 @@ public class ChatListener implements Listener{
 									break;
 								}
 								transfer.setAmount(temp);
-								floor.putAll(p.getInventory().addItem(transfer));
+								HashMap<Integer, ItemStack> remaining = new HashMap<Integer, ItemStack>(30);
+								
+								remaining.putAll(p.getInventory().addItem(transfer));
+								
+								for(ItemStack iStack : remaining.values()){
+									floor.put(n, iStack);
+									n++;
+								}
+								
+								//floor.p
 								amt = amt - temp;
 							}
 							//Give the player items

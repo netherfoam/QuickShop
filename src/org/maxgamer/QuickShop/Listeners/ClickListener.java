@@ -10,7 +10,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -70,7 +69,9 @@ public class ClickListener implements Listener{
 		ItemStack item = e.getItem();
 		Location loc = b.getLocation();
 		
+		//Get the shop
 		Shop shop = plugin.getShop(loc);
+		//If that wasn't a shop, search nearby shops
 		if(shop == null) shop = getShopNextTo(loc);
 
 		/* 
@@ -81,10 +82,6 @@ public class ClickListener implements Listener{
 				//Sneak only
 				return;
 			}
-			
-			//Shop shop = plugin.getShop(b.getLocation());
-			//if(shop == null) shop = this.getShopNextTo(loc);
-			
 			//Text menu
 			sendShopInfo(p, shop);
 			p.sendMessage(ChatColor.GREEN + "Enter how many you wish to purchase in chat.");
@@ -132,6 +129,7 @@ public class ClickListener implements Listener{
 				safety++;
 				if(safety > 12){
 					last = null;
+					break;
 				}
 			}
 			
@@ -196,7 +194,6 @@ public class ClickListener implements Listener{
 		blocks[3] = loc.getBlock().getRelative(0, 0, -1);
 		
 		for(Block b : blocks){
-			plugin.getLogger().info(b.getType() + " testing as shop");
 			if(b.getType() != Material.CHEST) continue;
 			Shop shop = plugin.getShop(b.getLocation());
 			if(shop != null) return shop;
