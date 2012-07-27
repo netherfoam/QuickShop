@@ -118,19 +118,13 @@ public class ClickListener implements Listener{
 			Location from = p.getLocation().clone();
 			from.setY(b.getY());
 			from.setPitch(0);
-			BlockIterator bIt = new BlockIterator(from);
-			int safety = 0;
+			BlockIterator bIt = new BlockIterator(from, 7);
 			while(bIt.hasNext()){
 				Block n = bIt.next();
 				if(n.getLocation().distanceSquared(b.getLocation()) < 0.1){
 					break;
 				}
 				last = n;
-				safety++;
-				if(safety > 12){
-					last = null;
-					break;
-				}
 			}
 			
 			
