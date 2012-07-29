@@ -30,8 +30,8 @@ public class MoveListener implements Listener{
 			Location loc2 = p.getLocation();
 			
 			
-			if(loc1.distanceSquared(loc2) > 25){
-				if(info.getAction() == ShopAction.CREATE){
+			if(loc1.getWorld() != loc2.getWorld() || loc1.distanceSquared(loc2) > 25){
+				if(info.getAction() == ShopAction.CREATE_BUY){
 					p.sendMessage(ChatColor.RED + "Shop creation cancelled");
 				}
 				else if(info.getAction() == ShopAction.BUY){
