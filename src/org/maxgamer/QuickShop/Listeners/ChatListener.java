@@ -47,7 +47,7 @@ public class ChatListener implements Listener{
 			/*
 			 * Creation handling
 			 */
-			if(info.getAction() == ShopAction.CREATE){
+			if(info.getAction() == ShopAction.CREATE_BUY){
 				try{
 					if(plugin.getShop(info.getLocation()) != null){
 						p.sendMessage(ChatColor.RED + "Someone else has claimed that shop.");

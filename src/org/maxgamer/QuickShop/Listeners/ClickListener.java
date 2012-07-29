@@ -129,7 +129,7 @@ public class ClickListener implements Listener{
 			
 			
 			//Send creation menu.
-			Info info = new Info(b.getLocation(), ShopAction.CREATE, e.getItem(), last);
+			Info info = new Info(b.getLocation(), ShopAction.CREATE_BUY, e.getItem(), last);
 			plugin.getActions().put(p.getName(), info);
 			p.sendMessage(ChatColor.GREEN + "Enter how much you wish to sell one "+ ChatColor.YELLOW  + item.getType().toString() + ChatColor.GREEN + " for.");
 		}
