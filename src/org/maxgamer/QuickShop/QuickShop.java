@@ -653,7 +653,6 @@ public class QuickShop extends JavaPlugin{
 	public boolean canBuildShop(Player p, Block b){
 		if(getWorldGuard() != null){
 			if(!getWorldGuard().canBuild(p, b)){
-				getLogger().info("WG blocked");
 				//Can't build.
 				return false;
 			}
