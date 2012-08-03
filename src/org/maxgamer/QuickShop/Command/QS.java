@@ -21,7 +21,7 @@ public class QS implements CommandExecutor{
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
 		if(args.length > 0){
 			if(sender instanceof Player && sender.hasPermission("quickshop.unlimited")){
-				BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender);
+				BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
 				while(bIt.hasNext()){
 					Block b = bIt.next();
 					Shop shop = plugin.getShop(b.getLocation());
