@@ -31,6 +31,14 @@ public class BlockListener implements Listener{
 		Shop shop = plugin.getShops().get(e.getBlock().getLocation());
 		//If the chest was a shop
 		if(shop != null){
+			if(plugin.getConfig().getBoolean("shop.lock")){
+				if(!shop.getOwner().equalsIgnoreCase(e.getPlayer().getName()) && !e.getPlayer().hasPermission("quickshop.destroy")){
+					e.setCancelled(true);
+					e.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to destroy " + shop.getOwner() + "'s shop");
+					return;
+				}
+			}
+			
 			for(Info info : plugin.getActions().values()){
 				info.setAction(ShopAction.CANCELLED);
 			}
