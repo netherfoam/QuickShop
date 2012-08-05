@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Shop.Info;
@@ -35,7 +35,7 @@ public class ChatListener implements Listener{
 	}
 	
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
-	public void onChat(final PlayerChatEvent e){
+	public void onChat(final AsyncPlayerChatEvent e){
 		//Don't care if its cancelled.
 		//if(e.isCancelled()) return;
 		Player p = e.getPlayer();
@@ -163,7 +163,7 @@ public class ChatListener implements Listener{
 					int amount = Integer.parseInt(e.getMessage());
 					Shop shop = plugin.getShops().get(info.getLocation());
 					
-					if(info.getLocation().getBlock().getType() != Material.CHEST){
+					if(shop == null || info.getLocation().getBlock().getType() != Material.CHEST){
 						p.sendMessage(ChatColor.RED + "That shop was removed.");
 						e.setCancelled(true);
 						actions.remove(p.getName());
