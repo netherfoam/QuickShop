@@ -2,6 +2,7 @@ package org.maxgamer.QuickShop.Listeners;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -37,6 +38,12 @@ public class BlockListener implements Listener{
 					e.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to destroy " + shop.getOwner() + "'s shop");
 					return;
 				}
+			}
+			
+			if(e.getPlayer().getGameMode() == GameMode.CREATIVE && !e.getPlayer().getName().equalsIgnoreCase(shop.getOwner())){
+				e.setCancelled(true);
+				e.getPlayer().sendMessage(ChatColor.RED + "You cannot break other players shops in creative mode.  Use survival instead.");
+				return;
 			}
 			
 			for(Info info : plugin.getActions().values()){
