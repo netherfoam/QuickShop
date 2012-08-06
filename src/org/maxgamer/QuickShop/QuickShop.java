@@ -209,7 +209,7 @@ public class QuickShop extends JavaPlugin{
 			e.printStackTrace();
 			getLogger().severe("Could not load shops.");
 		}
-		
+		getLogger().info("Loaded " + this.shops.size() + " shops.");
 		/**
 		 * Display item handler thread
 		 */
