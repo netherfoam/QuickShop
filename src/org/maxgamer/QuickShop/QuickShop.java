@@ -626,7 +626,7 @@ public class QuickShop extends JavaPlugin{
 			return "REDSTONE_LAMP";
 		}
 		if(damage == 0 || isTool(mat)) return mat.toString();
-		else return mat.toString()+ ":" + damage;
+		return mat.toString()+ ":" + damage;
 	}
 	
 	public WorldGuardPlugin getWorldGuard(){

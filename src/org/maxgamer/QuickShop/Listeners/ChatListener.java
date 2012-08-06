@@ -36,257 +36,234 @@ public class ChatListener implements Listener{
 	
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onChat(final AsyncPlayerChatEvent e){
-		//Don't care if its cancelled.
-		//if(e.isCancelled()) return;
-		Player p = e.getPlayer();
-		HashMap<String, Info> actions = plugin.getActions();
-		if(actions.containsKey(p.getName())){
-			//They wanted to do something.
-			Info info = actions.get(p.getName());
-			
-			/*
-			 * Creation handling
-			 */
-			if(info.getAction() == ShopAction.CREATE_BUY){
-				try{
-					if(plugin.getShop(info.getLocation()) != null){
-						p.sendMessage(ChatColor.RED + "Someone else has claimed that shop.");
-						e.setCancelled(true);
-						actions.remove(info.getLocation());
-						return;
-					}
-					
-					if(plugin.getChestNextTo(info.getLocation().getBlock()) != null){
-						p.sendMessage(ChatColor.RED + "Double chest shops are disabled.");
-						e.setCancelled(true);
-						actions.remove(p.getName());
-						return;
-					}
-					
-					if(info.getLocation().getBlock().getType() != Material.CHEST){
-						p.sendMessage(ChatColor.RED + "That chest was removed.");
-						e.setCancelled(true);
-						actions.remove(p.getName());
-						return;
-					}
-					
-					//Price per item
-					double price = Double.parseDouble(e.getMessage());
-					if(price < 0.01){
-						p.sendMessage(ChatColor.RED + "Price must be greater than " + ChatColor.YELLOW + "$0.01");
-						actions.remove(p.getName());
-						e.setCancelled(true);
-						return;
-					}
-					double tax = plugin.getConfig().getDouble("shop.cost"); 
-					
-					if(tax != 0 && plugin.getEcon().getBalance(p.getName()) <= tax){
-						p.sendMessage(ChatColor.RED + "It costs $" + tax + " to create a new shop.");
-						actions.remove(p.getName());
-						e.setCancelled(true);
-						return;
-					}
-					
-					//Add the shop to the list.
-					final Shop shop = new Shop(info.getLocation(), price, info.getItem(), p.getName());
-					plugin.getShops().put(info.getLocation(), shop);
-					
-					if(tax == 0) p.sendMessage(ChatColor.GREEN + "Created a shop");
-					else{
-						plugin.getEcon().withdrawPlayer(p.getName(), tax);
-						plugin.getEcon().depositPlayer(plugin.getConfig().getString("tax-account"), tax);
-					}
-					
-					//Save it to the database.
-					int x = shop.getLocation().getBlockX();
-					int y = shop.getLocation().getBlockY();
-					int z = shop.getLocation().getBlockZ();
-					String world = shop.getLocation().getWorld().getName();
-					String itemString = plugin.makeString(shop.getItem());
-					plugin.getDB().writeToBuffer("INSERT INTO shops VALUES ('"+e.getPlayer().getName()+"', '"+price+"', '"+itemString+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"', '"+0+"')");
-					
-					if(!plugin.getConfig().getBoolean("shop.lock")){
-						//Warn them if they havent been warned since reboot
-						if(!plugin.warnings.contains(p.getName())){
-							p.sendMessage(ChatColor.DARK_RED + "[QuickShop] " +ChatColor.RED+"Remember, shops are NOT protected from theft! If you want to stop thieves, lock it!");
-							plugin.warnings.add(p.getName());
-						}
-					}
-					
-					if(info.getSignBlock() != null && info.getSignBlock().getType() == Material.AIR && plugin.getConfig().getBoolean("shop.auto-sign")){
-						BlockState bs = info.getSignBlock().getState();
-						BlockFace bf = info.getLocation().getBlock().getFace(info.getSignBlock());
-						bs.setType(Material.WALL_SIGN);
-						
-						if(bf == BlockFace.NORTH){
-							bs.setRawData((byte)4);
-						}
-						else if(bf == BlockFace.SOUTH){
-							bs.setRawData((byte) 5);
-						}
-						else if(bf == BlockFace.EAST){
-							bs.setRawData((byte) 2);
-						}
-						else if(bf == BlockFace.WEST){
-							bs.setRawData((byte) 3);
+		if(!plugin.getActions().containsKey(e.getPlayer().getName())) return;
+		
+		//Use from the main thread, because Bukkit hates life
+		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
+			@Override
+			public void run() {
+				Player p = e.getPlayer();
+				HashMap<String, Info> actions = plugin.getActions();
+				//They wanted to do something.
+				Info info = actions.get(p.getName());
+				plugin.getActions().remove(p.getName());
+				
+				/*
+				 * Creation handling
+				 */
+				if(info.getAction() == ShopAction.CREATE_BUY){
+					try{
+						if(plugin.getShop(info.getLocation()) != null){
+							p.sendMessage(ChatColor.RED + "Someone else has claimed that shop.");
+							return;
 						}
 						
-						bs.update(true);
+						if(plugin.getChestNextTo(info.getLocation().getBlock()) != null){
+							p.sendMessage(ChatColor.RED + "Double chest shops are disabled.");
+							return;
+						}
 						
-						Sign sign = (Sign) info.getSignBlock().getState();
-						sign.setLine(0, "Selling:");
-						sign.setLine(1, plugin.getDataName(shop.getMaterial(), shop.getDurability()));
-						sign.setLine(2, "For $" + shop.getPrice());
-						sign.update(true);
+						if(info.getLocation().getBlock().getType() != Material.CHEST){
+							p.sendMessage(ChatColor.RED + "That chest was removed.");
+							return;
+						}
+						
+						//Price per item
+						double price = Double.parseDouble(e.getMessage());
+						if(price < 0.01){
+							p.sendMessage(ChatColor.RED + "Price must be greater than " + ChatColor.YELLOW + "$0.01");
+							return;
+						}
+						double tax = plugin.getConfig().getDouble("shop.cost"); 
+						
+						if(tax != 0 && plugin.getEcon().getBalance(p.getName()) <= tax){
+							p.sendMessage(ChatColor.RED + "It costs $" + tax + " to create a new shop.");
+							return;
+						}
+						
+						//Add the shop to the list.
+						final Shop shop = new Shop(info.getLocation(), price, info.getItem(), p.getName());
+						plugin.getShops().put(info.getLocation(), shop);
+						
+						if(tax == 0) p.sendMessage(ChatColor.GREEN + "Created a shop");
+						else{
+							plugin.getEcon().withdrawPlayer(p.getName(), tax);
+							plugin.getEcon().depositPlayer(plugin.getConfig().getString("tax-account"), tax);
+						}
+						
+						//Save it to the database.
+						int x = shop.getLocation().getBlockX();
+						int y = shop.getLocation().getBlockY();
+						int z = shop.getLocation().getBlockZ();
+						String world = shop.getLocation().getWorld().getName();
+						String itemString = plugin.makeString(shop.getItem());
+						plugin.getDB().writeToBuffer("INSERT INTO shops VALUES ('"+e.getPlayer().getName()+"', '"+price+"', '"+itemString+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"', '"+0+"')");
+						
+						if(!plugin.getConfig().getBoolean("shop.lock")){
+							//Warn them if they havent been warned since reboot
+							if(!plugin.warnings.contains(p.getName())){
+								p.sendMessage(ChatColor.DARK_RED + "[QuickShop] " +ChatColor.RED+"Remember, shops are NOT protected from theft! If you want to stop thieves, lock it!");
+								plugin.warnings.add(p.getName());
+							}
+						}
+						
+						if(info.getSignBlock() != null && info.getSignBlock().getType() == Material.AIR && plugin.getConfig().getBoolean("shop.auto-sign")){
+							BlockState bs = info.getSignBlock().getState();
+							BlockFace bf = info.getLocation().getBlock().getFace(info.getSignBlock());
+							bs.setType(Material.WALL_SIGN);
+							
+							if(bf == BlockFace.NORTH){
+								bs.setRawData((byte)4);
+							}
+							else if(bf == BlockFace.SOUTH){
+								bs.setRawData((byte) 5);
+							}
+							else if(bf == BlockFace.EAST){
+								bs.setRawData((byte) 2);
+							}
+							else if(bf == BlockFace.WEST){
+								bs.setRawData((byte) 3);
+							}
+							
+							bs.update(true);
+							
+							Sign sign = (Sign) info.getSignBlock().getState();
+							sign.setLine(0, "Selling:");
+							sign.setLine(1, plugin.getDataName(shop.getMaterial(), shop.getDurability()));
+							sign.setLine(2, "For $" + shop.getPrice());
+							sign.update(true);
+						}
 					}
-					
-					e.setCancelled(true); //Don't send to chat.
-					plugin.getActions().remove(p.getName());
+					/*
+					 * They didn't enter a number.
+					 */
+					catch(NumberFormatException ex){
+						p.sendMessage(ChatColor.RED + "Cancelled Shop Creation");
+						return;
+					}
 				}
 				/*
-				 * They didn't enter a number.
+				 * Purchase Handling
 				 */
-				catch(NumberFormatException ex){
-					actions.remove(p.getName());
-					p.sendMessage(ChatColor.RED + "Cancelled Shop Creation");
-					if(!plugin.getConfig().getBoolean("always-chat")){
-						e.setCancelled(true);
-					}
-					return;
-				}
-			}
-			/*
-			 * Purchase Handling
-			 */
-			else if(info.getAction() == ShopAction.BUY){
-				try{
-					int amount = Integer.parseInt(e.getMessage());
-					Shop shop = plugin.getShops().get(info.getLocation());
-					
-					if(shop == null || info.getLocation().getBlock().getType() != Material.CHEST){
-						p.sendMessage(ChatColor.RED + "That shop was removed.");
-						e.setCancelled(true);
-						actions.remove(p.getName());
-						return;
-					}
-					
-					if(shop.getRemainingStock() >=  amount){
-						if(plugin.getEcon().has(p.getName(), amount * shop.getPrice())){
-							ItemStack transfer = shop.getItem().clone();
-							transfer.setAmount(amount);
-							
-							if(amount == 0){
-								//Dumb.
-								sendPurchaseSuccess(p, shop, amount);
-								actions.remove(p.getName());
-								e.setCancelled(true);
-								return; 
-							}
-							else if(amount < 0){
-								// & Dumber
-								p.sendMessage(ChatColor.RED + "Derrrrp, Can't buy negative amounts.");
-								actions.remove(p.getName());
-								e.setCancelled(true);
-								return;
-							}
-							
-							//Money handling
-							if(!p.getName().equalsIgnoreCase(shop.getOwner())){
-								//Don't tax them if they're purchasing from themselves.
-								//Do charge an amount of tax though.
-								double tax = plugin.getConfig().getDouble("tax");
-								double total = amount * shop.getPrice();
+				else if(info.getAction() == ShopAction.BUY){
+					try{
+						int amount = Integer.parseInt(e.getMessage());
+						Shop shop = plugin.getShops().get(info.getLocation());
+						
+						if(shop == null || info.getLocation().getBlock().getType() != Material.CHEST){
+							p.sendMessage(ChatColor.RED + "That shop was removed.");
+							return;
+						}
+						
+						if(shop.getRemainingStock() >=  amount){
+							if(plugin.getEcon().has(p.getName(), amount * shop.getPrice())){
+								ItemStack transfer = shop.getItem().clone();
+								transfer.setAmount(amount);
 								
-								plugin.getEcon().withdrawPlayer(p.getName(), total);
-								
-								if(shop.isUnlimited() && !plugin.getConfig().getBoolean("shop.pay-unlimited-shop-owners")){
-									
+								if(amount == 0){
+									//Dumb.
+									sendPurchaseSuccess(p, shop, amount);
+									return; 
 								}
-								if(!shop.isUnlimited() || (shop.isUnlimited() && plugin.getConfig().getBoolean("shop.pay-unlimited-shop-owners"))){
-									plugin.getEcon().depositPlayer(shop.getOwner(), total * (1 - tax));
+								else if(amount < 0){
+									// & Dumber
+									p.sendMessage(ChatColor.RED + "Derrrrp, Can't buy negative amounts.");
+									return;
+								}
+								
+								//Money handling
+								if(!p.getName().equalsIgnoreCase(shop.getOwner())){
+									//Don't tax them if they're purchasing from themselves.
+									//Do charge an amount of tax though.
+									double tax = plugin.getConfig().getDouble("tax");
+									double total = amount * shop.getPrice();
 									
-									if(tax != 0){
-										plugin.getEcon().depositPlayer(plugin.getConfig().getString("tax-account"), total * tax);
+									plugin.getEcon().withdrawPlayer(p.getName(), total);
+									
+									if(shop.isUnlimited() && !plugin.getConfig().getBoolean("shop.pay-unlimited-shop-owners")){
+										
+									}
+									if(!shop.isUnlimited() || (shop.isUnlimited() && plugin.getConfig().getBoolean("shop.pay-unlimited-shop-owners"))){
+										plugin.getEcon().depositPlayer(shop.getOwner(), total * (1 - tax));
+										
+										if(tax != 0){
+											plugin.getEcon().depositPlayer(plugin.getConfig().getString("tax-account"), total * tax);
+										}
+									}
+									
+									Player owner = Bukkit.getPlayerExact(shop.getOwner());
+									if(owner != null){
+										owner.sendMessage(ChatColor.GREEN + p.getName() + " just purchased " + amount + " " + ChatColor.YELLOW + plugin.getDataName(shop.getItem().getType(), shop.getItem().getDurability()) + ChatColor.GREEN + " from your store.");
+										if(shop.getRemainingStock() == amount) owner.sendMessage(ChatColor.DARK_PURPLE + "Your shop at " + shop.getLocation().getBlockX() + ", " + shop.getLocation().getBlockY() + ", " + shop.getLocation().getBlockZ() + " has run out of " + plugin.getDataName(shop.getItem().getType(), shop.getItem().getDurability()));
 									}
 								}
 								
-								Player owner = Bukkit.getPlayerExact(shop.getOwner());
-								if(owner != null){
-									owner.sendMessage(ChatColor.GREEN + p.getName() + " just purchased " + amount + " " + ChatColor.YELLOW + plugin.getDataName(shop.getItem().getType(), shop.getItem().getDurability()) + ChatColor.GREEN + " from your store.");
-									if(shop.getRemainingStock() == amount) owner.sendMessage(ChatColor.DARK_PURPLE + "Your shop at " + shop.getLocation().getBlockX() + ", " + shop.getLocation().getBlockY() + ", " + shop.getLocation().getBlockZ() + " has run out of " + plugin.getDataName(shop.getItem().getType(), shop.getItem().getDurability()));
+								//Items to drop on floor
+								HashMap<Integer, ItemStack> floor = new HashMap<Integer, ItemStack>(30);
+								int amt = amount;
+								int n = 0;
+								while(amt > 0){
+									int temp = Math.min(amt, transfer.getMaxStackSize());
+									if(temp == -1){
+										//Uh oh, don't know stacksize.
+										transfer.setAmount(amt);
+										floor.putAll(p.getInventory().addItem(transfer));
+										break;
+									}
+									transfer.setAmount(temp);
+									HashMap<Integer, ItemStack> remaining = new HashMap<Integer, ItemStack>(30);
+									
+									remaining.putAll(p.getInventory().addItem(transfer));
+									
+									for(ItemStack iStack : remaining.values()){
+										floor.put(n, iStack);
+										n++;
+									}
+									
+									//floor.p
+									amt = amt - temp;
 								}
-							}
-							
-							//Items to drop on floor
-							HashMap<Integer, ItemStack> floor = new HashMap<Integer, ItemStack>(30);
-							int amt = amount;
-							int n = 0;
-							while(amt > 0){
-								int temp = Math.min(amt, transfer.getMaxStackSize());
-								if(temp == -1){
-									//Uh oh, don't know stacksize.
-									transfer.setAmount(amt);
-									floor.putAll(p.getInventory().addItem(transfer));
-									break;
+								//Give the player items
+								
+								//Drop the remainder on the floor.
+								for(int i = 0; i < floor.size(); i++){
+									p.getWorld().dropItem(p.getLocation(), floor.get(i));								
 								}
-								transfer.setAmount(temp);
-								HashMap<Integer, ItemStack> remaining = new HashMap<Integer, ItemStack>(30);
+								shop.remove(transfer, amount);
 								
-								remaining.putAll(p.getInventory().addItem(transfer));
+								sendPurchaseSuccess(p, shop, amount);
 								
-								for(ItemStack iStack : remaining.values()){
-									floor.put(n, iStack);
-									n++;
-								}
-								
-								//floor.p
-								amt = amt - temp;
+								//Don't send it to chat.
 							}
-							//Give the player items
-							
-							//Drop the remainder on the floor.
-							for(int i = 0; i < floor.size(); i++){
-								p.getWorld().dropItem(p.getLocation(), floor.get(i));								
+							else{
+								p.sendMessage(ChatColor.RED + "That costs " + ChatColor.YELLOW + amount * shop.getPrice() + ChatColor.RED + ", but you only have " + ChatColor.YELLOW + plugin.getEcon().getBalance(p.getName()));
+								return;
 							}
-							shop.remove(transfer, amount);
-							
-							sendPurchaseSuccess(p, shop, amount);
-							
-							//Don't send it to chat.
-							e.setCancelled(true);
-							actions.remove(p.getName());
 						}
 						else{
-							p.sendMessage(ChatColor.RED + "That costs " + ChatColor.YELLOW + amount * shop.getPrice() + ChatColor.RED + ", but you only have " + ChatColor.YELLOW + plugin.getEcon().getBalance(p.getName()));
-							actions.remove(p.getName());
-							e.setCancelled(true);
+							p.sendMessage(ChatColor.RED + "The shop only has " + ChatColor.YELLOW + shop.getRemainingStock() + " " + shop.getMaterial().toString() + ChatColor.RED + " left.");
 							return;
 						}
 					}
-					else{
-						p.sendMessage(ChatColor.RED + "The shop only has " + ChatColor.YELLOW + shop.getRemainingStock() + " " + shop.getMaterial().toString() + ChatColor.RED + " left.");
-						actions.remove(p.getName());
-						e.setCancelled(true);
+					/*
+					 * They didn't enter a number.
+					 */
+					catch(NumberFormatException ex){
+						p.sendMessage(ChatColor.RED + "Cancelled Shop Purchase");
 						return;
 					}
 				}
 				/*
-				 * They didn't enter a number.
+				 * If it was already cancelled (from destroyed)
 				 */
-				catch(NumberFormatException ex){
-					actions.remove(p.getName());
-					p.sendMessage(ChatColor.RED + "Cancelled Shop Purchase");
-					e.setCancelled(true);
-					return;
+				else{
+					return; //It was cancelled, go away.
 				}
 			}
-			/*
-			 * If it was already cancelled (from destroyed)
-			 */
-			else{
-				return; //It was cancelled, go away.
-			}
-		}
+			
+		});
+		
+		e.setCancelled(true);
 	}
 	private void sendPurchaseSuccess(Player p, Shop shop, int amount){
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
