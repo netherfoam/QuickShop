@@ -326,7 +326,17 @@ public class QuickShop extends JavaPlugin{
 		item.setAmount(Integer.parseInt(itemInfo[3]));
 		
 		for(int i = 4; i < itemInfo.length; i = i + 2){
-			item.addEnchantment(Enchantment.getByName(itemInfo[i]), Integer.parseInt(itemInfo[i+1]));
+			int level = Integer.parseInt(itemInfo[i+1]);
+			
+			Enchantment ench = Enchantment.getByName(itemInfo[i]);
+			if(ench == null) continue; //Invalid
+			if (ench.canEnchantItem(item)){
+				if(level <= 0) continue;
+				level = Math.min(ench.getMaxLevel(), level);
+				
+				item.addEnchantment(ench, level);
+			}
+			
 		}
 		return item;
 	}
