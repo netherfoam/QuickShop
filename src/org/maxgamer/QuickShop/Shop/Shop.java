@@ -125,6 +125,10 @@ public class Shop{
 		}
 	}
 	
+	public void setOwner(String owner){
+		this.owner = owner;
+	}
+	
 	/**
 	 * Returns the display item associated with this shop.
 	 * @return The display item associated with this shop.
