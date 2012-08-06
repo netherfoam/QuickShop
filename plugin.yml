@@ -1,5 +1,5 @@
 name: QuickShop
-version: 0.7
+version: 0.8
 main: org.maxgamer.QuickShop.QuickShop
 author: Netherfoam
 
@@ -11,4 +11,4 @@ soft-depend: [Towny, PreciousStones, Lockette, WorldGuard, GriefPrevention]
 commands:
     qs:
         description: QuickShop command
-        usage: /qs unlimited
+        usage: /qs unlimited|setowner
