@@ -128,14 +128,13 @@ public class Shop{
 		String world = this.getLocation().getWorld().getName();
 		
 		int unlimited = this.isUnlimited() ? 1 : 0;
-		int type = this.getShopType()==ShopType.SELLING ? 1 : 0;
 
 		String q = "";
 		if(isNew){
-			q = "INSERT INTO shops VALUES ('"+this.getOwner()+"', '"+this.getPrice()+"', '"+plugin.makeString(this.item)+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"', '"+unlimited+"', '"+type+"')";
+			q = "INSERT INTO shops VALUES ('"+this.getOwner()+"', '"+this.getPrice()+"', '"+plugin.makeString(this.item)+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"', '"+unlimited+"', '"+ShopType.toID(this.shopType)+"')";
 		}
 		else{
-			q = "UPDATE shops SET owner = '"+this.getOwner()+"', itemString = '"+plugin.makeString(this.item)+"', unlimited = '"+unlimited+"', type = '"+type+"'  WHERE x = '"+x+"' AND y = '"+y+"' AND z = '"+z+"' AND world = '"+world+"'";  
+			q = "UPDATE shops SET owner = '"+this.getOwner()+"', itemString = '"+plugin.makeString(this.item)+"', unlimited = '"+unlimited+"', type = '"+ShopType.toID(this.shopType)+"'  WHERE x = '"+x+"' AND y = '"+y+"' AND z = '"+z+"' AND world = '"+world+"'";  
 		}
 		
 		plugin.getDB().writeToBuffer(q);
@@ -262,14 +261,13 @@ public class Shop{
 	 */
 	public void buy(Player p, ItemStack item, int amount){
 		if(amount < 0) this.sell(p, item, -amount);
-		
 		//We do NOT want to modify this
 		ItemStack transfer = item.clone();
-		if(!this.isUnlimited()){
-			this.add(transfer, amount);
-		}
 		
-		while(amount > 0){
+		transfer.setAmount(amount);
+		p.getInventory().removeItem(transfer);
+		
+		while(amount > 0 && !this.isUnlimited()){
 			int stackSize = Math.min(amount, transfer.getMaxStackSize());
 			if(stackSize == -1){
 				stackSize = amount;
@@ -277,9 +275,7 @@ public class Shop{
 			
 			transfer.setAmount(stackSize);
 			
-			//Give the player the items.
-			//Store the leftover items they didn't have room for
-			this.getChest().getInventory().addItem(transfer);
+			this.add(transfer, amount);
 			
 			amount -= stackSize;
 		}
@@ -307,6 +303,26 @@ public class Shop{
 	public enum ShopType{
 		SELLING(),
 		BUYING();
+		public static ShopType fromID(int id){
+			if(id == 0){
+				return ShopType.SELLING;
+			}
+			if(id == 1){
+				return ShopType.BUYING;
+			}
+			return null;
+		}
+		public static int toID(ShopType shopType){
+			if(shopType == ShopType.SELLING){
+				return 0;
+			}
+			if(shopType == ShopType.BUYING){
+				return 1;
+			}
+			else{
+				return -1;
+			}
+		}
 	}
 	
 	public ShopType getShopType(){
