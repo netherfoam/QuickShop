@@ -1,10 +1,10 @@
 package org.maxgamer.QuickShop.Listeners;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -13,7 +13,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Shop.DisplayItem;
-import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.ShopAction;
 
@@ -30,52 +29,28 @@ public class BlockListener implements Listener{
 	public void onBreak(final BlockBreakEvent e){
 		if(e.isCancelled() || e.getBlock().getType() != Material.CHEST) return;
 		Shop shop = plugin.getShops().get(e.getBlock().getLocation());
+		
 		//If the chest was a shop
 		if(shop != null){
+			Player p = e.getPlayer();
 			if(plugin.getConfig().getBoolean("shop.lock")){
-				if(!shop.getOwner().equalsIgnoreCase(e.getPlayer().getName()) && !e.getPlayer().hasPermission("quickshop.destroy")){
+				if(!shop.getOwner().equalsIgnoreCase(p.getName()) && !p.hasPermission("quickshop.destroy")){
 					e.setCancelled(true);
-					e.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to destroy " + shop.getOwner() + "'s shop");
+					p.sendMessage(ChatColor.RED + "You don't have permission to destroy " + shop.getOwner() + "'s shop");
 					return;
 				}
 			}
 			
-			if(e.getPlayer().getGameMode() == GameMode.CREATIVE && !e.getPlayer().getName().equalsIgnoreCase(shop.getOwner())){
+			if(p.getGameMode() == GameMode.CREATIVE && !p.getName().equalsIgnoreCase(shop.getOwner())){
 				e.setCancelled(true);
-				e.getPlayer().sendMessage(ChatColor.RED + "You cannot break other players shops in creative mode.  Use survival instead.");
+				p.sendMessage(ChatColor.RED + "You cannot break other players shops in creative mode.  Use survival instead.");
 				return;
 			}
 			
-			for(Info info : plugin.getActions().values()){
-				info.setAction(ShopAction.CANCELLED);
-			}
-			//Refunding the shop
-			if(plugin.getConfig().getBoolean("shop.refund")){
-				double cost = plugin.getConfig().getDouble("shop.cost");
-				plugin.getEcon().depositPlayer(shop.getOwner(), cost);
-				plugin.getEcon().withdrawPlayer(plugin.getConfig().getString("tax-account"), cost);
-			}
+			plugin.getActions().get(p.getName()).setAction(ShopAction.CANCELLED);
 			
-			//Remove the item on top
-			shop.getDisplayItem().remove();
-			
-			//Remove the shop from the cache
-			plugin.getShops().remove(e.getBlock().getLocation());
-			e.getPlayer().sendMessage(ChatColor.GREEN + "Shop Removed");
-			
-			//Insert it into the buffer for the database.
-			Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable(){
-				@Override
-				public void run() {
-					String world = e.getBlock().getWorld().getName();
-					int x = e.getBlock().getX();
-					int y = e.getBlock().getY();
-					int z = e.getBlock().getZ();
-					
-					plugin.getDB().writeToBuffer("DELETE FROM shops WHERE x = '"+x+"' AND y = '"+y+"' AND z = '"+z+"' AND world = '"+world+"'");
-				}
-				
-			}, 0);
+			shop.delete();
+			p.sendMessage(ChatColor.GREEN + "Shop Removed");
 		}
 	}
 	/**
@@ -85,12 +60,15 @@ public class BlockListener implements Listener{
 	public void onPlace(BlockPlaceEvent e){
 		if(e.isCancelled()) return;
 		Block b = e.getBlock();
-		
-		if(b.getType() == Material.CHEST && plugin.getChestNextTo(b) != null && plugin.getShop(plugin.getChestNextTo(b).getLocation()) != null){
+		Block chest = plugin.getChestNextTo(b);
+		if(b.getType() == Material.CHEST && chest != null && plugin.getShop(chest.getLocation()) != null){
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(ChatColor.RED + "Double Chest shops are disabled.");
 		}
 	}
+	/**
+	 * Handles shops breaking through explosions
+	 */
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onExplode(EntityExplodeEvent e){
 		if(e.isCancelled()) return;
@@ -104,17 +82,7 @@ public class BlockListener implements Listener{
 				}
 				else{
 					Shop shop = plugin.getShop(b.getLocation());
-					shop.getDisplayItem().remove();
-					int x = shop.getLocation().getBlockX();
-					int y = shop.getLocation().getBlockY();
-					int z = shop.getLocation().getBlockZ();
-					String world = shop.getLocation().getWorld().getName();
-					
-					if(plugin.getConfig().getBoolean("shop.refund")){
-						plugin.getEcon().depositPlayer(shop.getOwner(), plugin.getConfig().getDouble("shop.cost"));
-					}
-					
-					plugin.getDB().writeToBuffer("DELETE FROM shops WHERE x = '"+x+"' AND y = '"+y+"' AND z = '"+z+"' AND world = '"+world+"'");
+					shop.delete();
 				}
 			}
 		}
