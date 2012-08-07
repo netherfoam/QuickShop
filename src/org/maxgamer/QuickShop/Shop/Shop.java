@@ -343,7 +343,12 @@ public class Shop{
 	 */
 	public void setShopType(ShopType shopType){
 		this.shopType = shopType;
-		
+	}
+	
+	/**
+	 * Updates signs
+	 */
+	public void setSignText(){
 		String[] lines = new String[3];
 		if(this.isBuying()){
 			lines[0] = "Buying:";
