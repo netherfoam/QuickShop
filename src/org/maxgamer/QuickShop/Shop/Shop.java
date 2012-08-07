@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -350,14 +351,15 @@ public class Shop{
 	 */
 	public void setSignText(){
 		String[] lines = new String[3];
+		lines[0] = ChatColor.RED + "[QuickShop]";
 		if(this.isBuying()){
-			lines[0] = "Buying:";
+			lines[1] = "Buying:";
 		}
 		if(this.isSelling()){
-			lines[0] = "Selling:";
+			lines[1] = "Selling:";
 		}
-		lines[1] = plugin.getDataName(this.getMaterial(), this.getDurability());
-		lines[2] = "For " + this.price + " each";
+		lines[2] = plugin.getDataName(this.getMaterial(), this.getDurability());
+		lines[3] = "For " + this.price + " each";
 		this.setSignText(lines);
 	}
 	
