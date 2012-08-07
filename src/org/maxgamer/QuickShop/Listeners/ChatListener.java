@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.minecraft.server.Item;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -16,6 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.inventory.ItemStack;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
@@ -205,13 +208,27 @@ public class ChatListener implements Listener{
 						shop.sell(p, shop.getItem(), amount);
 						sendPurchaseSuccess(p, shop, amount);
 					}
-					else if(shop.isSelling()){
+					else if(shop.isBuying()){
 						int space = shop.getRemainingSpace(shop.getMaterial().getMaxStackSize());
 						
 						if(space <  amount){
 							p.sendMessage(ChatColor.RED + "The shop only has room for " +space+ " more " + shop.getDataName() +".");
 							return;
 						}
+						
+						int count = 0;
+						for(ItemStack item : p.getInventory().getContents()){
+							if(item != null && item.getType() == shop.getMaterial() && item.getDurability() == shop.getDurability() && item.getEnchantments().equals(shop.getEnchants())){
+								count += item.getAmount();
+							}
+						}
+						
+						if(amount > count){
+							p.sendMessage(ChatColor.RED + "You only have "+ count + " " + shop.getDataName() + ".");
+							return;
+						}
+						
+						
 						if(!plugin.getEcon().has(shop.getOwner(), amount * shop.getPrice())){
 							p.sendMessage(ChatColor.RED + "That costs $" + ChatColor.YELLOW + amount * shop.getPrice() + ChatColor.RED + ", but the owner only has $" + ChatColor.YELLOW + plugin.getEcon().getBalance(shop.getOwner()));
 							return;
