@@ -26,13 +26,7 @@ import org.maxgamer.QuickShop.Shop.ShopAction;
 
 
 /**
- * Handles players clicking on chests:
- * Left click on chest with item	: 	Ask for price
- * Left click on shop		 		: 	Send price
- * Right click on others shop		: 	Send sell menu
- * Right click on own shop	 		: 	Open chest normally
  * @author Netherfoam
- *
  */
 public class ClickListener implements Listener{
 	QuickShop plugin;
@@ -132,7 +126,6 @@ public class ClickListener implements Listener{
 				last = n;
 			}
 			
-			
 			//Send creation menu.
 			Info info = new Info(b.getLocation(), ShopAction.CREATE, e.getItem(), last);
 			plugin.getActions().put(p.getName(), info);
@@ -151,7 +144,13 @@ public class ClickListener implements Listener{
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Shop Information:");
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Owner: " + shop.getOwner());
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Item: " + ChatColor.YELLOW + plugin.getDataName(items.getType(), items.getDurability()));
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Stock: " + ChatColor.YELLOW + stock);
+		
+		if(shop.isSelling()){
+			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Stock: " + ChatColor.YELLOW + stock);
+		}
+		else{
+			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Space: " + ChatColor.YELLOW + shop.getRemainingSpace(shop.getMaterial().getMaxStackSize()));
+		}
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Price per "+ChatColor.YELLOW + items.getType() + ChatColor.GREEN + " - " + ChatColor.YELLOW + shop.getPrice() + ChatColor.GREEN + " credits");
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Total Value of Chest: " + ChatColor.YELLOW + shop.getPrice() * stock + ChatColor.GREEN + " credits");
 		

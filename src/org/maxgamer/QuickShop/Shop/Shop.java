@@ -350,7 +350,7 @@ public class Shop{
 	 * Updates signs
 	 */
 	public void setSignText(){
-		String[] lines = new String[3];
+		String[] lines = new String[4];
 		lines[0] = ChatColor.RED + "[QuickShop]";
 		if(this.isBuying()){
 			lines[1] = "Buying:";
