@@ -77,7 +77,7 @@ public class ClickListener implements Listener{
 		/* 
 		 * Purchase Handling
 		 */
-		if(shop != null && p.hasPermission("quickshop.buy")){
+		if(shop != null && p.hasPermission("quickshop.use")){
 			if(plugin.getConfig().getBoolean("shop.sneak-only") && !p.isSneaking()){
 				//Sneak only
 				return;
@@ -154,6 +154,11 @@ public class ClickListener implements Listener{
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Stock: " + ChatColor.YELLOW + stock);
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Price per "+ChatColor.YELLOW + items.getType() + ChatColor.GREEN + " - " + ChatColor.YELLOW + shop.getPrice() + ChatColor.GREEN + " credits");
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Total Value of Chest: " + ChatColor.YELLOW + shop.getPrice() * stock + ChatColor.GREEN + " credits");
+		
+		if(plugin.isTool(items.getType())){
+			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + plugin.getToolPercentage(items) + "% Remaining"); 
+		}
+		
 		if(shop.isBuying()){
 			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.LIGHT_PURPLE + "This shop is BUYING items");
 		}
@@ -161,10 +166,6 @@ public class ClickListener implements Listener{
 			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.DARK_GREEN + "This shop is SELLING items");
 		}
 			
-		if(plugin.isTool(items.getType())){
-			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + plugin.getToolPercentage(items) + "% Remaining"); 
-		}
-		
 		Map<Enchantment, Integer> enchs = items.getEnchantments();
 		if(enchs != null && enchs.size() > 0){
 			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------ENCHANTS-----------------------+");
@@ -185,8 +186,8 @@ public class ClickListener implements Listener{
 		if(plugin.getConfig().getBoolean("shop.lock")){
 			Shop shop = plugin.getShop(e.getClickedBlock().getLocation());
 			if(shop != null && !shop.getOwner().equalsIgnoreCase(e.getPlayer().getName())){
-				if(e.getPlayer().hasPermission("quickshop.openother")){
-					e.getPlayer().sendMessage(ChatColor.RED + "Bypassing a QuickShop!");
+				if(e.getPlayer().hasPermission("quickshop.snoop")){
+					e.getPlayer().sendMessage(ChatColor.RED + "Bypassing a QuickShop lock!");
 					return;
 				}
 				e.getPlayer().sendMessage(ChatColor.RED + "[QuickShop] That shop is locked.  Left click if you wish to buy!");
