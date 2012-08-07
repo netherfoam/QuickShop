@@ -84,7 +84,12 @@ public class ClickListener implements Listener{
 			}
 			//Text menu
 			sendShopInfo(p, shop);
-			p.sendMessage(ChatColor.GREEN + "Enter how many you wish to purchase in chat.");
+			if(shop.isSelling()){
+				p.sendMessage(ChatColor.GREEN + "Enter how many you wish to BUY in chat.");
+			}
+			else{
+				p.sendMessage(ChatColor.GREEN + "Enter how many you wish to SELL in chat.");
+			}
 			
 			//Add the new action
 			HashMap<String, Info> actions = plugin.getActions();
@@ -129,9 +134,9 @@ public class ClickListener implements Listener{
 			
 			
 			//Send creation menu.
-			Info info = new Info(b.getLocation(), ShopAction.CREATE_BUY, e.getItem(), last);
+			Info info = new Info(b.getLocation(), ShopAction.CREATE, e.getItem(), last);
 			plugin.getActions().put(p.getName(), info);
-			p.sendMessage(ChatColor.GREEN + "Enter how much you wish to sell one "+ ChatColor.YELLOW  + item.getType().toString() + ChatColor.GREEN + " for.");
+			p.sendMessage(ChatColor.GREEN + "Enter how much you wish to trade one "+ ChatColor.YELLOW  + item.getType().toString() + ChatColor.GREEN + " for.");
 		}
 	}
 	
@@ -149,6 +154,12 @@ public class ClickListener implements Listener{
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Stock: " + ChatColor.YELLOW + stock);
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Price per "+ChatColor.YELLOW + items.getType() + ChatColor.GREEN + " - " + ChatColor.YELLOW + shop.getPrice() + ChatColor.GREEN + " credits");
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Total Value of Chest: " + ChatColor.YELLOW + shop.getPrice() * stock + ChatColor.GREEN + " credits");
+		if(shop.isBuying()){
+			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.LIGHT_PURPLE + "This shop is BUYING items");
+		}
+		else{
+			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.DARK_GREEN + "This shop is SELLING items");
+		}
 			
 		if(plugin.isTool(items.getType())){
 			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + plugin.getToolPercentage(items) + "% Remaining"); 
@@ -170,9 +181,14 @@ public class ClickListener implements Listener{
 	 */
 	public void onChestUse(PlayerInteractEvent e){
 		if(e.isCancelled() || e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getClickedBlock().getType() != Material.CHEST) return;
+		
 		if(plugin.getConfig().getBoolean("shop.lock")){
 			Shop shop = plugin.getShop(e.getClickedBlock().getLocation());
 			if(shop != null && !shop.getOwner().equalsIgnoreCase(e.getPlayer().getName())){
+				if(e.getPlayer().hasPermission("quickshop.openother")){
+					e.getPlayer().sendMessage(ChatColor.RED + "Bypassing a QuickShop!");
+					return;
+				}
 				e.getPlayer().sendMessage(ChatColor.RED + "[QuickShop] That shop is locked.  Left click if you wish to buy!");
 				e.setCancelled(true);
 				return;
