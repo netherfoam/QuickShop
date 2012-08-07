@@ -140,6 +140,7 @@ public class Database{
 				"\"z\"  INTEGER(32) NOT NULL, " +
 				"\"world\"  TEXT(30) NOT NULL, " +
 				"\"unlimited\"  boolean, " +
+				"\"type\"  boolean, " +
 				"PRIMARY KEY ('x', 'y','z','world') " +
 				");";
 		st.execute(createTable);
