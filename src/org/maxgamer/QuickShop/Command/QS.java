@@ -69,14 +69,15 @@ public class QS implements CommandExecutor{
 				}
 			}
 			
-			else if(subArg.equals("buy")){
-				if(sender instanceof Player && sender.hasPermission("quickshop.buy")){
+			else if(subArg.startsWith("buy")){
+				if(sender instanceof Player && sender.hasPermission("quickshop.create.buy")){
 					BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
 					while(bIt.hasNext()){
 						Block b = bIt.next();
 						Shop shop = plugin.getShop(b.getLocation());
 						if(shop != null && shop.getOwner().equalsIgnoreCase(((Player) sender).getName())){
 							shop.setShopType(ShopType.BUYING);
+							shop.setSignText();
 							shop.update();
 							
 							sender.sendMessage(ChatColor.GREEN + "Now buying: " + plugin.getDataName(shop.getMaterial(), shop.getDurability()));
@@ -90,14 +91,15 @@ public class QS implements CommandExecutor{
 				return true;
 			}
 			
-			else if(subArg.equals("sell")){
-				if(sender instanceof Player && sender.hasPermission("quickshop.sell")){
+			else if(subArg.startsWith("sell")){
+				if(sender instanceof Player && sender.hasPermission("quickshop.create.sell")){
 					BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
 					while(bIt.hasNext()){
 						Block b = bIt.next();
 						Shop shop = plugin.getShop(b.getLocation());
 						if(shop != null && shop.getOwner().equalsIgnoreCase(((Player) sender).getName())){
 							shop.setShopType(ShopType.SELLING);
+							shop.setSignText();
 							shop.update();
 							
 							sender.sendMessage(ChatColor.GREEN + "Now selling: " + plugin.getDataName(shop.getMaterial(), shop.getDurability()));
@@ -121,7 +123,7 @@ public class QS implements CommandExecutor{
 		s.sendMessage(ChatColor.GREEN + "QuickShop Help");
 		if(s.hasPermission("quickshop.unlimited")) s.sendMessage(ChatColor.GREEN + "/qs unlimited" + ChatColor.YELLOW + " - Makes a shop unlimited");
 		if(s.hasPermission("quickshop.setowner")) s.sendMessage(ChatColor.GREEN + "/qs setowner <player>" + ChatColor.YELLOW + " - Sets the owner of a shop");
-		if(s.hasPermission("quickshop.buy")) s.sendMessage(ChatColor.GREEN + "/qs buy" + ChatColor.YELLOW + " - Changes a shop to BUY mode");
-		if(s.hasPermission("quickshop.sell")) s.sendMessage(ChatColor.GREEN + "/qs sell" + ChatColor.YELLOW + " - Changes a shop to SELL mode");
+		if(s.hasPermission("quickshop.create.buy")) s.sendMessage(ChatColor.GREEN + "/qs buy" + ChatColor.YELLOW + " - Changes a shop to BUY mode");
+		if(s.hasPermission("quickshop.create.sell")) s.sendMessage(ChatColor.GREEN + "/qs sell" + ChatColor.YELLOW + " - Changes a shop to SELL mode");
 	}
 }
