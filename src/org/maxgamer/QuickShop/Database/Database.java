@@ -153,7 +153,14 @@ public class Database{
 			ps.execute();
 			ps.close();
 		} catch (SQLException e) {
-			plugin.getLogger().info("Found all columns");
+			plugin.getLogger().info("Found unlimited");
+		}
+		try {
+			ps = this.getConnection().prepareStatement(" ALTER TABLE shops ADD type int");
+			ps.execute();
+			ps.close();
+		} catch (SQLException e) {
+			plugin.getLogger().info("Found type column");
 		}
 	}
 	
