@@ -122,11 +122,14 @@ public class ChatListener implements Listener{
 							
 							bs.update(true);
 							
+							shop.setSignText();
+							
+							/*
 							Sign sign = (Sign) info.getSignBlock().getState();
 							sign.setLine(0, "Selling:");
 							sign.setLine(1, shop.getDataName());
 							sign.setLine(2, "For $" + shop.getPrice());
-							sign.update(true);
+							sign.update(true);*/
 						}
 					}
 					/*

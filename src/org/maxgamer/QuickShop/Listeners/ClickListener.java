@@ -85,10 +85,10 @@ public class ClickListener implements Listener{
 			//Text menu
 			sendShopInfo(p, shop);
 			if(shop.isSelling()){
-				p.sendMessage(ChatColor.GREEN + "Enter how many you wish to BUY in chat.");
+				p.sendMessage(ChatColor.GREEN + "Enter how many you wish to " + ChatColor.LIGHT_PURPLE + "BUY" + ChatColor.GREEN + " in chat.");
 			}
 			else{
-				p.sendMessage(ChatColor.GREEN + "Enter how many you wish to SELL in chat.");
+				p.sendMessage(ChatColor.GREEN + "Enter how many you wish to " + ChatColor.AQUA + "SELL" + ChatColor.GREEN + " in chat.");
 			}
 			
 			//Add the new action
@@ -160,10 +160,10 @@ public class ClickListener implements Listener{
 		}
 		
 		if(shop.isBuying()){
-			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.LIGHT_PURPLE + "This shop is BUYING items");
+			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "This shop is " + ChatColor.LIGHT_PURPLE + "BUYING" + ChatColor.GREEN + " items.");
 		}
 		else{
-			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.DARK_GREEN + "This shop is SELLING items");
+			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "This shop is " + ChatColor.AQUA + "SELLING" + ChatColor.GREEN + " items.");
 		}
 			
 		Map<Enchantment, Integer> enchs = items.getEnchantments();
