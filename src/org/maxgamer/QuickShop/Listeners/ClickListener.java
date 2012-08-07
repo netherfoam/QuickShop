@@ -102,7 +102,7 @@ public class ClickListener implements Listener{
 		/*
 		 * Creation handling
 		 */
-		else if(item != null && item.getType() != Material.AIR && p.hasPermission("quickshop.create") && b.getType() == Material.CHEST && shop == null){
+		else if(item != null && item.getType() != Material.AIR && p.hasPermission("quickshop.create.sell") && b.getType() == Material.CHEST && shop == null){
 			if(!plugin.canBuildShop(p, b)){
 				p.sendMessage(ChatColor.RED + "You may not create a shop here.");
 				//e.setCancelled(true);
@@ -186,7 +186,7 @@ public class ClickListener implements Listener{
 		if(plugin.getConfig().getBoolean("shop.lock")){
 			Shop shop = plugin.getShop(e.getClickedBlock().getLocation());
 			if(shop != null && !shop.getOwner().equalsIgnoreCase(e.getPlayer().getName())){
-				if(e.getPlayer().hasPermission("quickshop.snoop")){
+				if(e.getPlayer().hasPermission("quickshop.other.open")){
 					e.getPlayer().sendMessage(ChatColor.RED + "Bypassing a QuickShop lock!");
 					return;
 				}
