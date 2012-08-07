@@ -80,7 +80,7 @@ public class QS implements CommandExecutor{
 							shop.setSignText();
 							shop.update();
 							
-							sender.sendMessage(ChatColor.GREEN + "Now buying: " + plugin.getDataName(shop.getMaterial(), shop.getDurability()));
+							sender.sendMessage(ChatColor.GREEN + "Now "+ChatColor.LIGHT_PURPLE + "BUYING" + ChatColor.GREEN+": " + shop.getDataName());
 							return true;
 						}
 					}
@@ -102,7 +102,7 @@ public class QS implements CommandExecutor{
 							shop.setSignText();
 							shop.update();
 							
-							sender.sendMessage(ChatColor.GREEN + "Now selling: " + plugin.getDataName(shop.getMaterial(), shop.getDurability()));
+							sender.sendMessage(ChatColor.GREEN + "Now "+ChatColor.AQUA + "SELLING" + ChatColor.GREEN+": " + shop.getDataName());
 							return true;
 						}
 					}
