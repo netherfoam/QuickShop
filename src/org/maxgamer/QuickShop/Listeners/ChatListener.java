@@ -16,7 +16,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.inventory.ItemStack;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
@@ -51,7 +50,7 @@ public class ChatListener implements Listener{
 				/*
 				 * Creation handling
 				 */
-				if(info.getAction() == ShopAction.CREATE_BUY){
+				if(info.getAction() == ShopAction.CREATE){
 					try{
 						if(plugin.getShop(info.getLocation()) != null){
 							p.sendMessage(ChatColor.RED + "Someone else has claimed that shop.");
@@ -91,16 +90,11 @@ public class ChatListener implements Listener{
 							plugin.getEcon().depositPlayer(plugin.getConfig().getString("tax-account"), tax);
 						}
 						
-						//Save it to the database.
-						int x = shop.getLocation().getBlockX();
-						int y = shop.getLocation().getBlockY();
-						int z = shop.getLocation().getBlockZ();
-						String world = shop.getLocation().getWorld().getName();
-						String itemString = plugin.makeString(shop.getItem());
-						plugin.getDB().writeToBuffer("INSERT INTO shops VALUES ('"+e.getPlayer().getName()+"', '"+price+"', '"+itemString+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"', '"+0+"')");
+						//Writes the shop to the database
+						shop.update(true);
 						
 						if(!plugin.getConfig().getBoolean("shop.lock")){
-							//Warn them if they havent been warned since reboot
+							//Warn them if they haven't been warned since reboot
 							if(!plugin.warnings.contains(p.getName())){
 								p.sendMessage(ChatColor.DARK_RED + "[QuickShop] " +ChatColor.RED+"Remember, shops are NOT protected from theft! If you want to stop thieves, lock it!");
 								plugin.warnings.add(p.getName());
@@ -129,7 +123,7 @@ public class ChatListener implements Listener{
 							
 							Sign sign = (Sign) info.getSignBlock().getState();
 							sign.setLine(0, "Selling:");
-							sign.setLine(1, plugin.getDataName(shop.getMaterial(), shop.getDurability()));
+							sign.setLine(1, shop.getDataName());
 							sign.setLine(2, "For $" + shop.getPrice());
 							sign.update(true);
 						}
@@ -146,111 +140,119 @@ public class ChatListener implements Listener{
 				 * Purchase Handling
 				 */
 				else if(info.getAction() == ShopAction.BUY){
+					int amount;
 					try{
-						int amount = Integer.parseInt(e.getMessage());
-						Shop shop = plugin.getShops().get(info.getLocation());
+						amount = Integer.parseInt(e.getMessage());
+					}
+					catch(NumberFormatException e){
+						p.sendMessage(ChatColor.RED + "Cancelled Shop Purchase");
+						return;
+					}
+					
+					Shop shop = plugin.getShops().get(info.getLocation());
+					
+					if(shop == null || info.getLocation().getBlock().getType() != Material.CHEST){
+						p.sendMessage(ChatColor.RED + "That shop was removed.");
+						return;
+					}
+					
+					if(shop.isSelling()){
+						int stock = shop.getRemainingStock();
 						
-						if(shop == null || info.getLocation().getBlock().getType() != Material.CHEST){
-							p.sendMessage(ChatColor.RED + "That shop was removed.");
-							return;
-						}
-						
-						if(shop.getRemainingStock() >=  amount){
-							if(plugin.getEcon().has(p.getName(), amount * shop.getPrice())){
-								ItemStack transfer = shop.getItem().clone();
-								transfer.setAmount(amount);
-								
-								if(amount == 0){
-									//Dumb.
-									sendPurchaseSuccess(p, shop, amount);
-									return; 
-								}
-								else if(amount < 0){
-									// & Dumber
-									p.sendMessage(ChatColor.RED + "Derrrrp, Can't buy negative amounts.");
-									return;
-								}
-								
-								//Money handling
-								if(!p.getName().equalsIgnoreCase(shop.getOwner())){
-									//Don't tax them if they're purchasing from themselves.
-									//Do charge an amount of tax though.
-									double tax = plugin.getConfig().getDouble("tax");
-									double total = amount * shop.getPrice();
-									
-									plugin.getEcon().withdrawPlayer(p.getName(), total);
-									
-									if(shop.isUnlimited() && !plugin.getConfig().getBoolean("shop.pay-unlimited-shop-owners")){
-										
-									}
-									if(!shop.isUnlimited() || (shop.isUnlimited() && plugin.getConfig().getBoolean("shop.pay-unlimited-shop-owners"))){
-										plugin.getEcon().depositPlayer(shop.getOwner(), total * (1 - tax));
-										
-										if(tax != 0){
-											plugin.getEcon().depositPlayer(plugin.getConfig().getString("tax-account"), total * tax);
-										}
-									}
-									
-									Player owner = Bukkit.getPlayerExact(shop.getOwner());
-									if(owner != null){
-										owner.sendMessage(ChatColor.GREEN + p.getName() + " just purchased " + amount + " " + ChatColor.YELLOW + plugin.getDataName(shop.getItem().getType(), shop.getItem().getDurability()) + ChatColor.GREEN + " from your store.");
-										if(shop.getRemainingStock() == amount) owner.sendMessage(ChatColor.DARK_PURPLE + "Your shop at " + shop.getLocation().getBlockX() + ", " + shop.getLocation().getBlockY() + ", " + shop.getLocation().getBlockZ() + " has run out of " + plugin.getDataName(shop.getItem().getType(), shop.getItem().getDurability()));
-									}
-								}
-								
-								//Items to drop on floor
-								HashMap<Integer, ItemStack> floor = new HashMap<Integer, ItemStack>(30);
-								int amt = amount;
-								int n = 0;
-								while(amt > 0){
-									int temp = Math.min(amt, transfer.getMaxStackSize());
-									if(temp == -1){
-										//Uh oh, don't know stacksize.
-										transfer.setAmount(amt);
-										floor.putAll(p.getInventory().addItem(transfer));
-										break;
-									}
-									transfer.setAmount(temp);
-									HashMap<Integer, ItemStack> remaining = new HashMap<Integer, ItemStack>(30);
-									
-									remaining.putAll(p.getInventory().addItem(transfer));
-									
-									for(ItemStack iStack : remaining.values()){
-										floor.put(n, iStack);
-										n++;
-									}
-									
-									//floor.p
-									amt = amt - temp;
-								}
-								//Give the player items
-								
-								//Drop the remainder on the floor.
-								for(int i = 0; i < floor.size(); i++){
-									p.getWorld().dropItem(p.getLocation(), floor.get(i));								
-								}
-								shop.remove(transfer, amount);
-								
-								sendPurchaseSuccess(p, shop, amount);
-								
-								//Don't send it to chat.
-							}
-							else{
-								p.sendMessage(ChatColor.RED + "That costs " + ChatColor.YELLOW + amount * shop.getPrice() + ChatColor.RED + ", but you only have " + ChatColor.YELLOW + plugin.getEcon().getBalance(p.getName()));
-								return;
-							}
-						}
-						else{
+						if(stock <  amount){
 							p.sendMessage(ChatColor.RED + "The shop only has " + ChatColor.YELLOW + shop.getRemainingStock() + " " + shop.getMaterial().toString() + ChatColor.RED + " left.");
 							return;
 						}
+						if(!plugin.getEcon().has(p.getName(), amount * shop.getPrice())){
+							p.sendMessage(ChatColor.RED + "That costs " + ChatColor.YELLOW + amount * shop.getPrice() + ChatColor.RED + ", but you only have " + ChatColor.YELLOW + plugin.getEcon().getBalance(p.getName()));
+							return;
+						}
+						if(amount == 0){
+							//Dumb.
+							sendPurchaseSuccess(p, shop, amount);
+							return; 
+						}
+						else if(amount < 0){
+							// & Dumber
+							p.sendMessage(ChatColor.RED + "Derrrrp, Can't buy negative amounts.");
+							return;
+						}
+						
+						//Money handling
+						if(!p.getName().equalsIgnoreCase(shop.getOwner())){
+							//Don't tax them if they're purchasing from themselves.
+							//Do charge an amount of tax though.
+							double tax = plugin.getConfig().getDouble("tax");
+							double total = amount * shop.getPrice();
+							
+							plugin.getEcon().withdrawPlayer(p.getName(), total);
+							
+							if(!shop.isUnlimited() || (shop.isUnlimited() && plugin.getConfig().getBoolean("shop.pay-unlimited-shop-owners"))){
+								plugin.getEcon().depositPlayer(shop.getOwner(), total * (1 - tax));
+								
+								if(tax != 0){
+									plugin.getEcon().depositPlayer(plugin.getConfig().getString("tax-account"), total * tax);
+								}
+							}
+							
+							Player owner = Bukkit.getPlayerExact(shop.getOwner());
+							if(owner != null){
+								owner.sendMessage(ChatColor.GREEN + p.getName() + " just purchased " + amount + " " + ChatColor.YELLOW + shop.getDataName() + ChatColor.GREEN + " from your store.");
+								if(stock == amount) owner.sendMessage(ChatColor.DARK_PURPLE + "Your shop at " + shop.getLocation().getBlockX() + ", " + shop.getLocation().getBlockY() + ", " + shop.getLocation().getBlockZ() + " has run out of " + shop.getDataName());
+							}
+						}
+						
+						shop.sell(p, shop.getItem(), amount);
+						sendPurchaseSuccess(p, shop, amount);
 					}
-					/*
-					 * They didn't enter a number.
-					 */
-					catch(NumberFormatException ex){
-						p.sendMessage(ChatColor.RED + "Cancelled Shop Purchase");
-						return;
+					else if(shop.isSelling()){
+						int space = shop.getRemainingSpace(shop.getMaterial().getMaxStackSize());
+						
+						if(space <  amount){
+							p.sendMessage(ChatColor.RED + "The shop only has room for " +space+ " more " + shop.getDataName() +".");
+							return;
+						}
+						if(!plugin.getEcon().has(shop.getOwner(), amount * shop.getPrice())){
+							p.sendMessage(ChatColor.RED + "That costs $" + ChatColor.YELLOW + amount * shop.getPrice() + ChatColor.RED + ", but the owner only has $" + ChatColor.YELLOW + plugin.getEcon().getBalance(shop.getOwner()));
+							return;
+						}
+						if(amount == 0){
+							//Dumb.
+							sendPurchaseSuccess(p, shop, amount);
+							return; 
+						}
+						else if(amount < 0){
+							// & Dumber
+							p.sendMessage(ChatColor.RED + "Derrrrp, Can't sell negative amounts.");
+							return;
+						}
+						
+						//Money handling
+						if(!p.getName().equalsIgnoreCase(shop.getOwner())){
+							//Don't tax them if they're purchasing from themselves.
+							//Do charge an amount of tax though.
+							double tax = plugin.getConfig().getDouble("tax");
+							double total = amount * shop.getPrice();
+							
+							plugin.getEcon().withdrawPlayer(shop.getOwner(), total);
+							
+							if(!shop.isUnlimited() || (shop.isUnlimited() && plugin.getConfig().getBoolean("shop.pay-unlimited-shop-owners"))){
+								plugin.getEcon().depositPlayer(p.getName(), total * (1 - tax));
+								
+								if(tax != 0){
+									plugin.getEcon().depositPlayer(plugin.getConfig().getString("tax-account"), total * tax);
+								}
+							}
+							
+							Player owner = Bukkit.getPlayerExact(shop.getOwner());
+							if(owner != null){
+								owner.sendMessage(ChatColor.GREEN + p.getName() + " just sold " + amount + " " + ChatColor.YELLOW + shop.getDataName() + ChatColor.GREEN + " to your store.");
+								if(space == amount) owner.sendMessage(ChatColor.DARK_PURPLE + "Your shop at " + shop.getLocation().getBlockX() + ", " + shop.getLocation().getBlockY() + ", " + shop.getLocation().getBlockZ() + " has run out of space");
+							}
+						}
+						
+						shop.buy(p, shop.getItem(), amount);
+						sendSellSuccess(p, shop, amount);
 					}
 				}
 				/*
@@ -268,6 +270,21 @@ public class ChatListener implements Listener{
 	private void sendPurchaseSuccess(Player p, Shop shop, int amount){
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Successfully purchased:");
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + amount + " " + shop.getItem().getType() + ChatColor.GREEN + " for " + ChatColor.YELLOW + amount * shop.getPrice());
+
+		Map<Enchantment, Integer> enchs = shop.getEnchants();
+		if(enchs != null && enchs.size() > 0){
+			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------ENCHANTS-----------------------+");
+			for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
+				p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
+			}
+		}
+		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
+	}
+	
+	private void sendSellSuccess(Player p, Shop shop, int amount){
+		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Successfully Sold:");
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + amount + " " + shop.getItem().getType() + ChatColor.GREEN + " for " + ChatColor.YELLOW + amount * shop.getPrice());
 
 		Map<Enchantment, Integer> enchs = shop.getEnchants();
