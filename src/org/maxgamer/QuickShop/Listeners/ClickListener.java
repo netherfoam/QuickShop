@@ -85,10 +85,10 @@ public class ClickListener implements Listener{
 			//Text menu
 			sendShopInfo(p, shop);
 			if(shop.isSelling()){
-				p.sendMessage(ChatColor.GREEN + "Enter how many you wish to " + ChatColor.LIGHT_PURPLE + "BUY" + ChatColor.GREEN + " in chat.");
+				p.sendMessage(ChatColor.GREEN + "Enter how many you wish to " + ChatColor.AQUA + "BUY" + ChatColor.GREEN + " in chat.");
 			}
 			else{
-				p.sendMessage(ChatColor.GREEN + "Enter how many you wish to " + ChatColor.AQUA + "SELL" + ChatColor.GREEN + " in chat.");
+				p.sendMessage(ChatColor.GREEN + "Enter how many you wish to " + ChatColor.LIGHT_PURPLE + "SELL" + ChatColor.GREEN + " in chat.");
 			}
 			
 			//Add the new action
