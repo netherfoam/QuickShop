@@ -19,14 +19,14 @@ permissions:
     quickshop.create.buy:
         description: Allows a player to buy from a shop
     quickshop.use:
-    	description: Allows a player to buy/sell using other players shops
+        description: Allows a player to buy/sell using other players shops
     quickshop.unlimited:
         description: Allows a Staff Member to use /qs unlimited and make a shop infinite
-    quickshop.bypass.<itemID>
+    quickshop.bypass.<itemID>:
         description: Allows a player to sell <itemID>, even if its blacklisted
     quickshop.other.destroy:
         description: Allows a Staff Member to destroy other players shops if they are locked in the config
     quickshop.other.open:
         description: Allows a Staff Member to open someone elses shop if they are locked in the config
-    quickshop.setowner
+    quickshop.setowner:
         description: Allows a Staff Member to change the owner of any shop
