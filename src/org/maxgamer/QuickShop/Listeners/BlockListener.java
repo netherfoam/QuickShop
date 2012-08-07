@@ -34,7 +34,7 @@ public class BlockListener implements Listener{
 		if(shop != null){
 			Player p = e.getPlayer();
 			if(plugin.getConfig().getBoolean("shop.lock")){
-				if(!shop.getOwner().equalsIgnoreCase(p.getName()) && !p.hasPermission("quickshop.destroy")){
+				if(!shop.getOwner().equalsIgnoreCase(p.getName()) && !p.hasPermission("quickshop.other.destroy")){
 					e.setCancelled(true);
 					p.sendMessage(ChatColor.RED + "You don't have permission to destroy " + shop.getOwner() + "'s shop");
 					return;
