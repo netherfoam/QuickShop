@@ -43,6 +43,7 @@ import org.maxgamer.QuickShop.Listeners.MoveListener;
 import org.maxgamer.QuickShop.Listeners.QuitListener;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
+import org.maxgamer.QuickShop.Shop.Shop.ShopType;
 import org.maxgamer.QuickShop.Watcher.BufferWatcher;
 import org.maxgamer.QuickShop.Watcher.ItemWatcher;
 import org.yi.acru.bukkit.Lockette.Lockette;
@@ -197,10 +198,13 @@ public class QuickShop extends JavaPlugin{
 					getDB().writeToBuffer("DELETE FROM shops WHERE x = "+x+" AND y = "+y+" AND z = "+z+" AND world = '"+rs.getString("world")+"'");
 				}
 				
+				int type = rs.getInt("type");
+				
 				Shop shop = new Shop(loc, price, item, owner);
-				if(rs.getBoolean("unlimited")){
-					shop.setUnlimited(true);
-				}
+				shop.setUnlimited(rs.getBoolean("unlimited"));
+				
+				shop.setShopType(ShopType.fromID(type));
+				
 				
 				this.getShops().put(loc, shop);
 			}
