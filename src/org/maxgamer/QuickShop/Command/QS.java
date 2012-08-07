@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Shop.Shop;
+import org.maxgamer.QuickShop.Shop.Shop.ShopType;
 
 public class QS implements CommandExecutor{
 	QuickShop plugin;
@@ -20,7 +21,9 @@ public class QS implements CommandExecutor{
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
 		if(args.length > 0){
-			if(args[0].equalsIgnoreCase("unlimited")){
+			String subArg = args[0].toLowerCase();
+			
+			if(subArg.equals("unlimited")){
 				if(sender instanceof Player && sender.hasPermission("quickshop.unlimited")){
 					BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
 					while(bIt.hasNext()){
@@ -28,11 +31,7 @@ public class QS implements CommandExecutor{
 						Shop shop = plugin.getShop(b.getLocation());
 						if(shop != null){
 							shop.setUnlimited(true);
-							int x = shop.getLocation().getBlockX();
-							int y = shop.getLocation().getBlockY();
-							int z = shop.getLocation().getBlockZ();
-							String world = shop.getLocation().getWorld().getName();
-							plugin.getDB().writeToBuffer("UPDATE shops SET unlimited = '1' WHERE x = "+x+" AND y="+y+" AND z="+z+" AND world='"+world+"'");
+							shop.update();
 							sender.sendMessage(ChatColor.GREEN + "Unlimited QuickShop created.");
 							return true;
 						}
@@ -45,7 +44,7 @@ public class QS implements CommandExecutor{
 					return true;
 				}
 			}
-			else if(args[0].equalsIgnoreCase("setowner")){
+			else if(subArg.equals("setowner")){
 				if(sender instanceof Player && sender.hasPermission("quickshop.setowner")){
 					if(args.length < 2){
 						sender.sendMessage(ChatColor.RED + "No owner given.  /qs setowner <player>");
@@ -57,13 +56,8 @@ public class QS implements CommandExecutor{
 						Shop shop = plugin.getShop(b.getLocation());
 						if(shop != null){
 							shop.setOwner(args[1]);
+							shop.update();
 							
-							int x = shop.getLocation().getBlockX();
-							int y = shop.getLocation().getBlockY();
-							int z = shop.getLocation().getBlockZ();
-							String world = shop.getLocation().getWorld().getName();
-							
-							plugin.getDB().writeToBuffer("UPDATE shops SET owner = '"+args[1]+"' WHERE x = "+x+" AND y="+y+" AND z="+z+" AND world='"+world+"'");
 							sender.sendMessage(ChatColor.GREEN + "New Owner: " + shop.getOwner());
 							return true;
 						}
@@ -74,8 +68,60 @@ public class QS implements CommandExecutor{
 					return true;
 				}
 			}
+			
+			else if(subArg.equals("buy")){
+				if(sender instanceof Player && sender.hasPermission("quickshop.buy")){
+					BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
+					while(bIt.hasNext()){
+						Block b = bIt.next();
+						Shop shop = plugin.getShop(b.getLocation());
+						if(shop != null && shop.getOwner().equalsIgnoreCase(((Player) sender).getName())){
+							shop.setShopType(ShopType.BUYING);
+							shop.update();
+							
+							sender.sendMessage(ChatColor.GREEN + "Now buying: " + plugin.getDataName(shop.getMaterial(), shop.getDurability()));
+							return true;
+						}
+					}
+					sender.sendMessage(ChatColor.RED + "No QuickShop found.  You must be looking at one.");
+					return true;
+				}
+				sender.sendMessage(ChatColor.RED + "You cannot do that.");
+				return true;
+			}
+			
+			else if(subArg.equals("sell")){
+				if(sender instanceof Player && sender.hasPermission("quickshop.sell")){
+					BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
+					while(bIt.hasNext()){
+						Block b = bIt.next();
+						Shop shop = plugin.getShop(b.getLocation());
+						if(shop != null && shop.getOwner().equalsIgnoreCase(((Player) sender).getName())){
+							shop.setShopType(ShopType.SELLING);
+							shop.update();
+							
+							sender.sendMessage(ChatColor.GREEN + "Now selling: " + plugin.getDataName(shop.getMaterial(), shop.getDurability()));
+							return true;
+						}
+					}
+					sender.sendMessage(ChatColor.RED + "No QuickShop found.  You must be looking at one.");
+					return true;
+				}
+				sender.sendMessage(ChatColor.RED + "You cannot do that.");
+				return true;
+
+			}
 		}
-		return false;
+		sendHelp(sender);
+		return true;
 	}
 	
+	
+	public void sendHelp(CommandSender s){
+		s.sendMessage(ChatColor.GREEN + "QuickShop Help");
+		if(s.hasPermission("quickshop.unlimited")) s.sendMessage(ChatColor.GREEN + "/qs unlimited" + ChatColor.YELLOW + " - Makes a shop unlimited");
+		if(s.hasPermission("quickshop.setowner")) s.sendMessage(ChatColor.GREEN + "/qs setowner <player>" + ChatColor.YELLOW + " - Sets the owner of a shop");
+		if(s.hasPermission("quickshop.buy")) s.sendMessage(ChatColor.GREEN + "/qs buy" + ChatColor.YELLOW + " - Changes a shop to BUY mode");
+		if(s.hasPermission("quickshop.sell")) s.sendMessage(ChatColor.GREEN + "/qs sell" + ChatColor.YELLOW + " - Changes a shop to SELL mode");
+	}
 }
