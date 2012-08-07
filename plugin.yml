@@ -3,7 +3,7 @@ version: 0.9
 main: org.maxgamer.QuickShop.QuickShop
 author: Netherfoam
 
-description: The real shop plugin.
+description: Economy Shops plugin
 website: http://maxgamer.org
 depend: [Vault]
 soft-depend: [Towny, PreciousStones, Lockette, WorldGuard, GriefPrevention]
