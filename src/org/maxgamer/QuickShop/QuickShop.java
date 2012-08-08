@@ -107,6 +107,7 @@ public class QuickShop extends JavaPlugin{
 		
 		QS commandExecutor = new QS(this);
 		getCommand("qs").setExecutor(commandExecutor);
+		getCommand("shop").setExecutor(commandExecutor);
 		
 		/* Create plugin folder */
 		if(!this.getDataFolder().exists()){
