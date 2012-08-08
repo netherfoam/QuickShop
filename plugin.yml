@@ -6,12 +6,15 @@ author: Netherfoam
 description: Economy Shops plugin
 website: http://maxgamer.org
 depend: [Vault]
-soft-depend: [Towny, PreciousStones, Lockette, WorldGuard, GriefPrevention]
+soft-depend: [Towny, PreciousStones, Lockette, WorldGuard, GriefPrevention, Residence]
 
 commands:
     qs:
         description: QuickShop command
         usage: /qs
+    shop:
+        description: QuickShop command
+        usage: /shop
         
 permissions:
     quickshop.create.sell:
