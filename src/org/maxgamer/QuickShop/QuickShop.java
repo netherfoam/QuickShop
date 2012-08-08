@@ -48,6 +48,8 @@ import org.maxgamer.QuickShop.Watcher.BufferWatcher;
 import org.maxgamer.QuickShop.Watcher.ItemWatcher;
 import org.yi.acru.bukkit.Lockette.Lockette;
 
+import com.bekvon.bukkit.residence.Residence;
+import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.palmergames.bukkit.towny.Towny;
 
 import com.palmergames.bukkit.towny.object.TownBlock;
@@ -71,6 +73,8 @@ public class QuickShop extends JavaPlugin{
 	private PreciousStones preciousStones;
 	//Towny
 	private Towny towny;
+	//Residence
+	private Residence residence;
 	//WorldGuard
 	private WorldGuardPlugin worldGuardPlugin;
 	//GriefPrevention
@@ -155,6 +159,13 @@ public class QuickShop extends JavaPlugin{
 			plug = Bukkit.getPluginManager().getPlugin("GriefPrevention");
 			if(plug != null){
 				this.griefPrevention = (GriefPrevention) plug;
+			}
+		}
+		
+		if(getConfig().getBoolean("plugins.residence")){
+			plug = Bukkit.getPluginManager().getPlugin("Residence");
+			if(plug != null){
+				this.residence = (Residence) plug;
 			}
 		}
 		/* Start database - Also creates DB file. */
@@ -658,6 +669,9 @@ public class QuickShop extends JavaPlugin{
 	public GriefPrevention getGriefPrevention(){
 		return this.griefPrevention;
 	}
+	public Residence getResidence(){
+        return this.residence;
+	}
 	/**
 	 * Checks other plugins to make sure they can use the chest they're making a shop.
 	 * @param p The player to check
@@ -711,7 +725,14 @@ public class QuickShop extends JavaPlugin{
 			}
 			
 		}
-		
+		if(getResidence() != null){
+			ClaimedResidence res = Residence.getResidenceManager().getByLoc(b.getLocation());
+			if(res!=null){
+				if(!res.getPermissions().playerHas(p.getName(), "container", false)&&!Residence.getPermissionManager().isResidenceAdmin(p)){
+					return false;
+				}
+			}
+		}
 		return true;
 	}
 }
