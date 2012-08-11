@@ -612,7 +612,6 @@ public class QuickShop extends JavaPlugin{
 			case 2: return "WOODEN_SLAB";
 			case 3: return "COBBLESTONE_SLAB";
 			case 4: return "BRICK_SLAB";
-			//case 4: return "WTFUCKER";
 			case 5: return "STONE_BRICK_SLAB";
 			}
 			return mat.toString();
