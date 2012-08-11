@@ -391,31 +391,30 @@ public class Shop{
 	public boolean isAttached(Block b){
 		Sign sign = (Sign) b.getState();
 		BlockFace bf = b.getFace(this.getLocation().getBlock());
-		if(sign.getRawData() == 2){
+		if(sign.getRawData() == 5){
 			if(bf == BlockFace.NORTH){
 				return true;
 			}
 			return false;
 		}
-		if(sign.getRawData() == 3){
+		else if(sign.getRawData() == 4){
 			if(bf == BlockFace.SOUTH){
 				return true;
 			}
 			return false;
 		}
-		if(sign.getRawData() == 4){
+		else if(sign.getRawData() == 2){
 			if(bf == BlockFace.WEST){
 				return true;
 			}
 			return false;
 		}
-		if(sign.getRawData() == 5){
+		else{
 			if(bf == BlockFace.EAST){
 				return true;
 			}
 			return false;
 		}
-		return false;
 	}
 	
 	public String getDataName(){
