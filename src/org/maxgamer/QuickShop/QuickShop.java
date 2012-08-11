@@ -485,6 +485,7 @@ public class QuickShop extends JavaPlugin{
 			case 14: return "RED_WOOL";
 			case 15: return "BLACK_WOOL";
 			}
+			return mat.toString();
 		case 351:
 			switch((int) damage){
 			case 0: return "INK_SAC";
@@ -504,6 +505,7 @@ public class QuickShop extends JavaPlugin{
 			case 14: return "ORANGE_DYE";
 			case 15: return "BONE_MEAL";
 			}
+			return mat.toString();
 		case 98:
 			switch((int) damage){
 			case 0: return "STONE_BRICKS";
@@ -511,6 +513,7 @@ public class QuickShop extends JavaPlugin{
 			case 2: return "CRACKED_STONE_BRICKS";
 			case 3: return "CHISELED_STONE_BRICKS";
 			}
+			return mat.toString();
 		case 373:
 			//Special case
 			if(damage == 64) return "MUNDANE_POTION";
@@ -548,8 +551,7 @@ public class QuickShop extends JavaPlugin{
 			case 16: return prefix + "AWKWARD_POTION" + suffix;
 			case 32: return prefix + "THICK_POTION" + suffix;
 			}
-			getLogger().info("Potion ID: " + pot.getNameId());
-		
+			return mat.toString();
 		case 6:
 			switch((int) damage){
 			case 0: return "OAK_SAPLING";
@@ -557,6 +559,7 @@ public class QuickShop extends JavaPlugin{
 			case 2: return "BIRCH_SAPLING";
 			case 3: return "JUNGLE_TREE_SPALING";
 			}
+			return mat.toString();
 		
 		case 5:
 			switch((int) damage){
@@ -565,6 +568,7 @@ public class QuickShop extends JavaPlugin{
 			case 2: return "BIRCH_PLANKS";
 			case 3: return "JUNGLE_PLANKS";
 			}
+			return mat.toString();
 		case 17:
 			switch(damage){
 			case 0: return "OAK_LOG";
@@ -572,31 +576,35 @@ public class QuickShop extends JavaPlugin{
 			case 2: return "BIRCH_LOG";
 			case 3: return "JUNGLE_LOG";
 			}
+			return mat.toString();
 		case 18:
+			damage = (short) (damage%4);
 			switch(damage){
 			case 0: return "OAK_LEAVES";
 			case 1: return "PINE_LEAVES";
 			case 2: return "BIRCH_LEAVES";
 			case 3: return "JUNGLE_LEAVES";
-			case 7: return "JUNGLE_LEAVES";
 			}
 		case 263:
 			switch(damage){
 			case 0: return "COAL";
 			case 1: return "CHARCOAL";
 			}
+			return mat.toString();
 		case 24:
 			switch((int) damage){
 			case 0: return "SANDSTONE";
 			case 1: return "CHISELED_SANDSTONE";
 			case 2: return "SMOOTH_SANDSTONE";
 			}
+			return mat.toString();
 		case 31:
 			switch((int) damage){
 			case 0: return "DEAD_SHRUB";
 			case 1: return "TALL_GRASS";
 			case 2: return "FERN";
 			}
+			return mat.toString();
 		case 44:
 			switch((int) damage){
 			case 0: return "STONE_SLAB";
@@ -604,8 +612,10 @@ public class QuickShop extends JavaPlugin{
 			case 2: return "WOODEN_SLAB";
 			case 3: return "COBBLESTONE_SLAB";
 			case 4: return "BRICK_SLAB";
+			//case 4: return "WTFUCKER";
 			case 5: return "STONE_BRICK_SLAB";
 			}
+			return mat.toString();
 		case 383:
 			switch((int) damage){
 			case 50: return "CREEPER_EGG";
@@ -636,6 +646,7 @@ public class QuickShop extends JavaPlugin{
 			case 200: return "ENDER_CRYSTAL_EGG";
 			case 14: return "PRIMED_TNT_EGG";
 			}
+			return mat.toString();
 		case 76:
 			return "REDSTONE_TORCH";
 		case 115:
