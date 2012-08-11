@@ -206,7 +206,7 @@ public class ClickListener implements Listener{
 		for(Block b : blocks){
 			if(b.getType() != Material.CHEST) continue;
 			Shop shop = plugin.getShop(b.getLocation());
-			if(shop != null) return shop;
+			if(shop != null && shop.isAttached(loc.getBlock())) return shop;
 		}
 		return null;
 	}
