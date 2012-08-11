@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.enchantments.Enchantment;
@@ -376,6 +377,7 @@ public class Shop{
 		
 		for(Block b : blocks){
 			if(b.getType() != Material.WALL_SIGN) continue;
+			if(!isAttached(b)) continue;
 			Sign sign = (Sign) b.getState();
 			
 			for(int i = 0; i < lines.length; i++){
@@ -384,6 +386,36 @@ public class Shop{
 			
 			sign.update(true);
 		}
+	}
+	
+	public boolean isAttached(Block b){
+		Sign sign = (Sign) b.getState();
+		BlockFace bf = b.getFace(this.getLocation().getBlock());
+		if(sign.getRawData() == 2){
+			if(bf == BlockFace.NORTH){
+				return true;
+			}
+			return false;
+		}
+		if(sign.getRawData() == 3){
+			if(bf == BlockFace.SOUTH){
+				return true;
+			}
+			return false;
+		}
+		if(sign.getRawData() == 4){
+			if(bf == BlockFace.WEST){
+				return true;
+			}
+			return false;
+		}
+		if(sign.getRawData() == 5){
+			if(bf == BlockFace.EAST){
+				return true;
+			}
+			return false;
+		}
+		return false;
 	}
 	
 	public String getDataName(){
