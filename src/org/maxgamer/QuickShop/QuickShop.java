@@ -723,9 +723,6 @@ public class QuickShop extends JavaPlugin{
 					}
 				} catch (Exception e) {
 				} 
-				finally{
-					
-				}
 			}
 		}
 		if(getGriefPrevention() != null){
