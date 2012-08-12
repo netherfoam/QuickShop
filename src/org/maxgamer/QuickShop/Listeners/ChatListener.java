@@ -82,7 +82,8 @@ public class ChatListener implements Listener{
 						
 						//Add the shop to the list.
 						final Shop shop = new Shop(info.getLocation(), price, info.getItem(), p.getName());
-						plugin.getShops().put(info.getLocation(), shop);
+						//plugin.getShops().put(info.getLocation(), shop);
+						plugin.addShop(shop);
 						
 						if(tax == 0) p.sendMessage(ChatColor.GREEN + "Created a shop");
 						else{
@@ -145,7 +146,8 @@ public class ChatListener implements Listener{
 						return;
 					}
 					
-					Shop shop = plugin.getShops().get(info.getLocation());
+					//Shop shop = plugin.getShops().get(info.getLocation());
+					Shop shop = plugin.getShop(info.getLocation());
 					
 					if(shop == null || info.getLocation().getBlock().getType() != Material.CHEST){
 						p.sendMessage(ChatColor.RED + "That shop was removed.");

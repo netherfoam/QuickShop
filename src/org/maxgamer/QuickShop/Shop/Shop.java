@@ -455,6 +455,7 @@ public class Shop{
 		}
 		
 		//Delete it from memory
-		plugin.getShops().remove(this.getLocation());
+		//plugin.getShops().remove(this.getLocation());
+		plugin.removeShop(this.getLocation());
 	}
 }

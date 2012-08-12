@@ -47,7 +47,7 @@ public class ItemWatcher implements Runnable{
 		}
 		//Now we can remove it.
 		for(Location loc : toRemove){
-			plugin.getShops().remove(loc);
+			plugin.removeShop(loc);
 		}
 	}
 }

@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,12 +20,12 @@ import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
@@ -61,11 +62,11 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 public class QuickShop extends JavaPlugin{
 	private Economy economy;
 	private HashMap<Location, Shop> shops = new HashMap<Location, Shop>(30);
+	private HashMap<Chunk, List<Shop>> shopChunks = new HashMap<Chunk, List<Shop>>(30);
+	
 	private HashMap<String, Info> actions = new HashMap<String, Info>(30);
 	private HashSet<Material> tools = new HashSet<Material>(50);
 	public HashSet<String> warnings = new HashSet<String>(10);
-	
-	private HashMap<Shop, Item> spawnedItems = new HashMap<Shop, Item>(30);
 	
 	private Database database;
 	
@@ -228,7 +229,8 @@ public class QuickShop extends JavaPlugin{
 				shop.setShopType(ShopType.fromID(type));
 				
 				
-				this.getShops().put(loc, shop);
+				//this.getShops().put(loc, shop);
+				this.addShop(shop);
 			}
 			
 		} catch (SQLException e) {
@@ -269,9 +271,18 @@ public class QuickShop extends JavaPlugin{
 	/**
 	 * Returns a hashmap of (key: location) and (value: shop)'s.
 	 * @return A hashmap of (key: location) and (value: shop)'s.
-	 */
+	*/ 
 	public HashMap<Location, Shop> getShops(){
 		return this.shops;
+	}
+	
+	/**
+	 * Get all shops in a specific chunk
+	 * @param c The chunk to search
+	 * @return The shops list in the chunk
+	 */
+	public List<Shop> getShopsInChunk(Chunk c){
+		return this.shopChunks.get(c);
 	}
 	/**
 	 * @return Returns the HashMap<Player name, shopInfo>. Info contains what their last question etc was.
@@ -293,13 +304,32 @@ public class QuickShop extends JavaPlugin{
 	        return (economy != null);
     }
 	
+	public void addShop(Shop shop){
+		this.shops.put(shop.getLocation(), shop);
+		
+		//Chunk handling
+		Chunk chunk = shop.getLocation().getChunk();
+		
+		List<Shop> inChunk = this.shopChunks.get(chunk);
+		if(inChunk == null){
+			inChunk = new ArrayList<Shop>(1);
+			this.shopChunks.put(chunk, inChunk);
+		}
+		inChunk.add(shop);
+	}
+	
+	public void removeShop(Location loc){
+		this.shops.remove(loc);
+		this.shopChunks.remove(loc.getChunk());
+	}
+	
 	 /**
 	  * Fetches a shop in a particular location, or null.
 	  * @param loc The location to check.
 	  * @return The shop at the location.
 	  */
 	public Shop getShop(Location loc){
-		Shop shop = this.getShops().get(loc);
+		Shop shop = this.shops.get(loc);
 		if(shop != null) return shop;
 		return null;
 		
@@ -330,13 +360,7 @@ public class QuickShop extends JavaPlugin{
 		DecimalFormat formatter = new DecimalFormat("0");
 		return formatter.format((1 - dura/max)* 100.0);
 	}
-	
-	/**
-	 * @return Returns a hashmap<shop, item> of the protected items.
-	 */
-	public HashMap<Shop, Item> getProtectedItems(){
-		return this.spawnedItems;
-	}
+
 	/**
 	 * Converts a string into an item from the database.
 	 * @param itemString The database string.  Is the result of makeString(ItemStack item).
