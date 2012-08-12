@@ -50,6 +50,7 @@ import org.yi.acru.bukkit.Lockette.Lockette;
 
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
+import com.griefcraft.lwc.LWC;
 import com.palmergames.bukkit.towny.Towny;
 
 import com.palmergames.bukkit.towny.object.TownBlock;
@@ -81,6 +82,8 @@ public class QuickShop extends JavaPlugin{
 	private GriefPrevention griefPrevention; 
 	//Lockette
 	private Lockette lockette;
+	//LWC
+	private LWC lwc;
 	
 	private ChatListener chatListener = new ChatListener(this);
 	private ClickListener clickListener;
@@ -169,6 +172,13 @@ public class QuickShop extends JavaPlugin{
 				this.residence = (Residence) plug;
 			}
 		}
+		if(getConfig().getBoolean("plugins.lwc")){
+			plug = Bukkit.getPluginManager().getPlugin("LWC");
+			if(plug != null){
+				this.lwc = (LWC) lwc;
+			}
+		}
+		
 		/* Start database - Also creates DB file. */
 		this.database = new Database(this, this.getDataFolder() + File.separator + "shops.db");
 		
@@ -683,6 +693,9 @@ public class QuickShop extends JavaPlugin{
 	public Residence getResidence(){
         return this.residence;
 	}
+	public LWC getLWC(){
+		return this.lwc;
+	}
 	/**
 	 * Checks other plugins to make sure they can use the chest they're making a shop.
 	 * @param p The player to check
@@ -741,6 +754,13 @@ public class QuickShop extends JavaPlugin{
 				}
 			}
 		}
+		
+		if(getLWC() != null){
+			if(!getLWC().canAccessProtection(p, b)){
+				return false;
+			}
+		}
+		
 		return true;
 	}
 }
