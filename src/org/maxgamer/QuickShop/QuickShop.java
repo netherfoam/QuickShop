@@ -319,7 +319,12 @@ public class QuickShop extends JavaPlugin{
 	
 	public void removeShop(Location loc){
 		this.shops.remove(loc);
-		this.shopChunks.remove(loc.getChunk());
+		List<Shop> inChunk = this.shopChunks.get(loc.getChunk());
+		for(Shop shop : inChunk){
+			if(shop.getLocation().equals(loc)){
+				inChunk.remove(shop);
+			}
+		}
 	}
 	
 	 /**
