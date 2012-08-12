@@ -49,7 +49,7 @@ public class BlockListener implements Listener{
 			}
 			Info action = plugin.getActions().get(p.getName());
 			if(action != null){
-				plugin.getActions().get(p.getName()).setAction(ShopAction.CANCELLED);
+				action.setAction(ShopAction.CANCELLED);
 			}
 			shop.delete();
 			p.sendMessage(ChatColor.GREEN + "Shop Removed");
