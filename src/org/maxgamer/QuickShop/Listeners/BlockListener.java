@@ -13,6 +13,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Shop.DisplayItem;
+import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.ShopAction;
 
@@ -46,9 +47,10 @@ public class BlockListener implements Listener{
 				p.sendMessage(ChatColor.RED + "You cannot break other players shops in creative mode.  Use survival instead.");
 				return;
 			}
-			
-			plugin.getActions().get(p.getName()).setAction(ShopAction.CANCELLED);
-			
+			Info action = plugin.getActions().get(p.getName());
+			if(action != null){
+				plugin.getActions().get(p.getName()).setAction(ShopAction.CANCELLED);
+			}
 			shop.delete();
 			p.sendMessage(ChatColor.GREEN + "Shop Removed");
 		}
