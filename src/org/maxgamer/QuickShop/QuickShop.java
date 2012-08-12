@@ -62,7 +62,7 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 public class QuickShop extends JavaPlugin{
 	private Economy economy;
 	private HashMap<Location, Shop> shops = new HashMap<Location, Shop>(30);
-	private HashMap<Chunk, List<Shop>> shopChunks = new HashMap<Chunk, List<Shop>>(30);
+	public HashMap<Chunk, List<Shop>> shopChunks = new HashMap<Chunk, List<Shop>>(30);
 	
 	private HashMap<String, Info> actions = new HashMap<String, Info>(30);
 	private HashSet<Material> tools = new HashSet<Material>(50);
@@ -255,6 +255,7 @@ public class QuickShop extends JavaPlugin{
 		this.database.stopBuffer();
 		
 		this.actions.clear();
+		this.shopChunks.clear();
 		this.shops.clear();
 		this.tools.clear();
 		this.warnings.clear();
