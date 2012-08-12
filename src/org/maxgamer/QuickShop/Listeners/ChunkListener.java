@@ -28,19 +28,6 @@ public class ChunkListener implements Listener{
 			disItem.remove();
 			disItem.spawn();
 		}
-		/*
-		for(Entry<Location, Shop> map:plugin.getShops().entrySet()){
-			Location loc = map.getKey();
-			Shop shop = map.getValue();
-			if(loc.getWorld() == null) continue;
-			if(chunkMatches(e.getChunk(), loc.getChunk())){
-				//This is a shop chunk.
-				
-				shop.getDisplayItem().removeDupe();
-				shop.getDisplayItem().remove();
-				shop.getDisplayItem().spawn();
-			}
-		}*/
 	}
 	
 	@EventHandler(priority = EventPriority.LOW)
@@ -53,16 +40,5 @@ public class ChunkListener implements Listener{
 			disItem.removeDupe();
 			disItem.remove();
 		}
-		/*
-		for(Entry<Location, Shop> map:plugin.getShops().entrySet()){
-			Location loc = map.getKey();
-			if(loc.getWorld() == null) continue;
-			if(e.getChunk().equals(loc.getChunk())){
-				//This is a shop chunk.
-				Shop shop = map.getValue();
-				shop.getDisplayItem().removeDupe();
-				shop.getDisplayItem().remove();
-			}
-		}*/
 	}
 }

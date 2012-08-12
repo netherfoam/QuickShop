@@ -11,7 +11,6 @@
 			<attribute name="javadoc_location" value="http://jd.bukkit.org/apidocs/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="C:/Users/Dirk/Desktop/Bukkit/plugins/PreciousStones.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Dirk/Desktop/Bukkit/plugins/Towny.jar">
 		<attributes>
@@ -21,5 +20,8 @@
 	<classpathentry kind="lib" path="C:/Users/Dirk/Desktop/Bukkit/plugins/WorldGuard.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Dirk/Desktop/Bukkit/plugins/Lockette.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Dirk/Dropbox/Server/plugins/GriefPrevention.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Dirk/Dropbox/Server/lib/Residence.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="C:/Users/Dirk/Dropbox/Server/lib/LWC.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

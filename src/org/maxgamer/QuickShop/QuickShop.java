@@ -228,8 +228,6 @@ public class QuickShop extends JavaPlugin{
 				
 				shop.setShopType(ShopType.fromID(type));
 				
-				
-				//this.getShops().put(loc, shop);
 				this.addShop(shop);
 			}
 			
