@@ -63,6 +63,11 @@ public class ClickListener implements Listener{
 		ItemStack item = e.getItem();
 		Location loc = b.getLocation();
 		
+		if(plugin.getConfig().getBoolean("shop.sneak-only") && !p.isSneaking()){
+			//Sneak only
+			return;
+		}
+		
 		//Get the shop
 		Shop shop = plugin.getShop(loc);
 		//If that wasn't a shop, search nearby shops
@@ -72,10 +77,6 @@ public class ClickListener implements Listener{
 		 * Purchase Handling
 		 */
 		if(shop != null && p.hasPermission("quickshop.use")){
-			if(plugin.getConfig().getBoolean("shop.sneak-only") && !p.isSneaking()){
-				//Sneak only
-				return;
-			}
 			//Text menu
 			sendShopInfo(p, shop);
 			if(shop.isSelling()){
@@ -151,8 +152,8 @@ public class ClickListener implements Listener{
 		else{
 			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Space: " + ChatColor.YELLOW + shop.getRemainingSpace(shop.getMaterial().getMaxStackSize()));
 		}
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Price per "+ChatColor.YELLOW + items.getType() + ChatColor.GREEN + " - " + ChatColor.YELLOW + shop.getPrice() + ChatColor.GREEN + " credits");
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Total Value of Chest: " + ChatColor.YELLOW + shop.getPrice() * stock + ChatColor.GREEN + " credits");
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Price per "+ChatColor.YELLOW + items.getType() + ChatColor.GREEN + " - " + ChatColor.YELLOW + plugin.getEcon().format(shop.getPrice()));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Total Value of Chest: " + ChatColor.YELLOW + plugin.getEcon().format(shop.getPrice() * stock));
 		
 		if(plugin.isTool(items.getType())){
 			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + plugin.getToolPercentage(items) + "% Remaining"); 
