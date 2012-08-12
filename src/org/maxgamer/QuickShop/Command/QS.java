@@ -112,7 +112,12 @@ public class QS implements CommandExecutor{
 				sender.sendMessage(ChatColor.RED + "You cannot do that.");
 				return true;
 
-			}
+			}/*
+			else if(subArg.startsWith("debug")){
+				for(List<Shop> shops : plugin.shopChunks.values()){
+					plugin.getLogger().info("Size: " + shops.size());
+				}
+			}*/
 		}
 		sendHelp(sender);
 		return true;
