@@ -29,7 +29,6 @@ public class BlockListener implements Listener{
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBreak(final BlockBreakEvent e){
 		if(e.isCancelled() || e.getBlock().getType() != Material.CHEST) return;
-		//Shop shop = plugin.getShops().get(e.getBlock().getLocation());
 		Shop shop = plugin.getShop(e.getBlock().getLocation());
 		
 		//If the chest was a shop
@@ -77,7 +76,6 @@ public class BlockListener implements Listener{
 		if(e.isCancelled()) return;
 		for(int i = 0; i < e.blockList().size(); i++){
 			Block b = e.blockList().get(i);
-			//if(plugin.getShops().containsKey(b.getLocation())){
 			if(plugin.getShop(b.getLocation()) != null){
 				if(plugin.getConfig().getBoolean("shops.lock")){
 					e.blockList().remove(b);
