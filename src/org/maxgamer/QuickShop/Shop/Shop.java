@@ -424,6 +424,7 @@ public class Shop{
 	/**
 	 * Deletes the shop from the list of shops
 	 * and queues it for database deletion
+	 * *DOES* delete it from memory
 	 */
 	public void delete(){
 		//Delete the display item

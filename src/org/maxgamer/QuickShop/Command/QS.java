@@ -1,7 +1,5 @@
 package org.maxgamer.QuickShop.Command;
 
-import java.util.List;
-
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
