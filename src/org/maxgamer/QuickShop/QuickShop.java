@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
@@ -61,8 +62,8 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 
 public class QuickShop extends JavaPlugin{
 	private Economy economy;
-	private HashMap<Location, Shop> shops = new HashMap<Location, Shop>(30);
-	public HashMap<Chunk, List<Shop>> shopChunks = new HashMap<Chunk, List<Shop>>(30);
+	private ConcurrentHashMap<Location, Shop> shops = new ConcurrentHashMap<Location, Shop>(30);
+	public ConcurrentHashMap<Chunk, List<Shop>> shopChunks = new ConcurrentHashMap<Chunk, List<Shop>>(30);
 	
 	private HashMap<String, Info> actions = new HashMap<String, Info>(30);
 	private HashSet<Material> tools = new HashSet<Material>(50);
@@ -271,7 +272,7 @@ public class QuickShop extends JavaPlugin{
 	 * Returns a hashmap of (key: location) and (value: shop)'s.
 	 * @return A hashmap of (key: location) and (value: shop)'s.
 	*/ 
-	public HashMap<Location, Shop> getShops(){
+	public ConcurrentHashMap<Location, Shop> getShops(){
 		return this.shops;
 	}
 	
