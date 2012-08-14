@@ -29,7 +29,7 @@ public class DisplayItem{
 		this.plugin = plugin;
 		this.shop = shop;
 		this.iStack = iStack.clone();
-		this.displayLoc = shop.getLocation().clone().add(0.5, 1, 0.5);
+		this.displayLoc = shop.getLocation().clone().add(0.5, 1.2, 0.5);
 		
 		if(displayLoc.getWorld() != null){
 			this.removeDupe();
