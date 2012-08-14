@@ -6,19 +6,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-
-import me.ryanhamshire.GriefPrevention.Claim;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
-import net.milkbowl.vault.economy.Economy;
-import net.sacredlabyrinth.Phaed.PreciousStones.FieldFlag;
-import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
-import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -43,27 +35,34 @@ import org.maxgamer.QuickShop.Listeners.ChunkListener;
 import org.maxgamer.QuickShop.Listeners.ClickListener;
 import org.maxgamer.QuickShop.Listeners.MoveListener;
 import org.maxgamer.QuickShop.Listeners.QuitListener;
+import org.maxgamer.QuickShop.Shop.DisplayItem;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.Shop.ShopType;
 import org.maxgamer.QuickShop.Watcher.BufferWatcher;
 import org.maxgamer.QuickShop.Watcher.ItemWatcher;
-import org.yi.acru.bukkit.Lockette.Lockette;
 
 import com.bekvon.bukkit.residence.Residence;
-import com.bekvon.bukkit.residence.protection.ClaimedResidence;
-import com.griefcraft.lwc.LWC;
 import com.palmergames.bukkit.towny.Towny;
-
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.griefcraft.lwc.LWC;
+import org.yi.acru.bukkit.Lockette.Lockette;
+import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.palmergames.bukkit.towny.object.TownBlock;
 import com.palmergames.bukkit.towny.object.TownyUniverse;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import me.ryanhamshire.GriefPrevention.Claim;
+import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import net.sacredlabyrinth.Phaed.PreciousStones.FieldFlag;
+import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
+import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
 
+
+import net.milkbowl.vault.economy.Economy;
 
 public class QuickShop extends JavaPlugin{
 	private Economy economy;
-	private ConcurrentHashMap<Location, Shop> shops = new ConcurrentHashMap<Location, Shop>(30);
-	public ConcurrentHashMap<Chunk, List<Shop>> shopChunks = new ConcurrentHashMap<Chunk, List<Shop>>(30);
+	//Ain't this a fucker
+	private ConcurrentHashMap<Chunk, ConcurrentHashMap<Location, Shop>> shopChunks = new ConcurrentHashMap<Chunk, ConcurrentHashMap<Location, Shop>>(30);
 	
 	private HashMap<String, Info> actions = new HashMap<String, Info>(30);
 	private HashSet<Material> tools = new HashSet<Material>(50);
@@ -95,6 +94,8 @@ public class QuickShop extends JavaPlugin{
 	private QuitListener quitListener = new QuitListener(this);
 	
 	private int itemWatcherID;
+	public boolean lock;
+	public boolean sneak;
 	
 	public void onEnable(){
 		getLogger().info("Hooking Vault");
@@ -187,8 +188,6 @@ public class QuickShop extends JavaPlugin{
 		getLogger().info("Loading tools");
 		loadTools();
 		
-		getLogger().info("Starting item scheduler");
-		
 		/* Creates DB table 'shops' */
 		if(!getDB().hasTable()){
 			try {
@@ -202,6 +201,7 @@ public class QuickShop extends JavaPlugin{
 		
 		/* Load shops from database to memory */
 		Connection con = database.getConnection();
+		int i = 0;
 		try {
 			PreparedStatement ps = con.prepareStatement("SELECT * FROM shops");
 			ResultSet rs = ps.executeQuery();
@@ -230,25 +230,36 @@ public class QuickShop extends JavaPlugin{
 				shop.setShopType(ShopType.fromID(type));
 				
 				this.addShop(shop);
+				i++;
 			}
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
 			getLogger().severe("Could not load shops.");
 		}
-		getLogger().info("Loaded " + this.shops.size() + " shops.");
+		getLogger().info("Loaded " + i + " shops.");
 		/**
 		 * Display item handler thread
 		 */
-		itemWatcherID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new ItemWatcher(), 150, 150);
+		getLogger().info("Starting item scheduler");
+		ItemWatcher itemWatcher = new ItemWatcher(this);
+		itemWatcherID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, itemWatcher, 150, 150);
 		
+		
+		this.sneak = this.getConfig().getBoolean("shop.sneak-only");
+		this.lock = this.getConfig().getBoolean("shop.lock");
 	}
 	public void onDisable(){
 		Bukkit.getScheduler().cancelTask(itemWatcherID);
 		/* Remove all display items, and any dupes we can find */
-		for(Shop shop : shops.values()){
-			shop.getDisplayItem().removeDupe();
-			shop.getDisplayItem().remove();
+		//For each chunk of shops
+		for(Entry<Chunk, ConcurrentHashMap<Location, Shop>> chunkmap : this.shopChunks.entrySet()){
+			//For each shop in the chunk
+			for(Entry<Location, Shop> shopmap : chunkmap.getValue().entrySet()){
+				DisplayItem dispItem = shopmap.getValue().getDisplayItem();
+				dispItem.removeDupe();
+				dispItem.remove();
+			}
 		}
 		
 		/* Empty the buffer */
@@ -256,10 +267,17 @@ public class QuickShop extends JavaPlugin{
 		this.database.stopBuffer();
 		
 		this.actions.clear();
+		
+		//Clear each chunk of shops
+		for(Entry<Chunk, ConcurrentHashMap<Location, Shop>> chunkmap : this.shopChunks.entrySet()){
+			chunkmap.getValue().clear();
+		}
+		
 		this.shopChunks.clear();
-		this.shops.clear();
 		this.tools.clear();
 		this.warnings.clear();
+		
+		this.reloadConfig();
 	}
 	/**
 	 * Returns the vault economy
@@ -268,12 +286,9 @@ public class QuickShop extends JavaPlugin{
 	public Economy getEcon(){
 		return economy;
 	}
-	/**
-	 * Returns a hashmap of (key: location) and (value: shop)'s.
-	 * @return A hashmap of (key: location) and (value: shop)'s.
-	*/ 
-	public ConcurrentHashMap<Location, Shop> getShops(){
-		return this.shops;
+	
+	public  ConcurrentHashMap<Chunk, ConcurrentHashMap<Location, Shop>> getShopChunks(){
+		return this.shopChunks;
 	}
 	
 	/**
@@ -281,7 +296,7 @@ public class QuickShop extends JavaPlugin{
 	 * @param c The chunk to search
 	 * @return The shops list in the chunk
 	 */
-	public List<Shop> getShopsInChunk(Chunk c){
+	public ConcurrentHashMap<Location, Shop> getShopsInChunk(Chunk c){
 		return this.shopChunks.get(c);
 	}
 	/**
@@ -305,31 +320,20 @@ public class QuickShop extends JavaPlugin{
     }
 	
 	public void addShop(Shop shop){
-		this.shops.put(shop.getLocation(), shop);
-		
 		//Chunk handling
 		Chunk chunk = shop.getLocation().getChunk();
 		
-		List<Shop> inChunk = this.shopChunks.get(chunk);
+		ConcurrentHashMap<Location, Shop> inChunk = this.shopChunks.get(chunk);
 		if(inChunk == null){
-			inChunk = new ArrayList<Shop>(1);
+			inChunk = new ConcurrentHashMap<Location, Shop>(1);
 			this.shopChunks.put(chunk, inChunk);
 		}
-		inChunk.add(shop);
+		inChunk.put(shop.getLocation(), shop);
 	}
 	
-	public void removeShop(Location loc){
-		List<Shop> inChunk = this.shopChunks.get(loc.getChunk());
-		
-		Shop outer = null;
-		for(Shop shop : inChunk){
-			if(shop.getLocation().equals(loc)){
-				outer = shop;
-				break;
-			}
-		}
-		inChunk.remove(outer);
-		this.shops.remove(loc);
+	public void removeShop(Shop shop){
+		ConcurrentHashMap<Location, Shop> inChunk = this.shopChunks.get(shop.getLocation().getChunk());
+		inChunk.remove(shop.getLocation());
 	}
 	
 	 /**
@@ -338,9 +342,10 @@ public class QuickShop extends JavaPlugin{
 	  * @return The shop at the location.
 	  */
 	public Shop getShop(Location loc){
-		Shop shop = this.shops.get(loc);
-		if(shop != null) return shop;
-		return null;
+		ConcurrentHashMap<Location, Shop> inChunk = this.shopChunks.get(loc.getChunk());
+		
+		if(inChunk == null) return null;
+		return inChunk.get(loc);
 		
 	}
 	/**
@@ -736,6 +741,7 @@ public class QuickShop extends JavaPlugin{
 	 * @return True if they're allowed to place a shop there.
 	 */
 	public boolean canBuildShop(Player p, Block b){
+		
 		if(getWorldGuard() != null){
 			if(!getWorldGuard().canBuild(p, b)){
 				//Can't build.
