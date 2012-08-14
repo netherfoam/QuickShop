@@ -134,6 +134,7 @@ public class Shop{
 		String q = "";
 		if(isNew){
 			q = "INSERT INTO shops VALUES ('"+this.getOwner()+"', '"+this.getPrice()+"', '"+plugin.makeString(this.item)+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"', '"+unlimited+"', '"+ShopType.toID(this.shopType)+"')";
+			isNew = false;
 		}
 		else{
 			q = "UPDATE shops SET owner = '"+this.getOwner()+"', itemString = '"+plugin.makeString(this.item)+"', unlimited = '"+unlimited+"', type = '"+ShopType.toID(this.shopType)+"'  WHERE x = '"+x+"' AND y = '"+y+"' AND z = '"+z+"' AND world = '"+world+"'";  
@@ -427,6 +428,15 @@ public class Shop{
 	 * *DOES* delete it from memory
 	 */
 	public void delete(){
+		delete(true);
+	}
+	
+	/**
+	 * Delete sthe shop from the list of shops
+	 * and queues it for database deletion
+	 * @param fromMemory True if you are *NOT* iterating over this currently, *false if you are iterating*
+	 */
+	public void delete(boolean fromMemory){
 		//Delete the display item
 		this.getDisplayItem().remove();
 		
@@ -455,7 +465,9 @@ public class Shop{
 			plugin.getEcon().depositPlayer(this.getOwner(), plugin.getConfig().getDouble("shop.cost"));
 		}
 		
-		//Delete it from memory
-		plugin.removeShop(this.getLocation());
+		if(fromMemory){
+			//Delete it from memory
+			plugin.removeShop(this);
+		}
 	}
 }
