@@ -114,8 +114,16 @@ public class QS implements CommandExecutor{
 
 			}/*
 			else if(subArg.startsWith("debug")){
-				for(List<Shop> shops : plugin.shopChunks.values()){
-					plugin.getLogger().info("Size: " + shops.size());
+				if(this.testChunk == null){
+					this.testChunk = ((Player) sender).getLocation().getChunk();
+				}
+				else{
+					sender.sendMessage("Chunk is equal?: " + ((Player) sender).getLocation().getChunk().equals(this.testChunk));
+					this.testChunk = ((Player) sender).getLocation().getChunk();
+				}
+				
+				for(Entry<Location, Shop> ent : plugin.getShopsInChunk(((Player) sender).getLocation().getChunk()).entrySet()){
+					sender.sendMessage(ChatColor.YELLOW + "Type: " + ent.getValue().getDisplayItem().getItem().getItemStack().getType());
 				}
 			}*/
 		}

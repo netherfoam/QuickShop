@@ -10,10 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -35,7 +32,6 @@ import org.maxgamer.QuickShop.Listeners.ChunkListener;
 import org.maxgamer.QuickShop.Listeners.ClickListener;
 import org.maxgamer.QuickShop.Listeners.MoveListener;
 import org.maxgamer.QuickShop.Listeners.QuitListener;
-import org.maxgamer.QuickShop.Shop.DisplayItem;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.Shop.ShopType;
@@ -61,8 +57,7 @@ import net.milkbowl.vault.economy.Economy;
 
 public class QuickShop extends JavaPlugin{
 	private Economy economy;
-	//Ain't this a fucker
-	private ConcurrentHashMap<Chunk, ConcurrentHashMap<Location, Shop>> shopChunks = new ConcurrentHashMap<Chunk, ConcurrentHashMap<Location, Shop>>(30);
+	private HashMap<Location, Shop> shops = new HashMap<Location, Shop>(10);
 	
 	private HashMap<String, Info> actions = new HashMap<String, Info>(30);
 	private HashSet<Material> tools = new HashSet<Material>(50);
@@ -201,7 +196,6 @@ public class QuickShop extends JavaPlugin{
 		
 		/* Load shops from database to memory */
 		Connection con = database.getConnection();
-		int i = 0;
 		try {
 			PreparedStatement ps = con.prepareStatement("SELECT * FROM shops");
 			ResultSet rs = ps.executeQuery();
@@ -230,14 +224,13 @@ public class QuickShop extends JavaPlugin{
 				shop.setShopType(ShopType.fromID(type));
 				
 				this.addShop(shop);
-				i++;
 			}
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
 			getLogger().severe("Could not load shops.");
 		}
-		getLogger().info("Loaded " + i + " shops.");
+		getLogger().info("Loaded " + shops.size() + " shops.");
 		/**
 		 * Display item handler thread
 		 */
@@ -252,15 +245,12 @@ public class QuickShop extends JavaPlugin{
 	public void onDisable(){
 		Bukkit.getScheduler().cancelTask(itemWatcherID);
 		/* Remove all display items, and any dupes we can find */
-		//For each chunk of shops
-		for(Entry<Chunk, ConcurrentHashMap<Location, Shop>> chunkmap : this.shopChunks.entrySet()){
-			//For each shop in the chunk
-			for(Entry<Location, Shop> shopmap : chunkmap.getValue().entrySet()){
-				DisplayItem dispItem = shopmap.getValue().getDisplayItem();
-				dispItem.removeDupe();
-				dispItem.remove();
-			}
+		for(Shop shop : this.shops.values()){
+			shop.getDisplayItem().removeDupe();
+			shop.getDisplayItem().remove();
 		}
+		
+		this.shops.clear();
 		
 		/* Empty the buffer */
 		new BufferWatcher().run();
@@ -268,12 +258,6 @@ public class QuickShop extends JavaPlugin{
 		
 		this.actions.clear();
 		
-		//Clear each chunk of shops
-		for(Entry<Chunk, ConcurrentHashMap<Location, Shop>> chunkmap : this.shopChunks.entrySet()){
-			chunkmap.getValue().clear();
-		}
-		
-		this.shopChunks.clear();
 		this.tools.clear();
 		this.warnings.clear();
 		
@@ -287,18 +271,6 @@ public class QuickShop extends JavaPlugin{
 		return economy;
 	}
 	
-	public  ConcurrentHashMap<Chunk, ConcurrentHashMap<Location, Shop>> getShopChunks(){
-		return this.shopChunks;
-	}
-	
-	/**
-	 * Get all shops in a specific chunk
-	 * @param c The chunk to search
-	 * @return The shops list in the chunk
-	 */
-	public ConcurrentHashMap<Location, Shop> getShopsInChunk(Chunk c){
-		return this.shopChunks.get(c);
-	}
 	/**
 	 * @return Returns the HashMap<Player name, shopInfo>. Info contains what their last question etc was.
 	 */
@@ -320,20 +292,15 @@ public class QuickShop extends JavaPlugin{
     }
 	
 	public void addShop(Shop shop){
-		//Chunk handling
-		Chunk chunk = shop.getLocation().getChunk();
-		
-		ConcurrentHashMap<Location, Shop> inChunk = this.shopChunks.get(chunk);
-		if(inChunk == null){
-			inChunk = new ConcurrentHashMap<Location, Shop>(1);
-			this.shopChunks.put(chunk, inChunk);
-		}
-		inChunk.put(shop.getLocation(), shop);
+		this.shops.put(shop.getLocation(), shop);
 	}
 	
+	/**
+	 * Deletes a shop from the memory, NOT the database
+	 * @param shop The shop to delete
+	 */
 	public void removeShop(Shop shop){
-		ConcurrentHashMap<Location, Shop> inChunk = this.shopChunks.get(shop.getLocation().getChunk());
-		inChunk.remove(shop.getLocation());
+		this.getShops().remove(shop.getLocation());
 	}
 	
 	 /**
@@ -342,11 +309,10 @@ public class QuickShop extends JavaPlugin{
 	  * @return The shop at the location.
 	  */
 	public Shop getShop(Location loc){
-		ConcurrentHashMap<Location, Shop> inChunk = this.shopChunks.get(loc.getChunk());
-		
-		if(inChunk == null) return null;
-		return inChunk.get(loc);
-		
+		return this.shops.get(loc);
+	}
+	public HashMap<Location, Shop> getShops(){
+		return this.shops;
 	}
 	/**
 	 * @param mat The material to check

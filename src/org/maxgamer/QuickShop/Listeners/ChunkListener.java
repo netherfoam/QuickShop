@@ -1,9 +1,6 @@
 package org.maxgamer.QuickShop.Listeners;
 
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.bukkit.Location;
+import org.bukkit.Chunk;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -21,30 +18,29 @@ public class ChunkListener implements Listener{
 	}
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onChunkLoad(ChunkLoadEvent e){
-		ConcurrentHashMap<Location, Shop> inChunk = plugin.getShopsInChunk(e.getChunk());
-		//If theres no shops in the chunk, return
-		if(inChunk == null) return;
-		
-		//For each shop in the chunk, respawn the item (Is this necessary?)
-		for(Entry<Location, Shop> entry : inChunk.entrySet()){
-			DisplayItem disItem = entry.getValue().getDisplayItem();
-			disItem.removeDupe();
-			disItem.remove();
-			disItem.spawn();
+		Chunk c = e.getChunk();
+		for(Shop shop : plugin.getShops().values()){
+			if(shop.getLocation().getChunk().equals(c)){
+				DisplayItem disItem = shop.getDisplayItem();
+				disItem.removeDupe();
+				disItem.remove();
+				disItem.spawn();
+				plugin.getLogger().info("Chunk loading spawning item: " + disItem.getItem().getItemStack().getType());
+			}
 		}
 	}
 	
 	@EventHandler(priority = EventPriority.LOW)
 	public void onChunkUnload(ChunkUnloadEvent e){
-		ConcurrentHashMap<Location, Shop> inChunk = plugin.getShopsInChunk(e.getChunk());
-		//If theres no shop in the chunk, return
-		if(inChunk == null) return;
-		
-		//For each shop in the chunk, delete the item.
-		for(Entry<Location, Shop> entry : inChunk.entrySet()){
-			DisplayItem disItem = entry.getValue().getDisplayItem();
-			disItem.removeDupe();
-			disItem.remove();
+		Chunk c = e.getChunk();
+		for(Shop shop : plugin.getShops().values()){
+			if(shop.getLocation().getChunk().equals(c)){
+				DisplayItem disItem = shop.getDisplayItem();
+				disItem.removeDupe();
+				disItem.remove();
+				disItem.spawn();
+				plugin.getLogger().info("Chunk loading spawning item: " + disItem.getItem().getItemStack().getType());
+			}
 		}
 	}
 }
