@@ -158,45 +158,42 @@ public class ClickListener implements Listener{
 	private void sendShopInfo(Player p, Shop shop, int stock){
 		//Potentially faster with an array?
 		ItemStack items = shop.getItem();
-		List<String> messages = new ArrayList<String>(15);
-		messages.add("");
-		messages.add("");
+		p.sendMessage("");
+		p.sendMessage("");
 		
-		messages.add(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
-		messages.add(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Shop Information:");
-		messages.add(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Owner: " + shop.getOwner());
-		messages.add(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Item: " + ChatColor.YELLOW + plugin.getDataName(items.getType(), items.getDurability()));
+		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Shop Information:");
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Owner: " + shop.getOwner());
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Item: " + ChatColor.YELLOW + plugin.getDataName(items.getType(), items.getDurability()));
 		
 		if(shop.isSelling()){
-			messages.add(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Stock: " + ChatColor.YELLOW + stock);
+			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Stock: " + ChatColor.YELLOW + stock);
 		}
 		else{
-			messages.add(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Space: " + ChatColor.YELLOW + shop.getRemainingSpace(shop.getMaterial().getMaxStackSize()));
+			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Space: " + ChatColor.YELLOW + shop.getRemainingSpace(shop.getMaterial().getMaxStackSize()));
 		}
-		messages.add(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Price per "+ChatColor.YELLOW + items.getType() + ChatColor.GREEN + " - " + ChatColor.YELLOW + plugin.getEcon().format(shop.getPrice()));
-		messages.add(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Total Value of Chest: " + ChatColor.YELLOW + plugin.getEcon().format(shop.getPrice() * stock));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Price per "+ChatColor.YELLOW + items.getType() + ChatColor.GREEN + " - " + ChatColor.YELLOW + plugin.getEcon().format(shop.getPrice()));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Total Value of Chest: " + ChatColor.YELLOW + plugin.getEcon().format(shop.getPrice() * stock));
 		
 		if(plugin.isTool(items.getType())){
-			messages.add(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + plugin.getToolPercentage(items) + "% Remaining"); 
+			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + plugin.getToolPercentage(items) + "% Remaining"); 
 		}
 		
 		if(shop.isBuying()){
-			messages.add(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "This shop is " + ChatColor.LIGHT_PURPLE + "BUYING" + ChatColor.GREEN + " items.");
+			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "This shop is " + ChatColor.LIGHT_PURPLE + "BUYING" + ChatColor.GREEN + " items.");
 		}
 		else{
-			messages.add(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "This shop is " + ChatColor.AQUA + "SELLING" + ChatColor.GREEN + " items.");
+			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "This shop is " + ChatColor.AQUA + "SELLING" + ChatColor.GREEN + " items.");
 		}
 			
 		Map<Enchantment, Integer> enchs = items.getEnchantments();
 		if(enchs != null && enchs.size() > 0){
-			messages.add(ChatColor.DARK_PURPLE + "+--------------------ENCHANTS-----------------------+");
+			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------ENCHANTS-----------------------+");
 			for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
-				messages.add(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
+				p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
 			}
 		}
-		messages.add(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
-		
-		p.sendMessage((String[]) messages.toArray());
+		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 	}
 	
 	/**
