@@ -112,20 +112,7 @@ public class QS implements CommandExecutor{
 				sender.sendMessage(ChatColor.RED + "You cannot do that.");
 				return true;
 
-			}/*
-			else if(subArg.startsWith("debug")){
-				if(this.testChunk == null){
-					this.testChunk = ((Player) sender).getLocation().getChunk();
-				}
-				else{
-					sender.sendMessage("Chunk is equal?: " + ((Player) sender).getLocation().getChunk().equals(this.testChunk));
-					this.testChunk = ((Player) sender).getLocation().getChunk();
-				}
-				
-				for(Entry<Location, Shop> ent : plugin.getShopsInChunk(((Player) sender).getLocation().getChunk()).entrySet()){
-					sender.sendMessage(ChatColor.YELLOW + "Type: " + ent.getValue().getDisplayItem().getItem().getItemStack().getType());
-				}
-			}*/
+			}
 		}
 		sendHelp(sender);
 		return true;
