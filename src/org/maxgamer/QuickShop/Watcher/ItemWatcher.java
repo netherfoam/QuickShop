@@ -27,12 +27,17 @@ public class ItemWatcher implements Runnable{
 			Location loc = shop.getLocation();
 			DisplayItem disItem = shop.getDisplayItem();
 			
+			
 			if(loc.getBlock() != null && loc.getBlock().getType() != Material.CHEST){
 				//The block is nolonger a chest (Maybe WorldEdit or something?)
 				shop.delete(false);
 				
 				//We can't remove it yet, we're still iterating over this!
 				toRemove.add(shop);
+			}
+			else if(shop.getLocation().getBlock().getRelative(0, 1, 0).getType() == Material.WATER){
+				//Testing - Don't teleport the item back if they're trying to water dupe.
+				disItem.remove();
 			}
 			else if(disItem.getItem().getTicksLived() >= 5000 || disItem.getItem().isDead()){
 				//Needs respawning (its about to despawn)
