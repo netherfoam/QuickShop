@@ -2,10 +2,12 @@ package org.maxgamer.QuickShop.Watcher;
 
 import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Shop.DisplayItem;
 import org.maxgamer.QuickShop.Shop.Shop;
@@ -17,37 +19,46 @@ import org.maxgamer.QuickShop.Shop.Shop;
  * Also deletes invalid items.
  */
 public class ItemWatcher implements Runnable{
+	private QuickShop plugin;
+	public ItemWatcher(QuickShop plugin){
+		this.plugin = plugin;
+	}
+	
 	public void run(){
-		QuickShop plugin = (QuickShop) Bukkit.getServer().getPluginManager().getPlugin("QuickShop");
-		HashSet<Location> toRemove = new HashSet<Location>(5);
-		for(Entry<Location, Shop> entry : plugin.getShops().entrySet()){
-			if(entry.getValue().getLocation().getWorld() == null) continue; //World not loaded
+		HashSet<Shop> toRemove = new HashSet<Shop>(1);
+		
+		//For each chunk
+		for(Entry<Chunk, ConcurrentHashMap<Location, Shop>> chunkmap : plugin.getShopChunks().entrySet()){
+			if(chunkmap.getKey().getWorld() == null) continue; //World not loaded
+			if(!chunkmap.getKey().isLoaded()) continue; //Chunk not loaded
 			
-			DisplayItem disItem = entry.getValue().getDisplayItem();
-			if(entry.getValue().getLocation().getBlock() != null && entry.getValue().getLocation().getBlock().getType() != Material.CHEST){
-				/* Shop is invalid */
-				Location loc = entry.getValue().getLocation();
-				int x = loc.getBlockX();
-				int y = loc.getBlockY();
-				int z = loc.getBlockZ();
-				String world = loc.getWorld().getName();
+			//For each shop in the chunk
+			for(Entry<Location, Shop> shopmap : chunkmap.getValue().entrySet()){
+				Location loc = shopmap.getKey();
+				DisplayItem disItem = shopmap.getValue().getDisplayItem();
 				
-				plugin.getLogger().info("Shop is not a chest in " +world + " at: " + x + ", " + y + ", " + z + ".  Removing from DB.");
-				plugin.getDB().writeToBuffer("DELETE FROM shops WHERE x = "+x+" AND y = "+y+" AND z = "+z+" AND world = '"+world+"'");
-				
-				//We can't remove it yet, we're still iterating over this!
-				toRemove.add(loc);
-				//But we can delete the shops display item
-				entry.getValue().getDisplayItem().remove();
-			}
-			else if(entry.getKey().getChunk().isLoaded() && disItem.getItem().getTicksLived() >= 5000 || disItem.getItem().isDead() || disItem.getDisplayLocation().distanceSquared(disItem.getItem().getLocation()) > 1){
-				disItem.removeDupe();
-				disItem.respawn();
+				if(loc.getBlock() != null && loc.getBlock().getType() != Material.CHEST){
+					//The block is nolonger a chest (Maybe WorldEdit or something?)
+					shopmap.getValue().delete(false);
+					
+					//We can't remove it yet, we're still iterating over this!
+					toRemove.add(shopmap.getValue());
+				}
+				else if(disItem.getItem().getTicksLived() >= 5000 || disItem.getItem().isDead()){
+					//Needs respawning (its about to despawn)
+					disItem.removeDupe();
+					disItem.respawn();
+				}
+				else if(disItem.getDisplayLocation().distanceSquared(disItem.getItem().getLocation()) > 1){
+					//Needs to be teleported back. (TODO: Despawn the item after 3 strikes OSTL? Necessary?)
+					disItem.getItem().teleport(disItem.getDisplayLocation(), TeleportCause.PLUGIN);
+				}
 			}
 		}
+		
 		//Now we can remove it.
-		for(Location loc : toRemove){
-			plugin.removeShop(loc);
+		for(Shop shop : toRemove){
+			plugin.removeShop(shop);
 		}
 	}
 }
