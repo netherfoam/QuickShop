@@ -111,7 +111,6 @@ public class QS implements CommandExecutor{
 				}
 				sender.sendMessage(ChatColor.RED + "You cannot do that.");
 				return true;
-
 			}
 		}
 		sendHelp(sender);
