@@ -72,6 +72,7 @@ public class ClickListener implements Listener{
 					return;
 				}
 			}
+			return;
 		}
 		else if(e.getAction() != Action.LEFT_CLICK_BLOCK){
 			return;
