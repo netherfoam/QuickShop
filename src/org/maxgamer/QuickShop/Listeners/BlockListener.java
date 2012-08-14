@@ -19,7 +19,7 @@ import org.maxgamer.QuickShop.Shop.ShopAction;
 
 
 public class BlockListener implements Listener{
-	QuickShop plugin;
+	private QuickShop plugin;
 	public BlockListener(QuickShop plugin){
 		this.plugin = plugin;
 	}
@@ -34,7 +34,7 @@ public class BlockListener implements Listener{
 		//If the chest was a shop
 		if(shop != null){
 			Player p = e.getPlayer();
-			if(plugin.getConfig().getBoolean("shop.lock")){
+			if(plugin.lock){
 				if(!shop.getOwner().equalsIgnoreCase(p.getName()) && !p.hasPermission("quickshop.other.destroy")){
 					e.setCancelled(true);
 					p.sendMessage(ChatColor.RED + "You don't have permission to destroy " + shop.getOwner() + "'s shop");
@@ -60,10 +60,10 @@ public class BlockListener implements Listener{
 	 */
 	@EventHandler
 	public void onPlace(BlockPlaceEvent e){
-		if(e.isCancelled()) return;
+		if(e.isCancelled() || e.getBlock().getType() != Material.CHEST) return;
 		Block b = e.getBlock();
 		Block chest = plugin.getChestNextTo(b);
-		if(b.getType() == Material.CHEST && chest != null && plugin.getShop(chest.getLocation()) != null){
+		if(chest != null && plugin.getShop(chest.getLocation()) != null){
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(ChatColor.RED + "Double Chest shops are disabled.");
 		}
@@ -77,7 +77,8 @@ public class BlockListener implements Listener{
 		for(int i = 0; i < e.blockList().size(); i++){
 			Block b = e.blockList().get(i);
 			if(plugin.getShop(b.getLocation()) != null){
-				if(plugin.getConfig().getBoolean("shops.lock")){
+				if(plugin.lock){
+					//ToDo: Shouldn't I be decrementing 1 here? Concurrency and all..
 					e.blockList().remove(b);
 					DisplayItem disItem = plugin.getShop(b.getLocation()).getDisplayItem();
 					disItem.remove();
