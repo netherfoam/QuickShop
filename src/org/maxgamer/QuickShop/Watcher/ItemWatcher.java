@@ -45,18 +45,6 @@ public class ItemWatcher implements Runnable{
 			}
 		}
 		
-		//For each chunk
-		/*
-		for(Entry<ChunkLocation, ConcurrentHashMap<Location, Shop>> chunkmap : plugin.getShopChunks().entrySet()){
-			if(chunkmap.getKey().getWorld() == null) continue; //World not loaded
-			if(!chunkmap.getKey().getChunk().isLoaded()) continue; //Chunk not loaded
-			
-			//For each shop in the chunk
-			for(Entry<Location, Shop> shopmap : chunkmap.getValue().entrySet()){
-				
-			}
-		}*/
-		
 		//Now we can remove it.
 		for(Shop shop : toRemove){
 			plugin.removeShop(shop);
