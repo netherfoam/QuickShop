@@ -1,7 +1,9 @@
 package org.maxgamer.QuickShop.Listeners;
 
-import java.util.List;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -19,11 +21,13 @@ public class ChunkListener implements Listener{
 	}
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onChunkLoad(ChunkLoadEvent e){
-		List<Shop> inChunk = plugin.getShopsInChunk(e.getChunk());
+		ConcurrentHashMap<Location, Shop> inChunk = plugin.getShopsInChunk(e.getChunk());
+		//If theres no shops in the chunk, return
 		if(inChunk == null) return;
 		
-		for(Shop shop : inChunk){
-			DisplayItem disItem = shop.getDisplayItem();
+		//For each shop in the chunk, respawn the item (Is this necessary?)
+		for(Entry<Location, Shop> entry : inChunk.entrySet()){
+			DisplayItem disItem = entry.getValue().getDisplayItem();
 			disItem.removeDupe();
 			disItem.remove();
 			disItem.spawn();
@@ -32,11 +36,13 @@ public class ChunkListener implements Listener{
 	
 	@EventHandler(priority = EventPriority.LOW)
 	public void onChunkUnload(ChunkUnloadEvent e){
-		List<Shop> inChunk = plugin.getShopsInChunk(e.getChunk());
+		ConcurrentHashMap<Location, Shop> inChunk = plugin.getShopsInChunk(e.getChunk());
+		//If theres no shop in the chunk, return
 		if(inChunk == null) return;
 		
-		for(Shop shop : inChunk){
-			DisplayItem disItem = shop.getDisplayItem();
+		//For each shop in the chunk, delete the item.
+		for(Entry<Location, Shop> entry : inChunk.entrySet()){
+			DisplayItem disItem = entry.getValue().getDisplayItem();
 			disItem.removeDupe();
 			disItem.remove();
 		}
