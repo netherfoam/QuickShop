@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -61,6 +62,7 @@ public class QuickShop extends JavaPlugin{
 	
 	private HashMap<String, Info> actions = new HashMap<String, Info>(30);
 	private HashSet<Material> tools = new HashSet<Material>(50);
+	public boolean debug = false;
 	public HashSet<String> warnings = new HashSet<String>(10);
 	
 	private Database database;
@@ -369,6 +371,11 @@ public class QuickShop extends JavaPlugin{
 			
 		}
 		return item;
+	}
+	
+	public void debug(String s){
+		if(!debug) return;
+		this.getLogger().info(ChatColor.YELLOW + "[Debug] " + s);
 	}
 	
 	/**
