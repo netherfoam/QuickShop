@@ -31,7 +31,10 @@ public class ChunkListener implements Listener{
 		List<Shop> shops = new ArrayList<Shop>(5);
 		
 		for(Shop shop : plugin.getShops().values()){
-			if(shop.getLocation().getChunk() != null && shop.getLocation().getChunk().isLoaded() && shop.getLocation().getChunk().equals(c)){
+			if(		shop.getLocation().getWorld() != null &&
+					shop.getLocation().getChunk() != null && 
+					shop.getLocation().getChunk().isLoaded() && 
+					shop.getLocation().getChunk().equals(c)){
 				shops.add(shop);
 				
 				DisplayItem disItem = shop.getDisplayItem();
