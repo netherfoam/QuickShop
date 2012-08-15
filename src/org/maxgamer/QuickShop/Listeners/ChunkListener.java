@@ -56,6 +56,7 @@ public class ChunkListener implements Listener{
 			disItem.remove();
 			plugin.debug("Chunk loading spawning item: " + disItem.getItem().getItemStack().getType());
 		}
+		this.chunkMap.remove(c);
 		/*
 		if(plugin.getShops() == null) return;
 		for(Shop shop : plugin.getShops().values()){
