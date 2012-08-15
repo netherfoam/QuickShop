@@ -27,8 +27,10 @@ public class ItemWatcher implements Runnable{
 			Location loc = shop.getLocation();
 			DisplayItem disItem = shop.getDisplayItem();
 			
-			
-			if(loc.getBlock() != null && loc.getBlock().getType() != Material.CHEST){
+			if(loc.getWorld() == null){
+				continue;
+			}
+			else if(loc.getBlock() != null && loc.getBlock().getType() != Material.CHEST){
 				//The block is nolonger a chest (Maybe WorldEdit or something?)
 				shop.delete(false);
 				
