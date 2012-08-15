@@ -52,7 +52,7 @@ public class ChunkListener implements Listener{
 		Chunk c = e.getChunk();
 		
 		List<Shop> shops = this.chunkMap.get(c);
-		
+		if(shops == null) return;
 		for(Shop shop : shops){
 			DisplayItem disItem = shop.getDisplayItem();
 			disItem.removeDupe();
