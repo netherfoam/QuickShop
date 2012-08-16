@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -31,10 +32,11 @@ public class ChunkListener implements Listener{
 		List<Shop> shops = new ArrayList<Shop>(5);
 		
 		for(Shop shop : plugin.getShops().values()){
-			if(		shop.getLocation().getWorld() != null &&
-					shop.getLocation().getChunk() != null && 
-					shop.getLocation().getChunk().isLoaded() && 
-					shop.getLocation().getChunk().equals(c)){
+			Location loc = shop.getLocation();
+			if(		loc.getWorld() != null &&
+					loc.getChunk().isLoaded() && 
+					loc.getChunk().getX() == c.getX() &&
+					loc.getChunk().getZ() == c.getZ()){
 				shops.add(shop);
 				
 				DisplayItem disItem = shop.getDisplayItem();
