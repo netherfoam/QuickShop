@@ -46,7 +46,7 @@ public class ChatListener implements Listener{
 				//They wanted to do something.
 				Info info = actions.get(p.getName());
 				plugin.getActions().remove(p.getName());
-				
+				if(info == null) return;
 				/*
 				 * Creation handling
 				 */
