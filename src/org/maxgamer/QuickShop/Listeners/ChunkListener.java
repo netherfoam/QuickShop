@@ -34,7 +34,6 @@ public class ChunkListener implements Listener{
 		for(Shop shop : plugin.getShops().values()){
 			Location loc = shop.getLocation();
 			if(		loc.getWorld() != null &&
-					loc.getChunk().isLoaded() && 
 					loc.getChunk().getX() == c.getX() &&
 					loc.getChunk().getZ() == c.getZ()){
 				shops.add(shop);
