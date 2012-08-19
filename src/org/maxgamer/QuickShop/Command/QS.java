@@ -1,5 +1,8 @@
 package org.maxgamer.QuickShop.Command;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -112,6 +115,28 @@ public class QS implements CommandExecutor{
 				sender.sendMessage(ChatColor.RED + "You cannot do that.");
 				return true;
 			}
+			
+			else if(subArg.equals("clean")){
+				if(sender.hasPermission("quickshop.clean")){
+					sender.sendMessage(ChatColor.RED + "Cleaning up shops with 0 Stock...");
+					int i = 0;
+					List<Shop> toRemove = new ArrayList<Shop>(10);
+					for(Shop shop : plugin.getShops().values()){
+						if(shop.isSelling() && shop.getRemainingStock() == 0){
+							shop.delete(false);
+							toRemove.add(shop);
+							i++;
+						}
+					}
+					for(Shop shop : toRemove){
+						plugin.removeShop(shop);
+					}
+					sender.sendMessage(ChatColor.GREEN + "Cleaned " + i + " shops.");
+					return true;
+				}
+				sender.sendMessage(ChatColor.RED + "You cannot do that.");
+				return true;
+			}
 		}
 		sendHelp(sender);
 		return true;
@@ -124,5 +149,6 @@ public class QS implements CommandExecutor{
 		if(s.hasPermission("quickshop.setowner")) s.sendMessage(ChatColor.GREEN + "/qs setowner <player>" + ChatColor.YELLOW + " - Sets the owner of a shop");
 		if(s.hasPermission("quickshop.create.buy")) s.sendMessage(ChatColor.GREEN + "/qs buy" + ChatColor.YELLOW + " - Changes a shop to BUY mode");
 		if(s.hasPermission("quickshop.create.sell")) s.sendMessage(ChatColor.GREEN + "/qs sell" + ChatColor.YELLOW + " - Changes a shop to SELL mode");
+		if(s.hasPermission("quickshop.clean")) s.sendMessage(ChatColor.GREEN + "/qs clean" + ChatColor.YELLOW + " - Removes all shops who have 0 stock");
 	}
 }
