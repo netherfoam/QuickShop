@@ -246,7 +246,8 @@ public class Shop{
 			
 			//Give the player the items.
 			//Store the leftover items they didn't have room for
-			floor.putAll(p.getInventory().addItem(transfer));
+			//Clone because otherwise we just fiddle with the same stack over and over
+			floor.putAll(p.getInventory().addItem(transfer.clone()));
 			amount -= stackSize;
 		}
 		
@@ -278,7 +279,8 @@ public class Shop{
 			
 			transfer.setAmount(stackSize);
 			
-			this.add(transfer, amount);
+			//Clone because otherwise we just fiddle with the same stack over and over
+			this.add(transfer.clone(), stackSize);
 			
 			amount -= stackSize;
 		}
