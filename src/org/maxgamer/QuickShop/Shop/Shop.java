@@ -382,7 +382,8 @@ public class Shop{
 			if(b.getType() != Material.WALL_SIGN) continue;
 			if(!isAttached(b)) continue;
 			Sign sign = (Sign) b.getState();
-			
+			//Only if its a quickshop sign do we change it.
+			if(!sign.getLine(0).equals(ChatColor.RED + "[QuickShop]")) continue;
 			for(int i = 0; i < lines.length; i++){
 				sign.setLine(i, lines[i]);
 			}
