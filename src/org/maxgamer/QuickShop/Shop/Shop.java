@@ -383,7 +383,7 @@ public class Shop{
 			if(!isAttached(b)) continue;
 			Sign sign = (Sign) b.getState();
 			//Only if its a quickshop sign do we change it.
-			if(!sign.getLine(0).equals(ChatColor.RED + "[QuickShop]")) continue;
+			if(!sign.getLine(0).contains("[QuickShop]")) continue;
 			for(int i = 0; i < lines.length; i++){
 				sign.setLine(i, lines[i]);
 			}
