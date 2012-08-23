@@ -1,8 +1,6 @@
 package org.maxgamer.QuickShop.Listeners;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -14,7 +12,6 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Shop.DisplayItem;
 import org.maxgamer.QuickShop.Shop.Shop;
-import org.maxgamer.QuickShop.Shop.ShopChunk;
 
 
 public class ChunkListener implements Listener{
