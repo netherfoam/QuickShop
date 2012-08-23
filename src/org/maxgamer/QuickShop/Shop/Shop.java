@@ -343,7 +343,7 @@ public class Shop{
 	}
 	
 	/**
-	 * Changes a shop type to Buying or Selling. Also updates the signs nearby
+	 * Changes a shop type to Buying or Selling. Also updates the signs nearby TODO: Why doesn ti update shops again?
 	 * @param shopType The new type (ShopType.BUYING or ShopType.SELLING)
 	 */
 	public void setShopType(ShopType shopType){
@@ -383,7 +383,7 @@ public class Shop{
 			if(!isAttached(b)) continue;
 			Sign sign = (Sign) b.getState();
 			//Only if its a quickshop sign do we change it.
-			if(!sign.getLine(0).contains("[QuickShop]")) continue;
+			if(!sign.getLine(0).contains("[QuickShop]") && sign.getLine(0).length() > 0) continue;
 			for(int i = 0; i < lines.length; i++){
 				sign.setLine(i, lines[i]);
 			}

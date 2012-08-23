@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -36,6 +37,7 @@ import org.maxgamer.QuickShop.Listeners.QuitListener;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.Shop.ShopType;
+import org.maxgamer.QuickShop.Shop.ShopChunk;
 import org.maxgamer.QuickShop.Watcher.BufferWatcher;
 import org.maxgamer.QuickShop.Watcher.ItemWatcher;
 
@@ -58,11 +60,12 @@ import net.milkbowl.vault.economy.Economy;
 
 public class QuickShop extends JavaPlugin{
 	private Economy economy;
-	private HashMap<Location, Shop> shops = new HashMap<Location, Shop>(10);
+	//private HashMap<Location, Shop> shops = new HashMap<Location, Shop>(10);
+	private HashMap<ShopChunk, HashMap<Location, Shop>> shopChunks = new HashMap<ShopChunk, HashMap<Location, Shop>>(10);
 	
 	private HashMap<String, Info> actions = new HashMap<String, Info>(30);
 	private HashSet<Material> tools = new HashSet<Material>(50);
-	public boolean debug = false;
+	public boolean debug = true;
 	public HashSet<String> warnings = new HashSet<String>(10);
 	
 	private Database database;
@@ -232,7 +235,7 @@ public class QuickShop extends JavaPlugin{
 			e.printStackTrace();
 			getLogger().severe("Could not load shops.");
 		}
-		getLogger().info("Loaded " + shops.size() + " shops.");
+		getLogger().info("Loaded ? shops.");
 		/**
 		 * Display item handler thread
 		 */
@@ -247,12 +250,21 @@ public class QuickShop extends JavaPlugin{
 	public void onDisable(){
 		Bukkit.getScheduler().cancelTask(itemWatcherID);
 		/* Remove all display items, and any dupes we can find */
+		/*
 		for(Shop shop : this.shops.values()){
 			shop.getDisplayItem().removeDupe();
 			shop.getDisplayItem().remove();
-		}
+		}*/
 		
-		this.shops.clear();
+		for(HashMap<Location, Shop> inChunk : this.shopChunks.values()){
+			for(Shop shop : inChunk.values()){
+				shop.getDisplayItem().removeDupe();
+				shop.getDisplayItem().remove();
+			}
+			inChunk.clear();
+		}
+		this.shopChunks.clear();
+		//this.shops.clear();
 		
 		/* Empty the buffer */
 		new BufferWatcher().run();
@@ -294,7 +306,26 @@ public class QuickShop extends JavaPlugin{
     }
 	
 	public void addShop(Shop shop){
-		this.shops.put(shop.getLocation(), shop);
+		//this.shops.put(shop.getLocation(), shop);
+		Location loc = shop.getLocation();
+		Chunk chunk = loc.getChunk();
+		ShopChunk shopChunk = new ShopChunk(loc.getWorld(), chunk.getX(), chunk.getZ());
+		
+		
+		HashMap<Location, Shop> shopsInChunk = this.shopChunks.get(shopChunk);
+		
+		if(shopsInChunk == null){
+			//Theres no shops in this chunk yet.
+			shopsInChunk = new HashMap<Location, Shop>(1);
+			this.shopChunks.put(shopChunk, shopsInChunk);
+		}
+		
+		shopsInChunk.put(loc, shop);
+	}
+	
+	public HashMap<Location, Shop> getShopsInChunk(Chunk c){
+		ShopChunk shopChunk = new ShopChunk(c.getWorld(), c.getX(), c.getZ());
+		return this.shopChunks.get(shopChunk);
 	}
 	
 	/**
@@ -311,10 +342,18 @@ public class QuickShop extends JavaPlugin{
 	  * @return The shop at the location.
 	  */
 	public Shop getShop(Location loc){
-		return this.shops.get(loc);
+		//return this.shops.get(loc);
+		Chunk chunk = loc.getChunk();
+		
+		ShopChunk shopChunk = new ShopChunk(chunk.getWorld(), chunk.getX(), chunk.getZ());
+		
+		HashMap<Location, Shop> inChunk = this.shopChunks.get(shopChunk);
+		if(inChunk == null) return null;
+		return inChunk.get(loc);
+		
 	}
-	public HashMap<Location, Shop> getShops(){
-		return this.shops;
+	public HashMap<ShopChunk, HashMap<Location, Shop>> getShops(){
+		return this.shopChunks;
 	}
 	/**
 	 * @param mat The material to check

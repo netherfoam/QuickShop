@@ -1,9 +1,11 @@
 package org.maxgamer.QuickShop.Command;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -121,17 +123,28 @@ public class QS implements CommandExecutor{
 					sender.sendMessage(ChatColor.RED + "Cleaning up shops with 0 Stock...");
 					int i = 0;
 					List<Shop> toRemove = new ArrayList<Shop>(10);
-					for(Shop shop : plugin.getShops().values()){
-						if(shop.isSelling() && shop.getRemainingStock() == 0){
-							shop.delete(false);
-							toRemove.add(shop);
-							i++;
+					for(HashMap<Location, Shop> inChunk : plugin.getShops().values()){
+						for(Shop shop : inChunk.values()){
+							if(shop.isSelling() && shop.getRemainingStock() == 0){
+								shop.delete(false);
+								toRemove.add(shop);
+								i++;
+							}
 						}
 					}
 					for(Shop shop : toRemove){
 						plugin.removeShop(shop);
 					}
 					sender.sendMessage(ChatColor.GREEN + "Cleaned " + i + " shops.");
+					return true;
+				}
+				sender.sendMessage(ChatColor.RED + "You cannot do that.");
+				return true;
+			}
+			else if(subArg.equals("debug")){
+				if(sender.hasPermission("quickshop.debug")){
+					plugin.debug = !plugin.debug;
+					sender.sendMessage(ChatColor.RED + "[QuickShop] Debug is now " + plugin.debug + ". Pfft - As if there's bugs.");
 					return true;
 				}
 				sender.sendMessage(ChatColor.RED + "You cannot do that.");

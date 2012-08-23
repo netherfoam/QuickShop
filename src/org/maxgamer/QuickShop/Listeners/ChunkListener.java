@@ -14,11 +14,12 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Shop.DisplayItem;
 import org.maxgamer.QuickShop.Shop.Shop;
+import org.maxgamer.QuickShop.Shop.ShopChunk;
 
 
 public class ChunkListener implements Listener{
 	private QuickShop plugin;
-	public HashMap<Chunk, List<Shop>> chunkMap = new HashMap<Chunk, List<Shop>>(10);
+	//public HashMap<Chunk, List<Shop>> chunkMap = new HashMap<Chunk, List<Shop>>(10);
 	
 	public ChunkListener(QuickShop plugin){
 		this.plugin = plugin;
@@ -29,6 +30,21 @@ public class ChunkListener implements Listener{
 		Chunk c = e.getChunk();
 		if(plugin.getShops() == null) return;
 		
+		HashMap<Location, Shop> inChunk = plugin.getShopsInChunk(c);
+		
+		if(inChunk == null) return;
+		
+		for(Shop shop : inChunk.values()){
+			DisplayItem disItem = shop.getDisplayItem();
+			disItem.removeDupe();
+			disItem.remove();
+			disItem.spawn();
+			
+			plugin.debug("Chunk loading spawning item: " + disItem.getItem().getItemStack().getType());
+		}
+		
+		
+		/*
 		List<Shop> shops = new ArrayList<Shop>(5);
 		
 		for(Shop shop : plugin.getShops().values()){
@@ -45,13 +61,28 @@ public class ChunkListener implements Listener{
 				plugin.debug("Chunk loading spawning item: " + disItem.getItem().getItemStack().getType());
 			}
 		}
-		this.chunkMap.put(c, shops);
+		this.chunkMap.put(c, shops); */
 	}
 	
 	@EventHandler(priority = EventPriority.LOW)
 	public void onChunkUnload(ChunkUnloadEvent e){
 		Chunk c = e.getChunk();
 		
+		//ShopChunk shopChunk = new ShopChunk(c.getWorld(), c.getX(), c.getZ());
+		
+		HashMap<Location, Shop> inChunk = plugin.getShopsInChunk(c);
+		
+		if(inChunk == null) return;
+		
+		for(Shop shop : inChunk.values()){
+			DisplayItem disItem = shop.getDisplayItem();
+			disItem.removeDupe();
+			disItem.remove();
+			
+			plugin.debug("Chunk unloading unspawning item: " + disItem.getItem().getItemStack().getType());
+		}
+		
+		/*
 		List<Shop> shops = this.chunkMap.get(c);
 		if(shops == null) return;
 		for(Shop shop : shops){
@@ -60,7 +91,7 @@ public class ChunkListener implements Listener{
 			disItem.remove();
 			plugin.debug("Chunk loading spawning item: " + disItem.getItem().getItemStack().getType());
 		}
-		this.chunkMap.remove(c);
+		this.chunkMap.remove(c);*/
 		/*
 		if(plugin.getShops() == null) return;
 		for(Shop shop : plugin.getShops().values()){
