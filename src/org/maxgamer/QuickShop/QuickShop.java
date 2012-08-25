@@ -332,7 +332,8 @@ public class QuickShop extends JavaPlugin{
 	 * @param shop The shop to delete
 	 */
 	public void removeShop(Shop shop){
-		this.getShops().remove(shop.getLocation());
+		//this.getShops().remove(shop.getLocation());
+		this.getShopsInChunk(shop.getLocation().getChunk()).remove(shop.getLocation());
 	}
 	
 	 /**
