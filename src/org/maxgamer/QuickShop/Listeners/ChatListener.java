@@ -36,7 +36,6 @@ public class ChatListener implements Listener{
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onChat(final AsyncPlayerChatEvent e){
 		if(!plugin.getActions().containsKey(e.getPlayer().getName())) return;
-		
 		//Use from the main thread, because Bukkit hates life
 		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
 			@Override
