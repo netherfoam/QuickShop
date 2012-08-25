@@ -60,12 +60,11 @@ import net.milkbowl.vault.economy.Economy;
 
 public class QuickShop extends JavaPlugin{
 	private Economy economy;
-	//private HashMap<Location, Shop> shops = new HashMap<Location, Shop>(10);
 	private HashMap<ShopChunk, HashMap<Location, Shop>> shopChunks = new HashMap<ShopChunk, HashMap<Location, Shop>>(10);
 	
 	private HashMap<String, Info> actions = new HashMap<String, Info>(30);
 	private HashSet<Material> tools = new HashSet<Material>(50);
-	public boolean debug = true;
+	public boolean debug = false;
 	public HashSet<String> warnings = new HashSet<String>(10);
 	
 	private Database database;
