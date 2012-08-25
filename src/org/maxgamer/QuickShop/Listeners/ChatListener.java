@@ -245,10 +245,10 @@ public class ChatListener implements Listener{
 							double tax = plugin.getConfig().getDouble("tax");
 							double total = amount * shop.getPrice();
 							
-							plugin.getEcon().withdrawPlayer(shop.getOwner(), total);
+							plugin.getEcon().depositPlayer(p.getName(), total * (1 - tax));
 							
 							if(!shop.isUnlimited() || (shop.isUnlimited() && plugin.getConfig().getBoolean("shop.pay-unlimited-shop-owners"))){
-								plugin.getEcon().depositPlayer(p.getName(), total * (1 - tax));
+								plugin.getEcon().withdrawPlayer(shop.getOwner(), total);
 								
 								if(tax != 0){
 									plugin.getEcon().depositPlayer(plugin.getConfig().getString("tax-account"), total * tax);
