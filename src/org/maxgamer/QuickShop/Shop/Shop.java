@@ -373,6 +373,8 @@ public class Shop{
 	 * @param lines The array of lines to change. Index is line number.
 	 */
 	public void setSignText(String[] lines){
+		if(this.getLocation().getWorld() == null) return;
+		
 		Block[] blocks = new Block[4];
 		blocks[0] = loc.getBlock().getRelative(1, 0, 0);
 		blocks[1] = loc.getBlock().getRelative(-1, 0, 0);
