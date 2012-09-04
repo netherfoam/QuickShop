@@ -49,7 +49,7 @@ public class ItemWatcher implements Runnable{
 						
 						plugin.debug("Removing QuickShop Display Item (Water flow) selling " + shop.getMaterial());
 					}
-					else if(disItem.getItem().getTicksLived() >= 5000 || disItem.getItem().isDead()){
+					else if(disItem.getItem() == null || disItem.getItem().getTicksLived() >= 5000 || disItem.getItem().isDead()){
 						//Needs respawning (its about to despawn)
 						disItem.removeDupe();
 						disItem.respawn();
