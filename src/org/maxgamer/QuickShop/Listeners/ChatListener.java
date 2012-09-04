@@ -53,7 +53,7 @@ public class ChatListener implements Listener{
 				 */
 				if(info.getAction() == ShopAction.CREATE){
 					try{
-						if(plugin.getShop(info.getLocation()) != null){
+						if(plugin.getShopManager().getShop(info.getLocation()) != null){
 							p.sendMessage(ChatColor.RED + "Someone else has claimed that shop.");
 							return;
 						}
@@ -84,7 +84,7 @@ public class ChatListener implements Listener{
 						//Add the shop to the list.
 						final Shop shop = new Shop(info.getLocation(), price, info.getItem(), p.getName());
 
-						plugin.addShop(shop);
+						plugin.getShopManager().addShop(shop.getLocation().getWorld().getName(), shop);
 						
 						if(tax == 0) p.sendMessage(ChatColor.GREEN + "Created a shop");
 						else{
@@ -145,7 +145,7 @@ public class ChatListener implements Listener{
 					}
 					
 					//Get the shop they interacted with
-					Shop shop = plugin.getShop(info.getLocation());
+					Shop shop = plugin.getShopManager().getShop(info.getLocation());
 					
 					//It's not valid anymore
 					if(shop == null || info.getLocation().getBlock().getType() != Material.CHEST){

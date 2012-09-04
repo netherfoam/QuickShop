@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -34,10 +33,10 @@ import org.maxgamer.QuickShop.Listeners.ChunkListener;
 import org.maxgamer.QuickShop.Listeners.ClickListener;
 import org.maxgamer.QuickShop.Listeners.MoveListener;
 import org.maxgamer.QuickShop.Listeners.QuitListener;
+import org.maxgamer.QuickShop.Listeners.WorldListener;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.Shop.ShopType;
-import org.maxgamer.QuickShop.Shop.ShopChunk;
 import org.maxgamer.QuickShop.Watcher.BufferWatcher;
 import org.maxgamer.QuickShop.Watcher.ItemWatcher;
 
@@ -60,7 +59,7 @@ import net.milkbowl.vault.economy.Economy;
 
 public class QuickShop extends JavaPlugin{
 	private Economy economy;
-	private HashMap<ShopChunk, HashMap<Location, Shop>> shopChunks = new HashMap<ShopChunk, HashMap<Location, Shop>>(10);
+	private ShopManager shopManager;
 	
 	private HashMap<String, Info> actions = new HashMap<String, Info>(30);
 	private HashSet<Material> tools = new HashSet<Material>(50);
@@ -91,6 +90,7 @@ public class QuickShop extends JavaPlugin{
 	private MoveListener moveListener = new MoveListener(this);
 	private ChunkListener chunkListener = new ChunkListener(this);
 	private QuitListener quitListener = new QuitListener(this);
+	private WorldListener worldListener = new WorldListener(this);
 	
 	private int itemWatcherID;
 	public boolean lock;
@@ -100,16 +100,22 @@ public class QuickShop extends JavaPlugin{
 		getLogger().info("Hooking Vault");
 		setupEconomy();
 		
+		this.shopManager = new ShopManager(this);
+		
 		//Safe to initialize now - It accesses config!
 		this.clickListener = new ClickListener(this);
 		getLogger().info("Registering Listeners");
+		
+		//Register events
 		Bukkit.getServer().getPluginManager().registerEvents(chatListener, this);
 		Bukkit.getServer().getPluginManager().registerEvents(clickListener, this);
 		Bukkit.getServer().getPluginManager().registerEvents(blockListener, this);
 		Bukkit.getServer().getPluginManager().registerEvents(moveListener, this);
 		Bukkit.getServer().getPluginManager().registerEvents(chunkListener, this);
 		Bukkit.getServer().getPluginManager().registerEvents(quitListener, this);
+		Bukkit.getServer().getPluginManager().registerEvents(worldListener, this);
 		
+		//Command handlers
 		QS commandExecutor = new QS(this);
 		getCommand("qs").setExecutor(commandExecutor);
 		getCommand("shop").setExecutor(commandExecutor);
@@ -133,47 +139,49 @@ public class QuickShop extends JavaPlugin{
 		/* Hook into other plugins */
 		Plugin plug;
 		
+		//PreciousStones
 		if(getConfig().getBoolean("plugins.preciousstones")){
 			plug = Bukkit.getPluginManager().getPlugin("PreciousStones");
 			if(plug != null){
 				this.preciousStones = (PreciousStones) plug;
 			}
 		}
-		
+		//Towny
 		if(getConfig().getBoolean("plugins.towny")){
 			plug = Bukkit.getPluginManager().getPlugin("Towny");
 			if(plug != null){
 				this.towny = (Towny) plug;
 			}	
 		}
-		
+		//Lockette
 		if(getConfig().getBoolean("plugins.lockette")){
 			plug = Bukkit.getPluginManager().getPlugin("Lockette");
 			if(plug != null){
 				this.lockette = (Lockette) plug;
 			}
 		}
-		
+		//WorldGuard
 		if(getConfig().getBoolean("plugins.worldguard")){
 			plug = Bukkit.getPluginManager().getPlugin("WorldGuard");
 			if(plug != null){
 				this.worldGuardPlugin = (WorldGuardPlugin) plug;
 			}
 		}
-		
+		//GriefPrevention
 		if(getConfig().getBoolean("plugins.griefprevention")){
 			plug = Bukkit.getPluginManager().getPlugin("GriefPrevention");
 			if(plug != null){
 				this.griefPrevention = (GriefPrevention) plug;
 			}
 		}
-		
+		//Residence
 		if(getConfig().getBoolean("plugins.residence")){
 			plug = Bukkit.getPluginManager().getPlugin("Residence");
 			if(plug != null){
 				this.residence = (Residence) plug;
 			}
 		}
+		//LWC
 		if(getConfig().getBoolean("plugins.lwc")){
 			plug = Bukkit.getPluginManager().getPlugin("LWC");
 			if(plug != null){
@@ -196,11 +204,15 @@ public class QuickShop extends JavaPlugin{
 				getLogger().severe("Could not create database table");
 			}
 		}
+		//Make the database up to date
 		getDB().checkColumns();
 		
 		/* Load shops from database to memory */
+		int count = 0; //Shops count
 		Connection con = database.getConnection();
 		try {
+			getLogger().info("Loading shops from database...");
+			
 			PreparedStatement ps = con.prepareStatement("SELECT * FROM shops");
 			ResultSet rs = ps.executeQuery();
 			while(rs.next()){
@@ -227,14 +239,15 @@ public class QuickShop extends JavaPlugin{
 				
 				shop.setShopType(ShopType.fromID(type));
 				
-				this.addShop(shop);
+				shopManager.addShop(rs.getString("world"), shop);
+				count++;
 			}
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
 			getLogger().severe("Could not load shops.");
 		}
-		getLogger().info("Loaded ? shops.");
+		getLogger().info("Loaded "+count+" shops.");
 		/**
 		 * Display item handler thread
 		 */
@@ -242,28 +255,13 @@ public class QuickShop extends JavaPlugin{
 		ItemWatcher itemWatcher = new ItemWatcher(this);
 		itemWatcherID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, itemWatcher, 150, 150);
 		
-		
 		this.sneak = this.getConfig().getBoolean("shop.sneak-only");
 		this.lock = this.getConfig().getBoolean("shop.lock");
 	}
 	public void onDisable(){
 		Bukkit.getScheduler().cancelTask(itemWatcherID);
 		/* Remove all display items, and any dupes we can find */
-		/*
-		for(Shop shop : this.shops.values()){
-			shop.getDisplayItem().removeDupe();
-			shop.getDisplayItem().remove();
-		}*/
-		
-		for(HashMap<Location, Shop> inChunk : this.shopChunks.values()){
-			for(Shop shop : inChunk.values()){
-				shop.getDisplayItem().removeDupe();
-				shop.getDisplayItem().remove();
-			}
-			inChunk.clear();
-		}
-		this.shopChunks.clear();
-		//this.shops.clear();
+		shopManager.clear();
 		
 		/* Empty the buffer */
 		new BufferWatcher().run();
@@ -303,58 +301,7 @@ public class QuickShop extends JavaPlugin{
 
 	        return (economy != null);
     }
-	
-	public void addShop(Shop shop){
-		//this.shops.put(shop.getLocation(), shop);
-		Location loc = shop.getLocation();
-		Chunk chunk = loc.getChunk();
-		ShopChunk shopChunk = new ShopChunk(loc.getWorld(), chunk.getX(), chunk.getZ());
-		
-		
-		HashMap<Location, Shop> shopsInChunk = this.shopChunks.get(shopChunk);
-		
-		if(shopsInChunk == null){
-			//Theres no shops in this chunk yet.
-			shopsInChunk = new HashMap<Location, Shop>(1);
-			this.shopChunks.put(shopChunk, shopsInChunk);
-		}
-		
-		shopsInChunk.put(loc, shop);
-	}
-	
-	public HashMap<Location, Shop> getShopsInChunk(Chunk c){
-		ShopChunk shopChunk = new ShopChunk(c.getWorld(), c.getX(), c.getZ());
-		return this.shopChunks.get(shopChunk);
-	}
-	
-	/**
-	 * Deletes a shop from the memory, NOT the database
-	 * @param shop The shop to delete
-	 */
-	public void removeShop(Shop shop){
-		//this.getShops().remove(shop.getLocation());
-		this.getShopsInChunk(shop.getLocation().getChunk()).remove(shop.getLocation());
-	}
-	
-	 /**
-	  * Fetches a shop in a particular location, or null.
-	  * @param loc The location to check.
-	  * @return The shop at the location.
-	  */
-	public Shop getShop(Location loc){
-		//return this.shops.get(loc);
-		Chunk chunk = loc.getChunk();
-		
-		ShopChunk shopChunk = new ShopChunk(chunk.getWorld(), chunk.getX(), chunk.getZ());
-		
-		HashMap<Location, Shop> inChunk = this.shopChunks.get(shopChunk);
-		if(inChunk == null) return null;
-		return inChunk.get(loc);
-		
-	}
-	public HashMap<ShopChunk, HashMap<Location, Shop>> getShops(){
-		return this.shopChunks;
-	}
+
 	/**
 	 * @param mat The material to check
 	 * @return Returns true if the item is a tool (Has durability) or false if it doesn't.
@@ -577,7 +524,7 @@ public class QuickShop extends JavaPlugin{
 		case 373:
 			//Special case
 			if(damage == 64) return "MUNDANE_POTION";
-			Potion pot = null;
+			Potion pot;
 			try{
 				pot = Potion.fromDamage(damage);
 			}
@@ -753,7 +700,6 @@ public class QuickShop extends JavaPlugin{
 	 * @return True if they're allowed to place a shop there.
 	 */
 	public boolean canBuildShop(Player p, Block b){
-		
 		if(getWorldGuard() != null){
 			if(!getWorldGuard().canBuild(p, b)){
 				//Can't build.
@@ -813,5 +759,13 @@ public class QuickShop extends JavaPlugin{
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * Returns the ShopManager.  This is used for fetching, adding and removing shops.
+	 * @return The ShopManager.
+	 */
+	public ShopManager getShopManager(){
+		return this.shopManager;
 	}
 }

@@ -42,7 +42,7 @@ public class Shop{
 		this.item = item.clone();
 		this.plugin = (QuickShop) Bukkit.getPluginManager().getPlugin("QuickShop");
 		this.item.setAmount(1);
-		this.displayItem = new DisplayItem(plugin, this, this.item);
+		this.displayItem = new DisplayItem(/*plugin,*/ this, this.item);
 		
 		this.shopType = ShopType.SELLING;
 	}
@@ -473,7 +473,7 @@ public class Shop{
 		
 		if(fromMemory){
 			//Delete it from memory
-			plugin.removeShop(this);
+			plugin.getShopManager().removeShop(this);
 		}
 	}
 }

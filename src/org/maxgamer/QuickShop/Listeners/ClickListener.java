@@ -60,7 +60,7 @@ public class ClickListener implements Listener{
 		
 		if(e.getAction() == Action.RIGHT_CLICK_BLOCK){
 			if(e.getClickedBlock().getType() == Material.CHEST && plugin.lock){
-				Shop shop = plugin.getShop(e.getClickedBlock().getLocation());
+				Shop shop = plugin.getShopManager().getShop(e.getClickedBlock().getLocation());
 				if(shop != null && !shop.getOwner().equalsIgnoreCase(e.getPlayer().getName())){
 					if(e.getPlayer().hasPermission("quickshop.other.open")){
 						e.getPlayer().sendMessage(ChatColor.RED + "Bypassing a QuickShop lock!");
@@ -89,7 +89,7 @@ public class ClickListener implements Listener{
 		ItemStack item = e.getItem();
 		
 		//Get the shop
-		Shop shop = plugin.getShop(loc);
+		Shop shop = plugin.getShopManager().getShop(loc);
 		//If that wasn't a shop, search nearby shops
 		if(shop == null) shop = getShopNextTo(loc);
 
@@ -210,7 +210,7 @@ public class ClickListener implements Listener{
 		
 		for(Block b : blocks){
 			if(b.getType() != Material.CHEST) continue;
-			Shop shop = plugin.getShop(b.getLocation());
+			Shop shop = plugin.getShopManager().getShop(b.getLocation());
 			if(shop != null && shop.isAttached(loc.getBlock())) return shop;
 		}
 		return null;

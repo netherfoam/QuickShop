@@ -3,8 +3,11 @@ package org.maxgamer.QuickShop.Command;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -16,6 +19,7 @@ import org.bukkit.util.BlockIterator;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.Shop.ShopType;
+import org.maxgamer.QuickShop.Shop.ShopChunk;
 
 public class QS implements CommandExecutor{
 	QuickShop plugin;
@@ -33,7 +37,7 @@ public class QS implements CommandExecutor{
 					BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
 					while(bIt.hasNext()){
 						Block b = bIt.next();
-						Shop shop = plugin.getShop(b.getLocation());
+						Shop shop = plugin.getShopManager().getShop(b.getLocation());
 						if(shop != null){
 							shop.setUnlimited(true);
 							shop.update();
@@ -58,7 +62,7 @@ public class QS implements CommandExecutor{
 					BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
 					while(bIt.hasNext()){
 						Block b = bIt.next();
-						Shop shop = plugin.getShop(b.getLocation());
+						Shop shop = plugin.getShopManager().getShop(b.getLocation());
 						if(shop != null){
 							shop.setOwner(args[1]);
 							shop.update();
@@ -79,7 +83,7 @@ public class QS implements CommandExecutor{
 					BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
 					while(bIt.hasNext()){
 						Block b = bIt.next();
-						Shop shop = plugin.getShop(b.getLocation());
+						Shop shop = plugin.getShopManager().getShop(b.getLocation());
 						if(shop != null && shop.getOwner().equalsIgnoreCase(((Player) sender).getName())){
 							shop.setShopType(ShopType.BUYING);
 							shop.setSignText();
@@ -101,7 +105,7 @@ public class QS implements CommandExecutor{
 					BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
 					while(bIt.hasNext()){
 						Block b = bIt.next();
-						Shop shop = plugin.getShop(b.getLocation());
+						Shop shop = plugin.getShopManager().getShop(b.getLocation());
 						if(shop != null && shop.getOwner().equalsIgnoreCase(((Player) sender).getName())){
 							shop.setShopType(ShopType.SELLING);
 							shop.setSignText();
@@ -123,17 +127,20 @@ public class QS implements CommandExecutor{
 					sender.sendMessage(ChatColor.RED + "Cleaning up shops with 0 Stock...");
 					int i = 0;
 					List<Shop> toRemove = new ArrayList<Shop>(10);
-					for(HashMap<Location, Shop> inChunk : plugin.getShops().values()){
-						for(Shop shop : inChunk.values()){
-							if(shop.isSelling() && shop.getRemainingStock() == 0){
-								shop.delete(false);
-								toRemove.add(shop);
-								i++;
+					for(Entry<String, HashMap<ShopChunk, HashMap<Location, Shop>>> worlds : plugin.getShopManager().getShops().entrySet()){
+						if(Bukkit.getWorld(worlds.getKey()) == null) continue;
+						for(HashMap<Location, Shop> inChunk : worlds.getValue().values()){
+							for(Shop shop : inChunk.values()){
+								if(shop.getLocation().getWorld() != null && shop.getLocation().getChunk().isLoaded() && shop.isSelling() && shop.getRemainingStock() == 0){
+									shop.delete(false);
+									toRemove.add(shop);
+									i++;
+								}
 							}
 						}
 					}
 					for(Shop shop : toRemove){
-						plugin.removeShop(shop);
+						plugin.getShopManager().removeShop(shop);
 					}
 					sender.sendMessage(ChatColor.GREEN + "Cleaned " + i + " shops.");
 					return true;
@@ -145,6 +152,26 @@ public class QS implements CommandExecutor{
 				if(sender.hasPermission("quickshop.debug")){
 					plugin.debug = !plugin.debug;
 					sender.sendMessage(ChatColor.RED + "[QuickShop] Debug is now " + plugin.debug + ". Pfft - As if there's bugs.");
+					return true;
+				}
+				sender.sendMessage(ChatColor.RED + "You cannot do that.");
+				return true;
+			}
+			
+			else if(subArg.equals("info")){
+				if(sender.hasPermission("quickshop.info")){
+					Player p = (Player) sender;
+					Chunk c = p.getLocation().getChunk();
+					
+					for(Shop shop : plugin.getShopManager().getShops(c).values()){
+						String reply = "";
+						
+						Location loc = shop.getLocation();
+						reply += ChatColor.GREEN + shop.getDataName() + " at " + loc.getX() + "," + loc.getY() + "," + loc.getZ();
+						
+						p.sendMessage(reply);
+					}
+					
 					return true;
 				}
 				sender.sendMessage(ChatColor.RED + "You cannot do that.");

@@ -29,7 +29,7 @@ public class BlockListener implements Listener{
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBreak(final BlockBreakEvent e){
 		if(e.isCancelled() || e.getBlock().getType() != Material.CHEST) return;
-		Shop shop = plugin.getShop(e.getBlock().getLocation());
+		Shop shop = plugin.getShopManager().getShop(e.getBlock().getLocation());
 		
 		//If the chest was a shop
 		if(shop != null){
@@ -63,7 +63,7 @@ public class BlockListener implements Listener{
 		if(e.isCancelled() || e.getBlock().getType() != Material.CHEST) return;
 		Block b = e.getBlock();
 		Block chest = plugin.getChestNextTo(b);
-		if(chest != null && plugin.getShop(chest.getLocation()) != null){
+		if(chest != null && plugin.getShopManager().getShop(chest.getLocation()) != null){
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(ChatColor.RED + "Double Chest shops are disabled.");
 		}
@@ -76,15 +76,15 @@ public class BlockListener implements Listener{
 		if(e.isCancelled()) return;
 		for(int i = 0; i < e.blockList().size(); i++){
 			Block b = e.blockList().get(i);
-			if(plugin.getShop(b.getLocation()) != null){
+			if(plugin.getShopManager().getShop(b.getLocation()) != null){
 				if(plugin.lock){
 					//ToDo: Shouldn't I be decrementing 1 here? Concurrency and all..
 					e.blockList().remove(b);
-					DisplayItem disItem = plugin.getShop(b.getLocation()).getDisplayItem();
+					DisplayItem disItem = plugin.getShopManager().getShop(b.getLocation()).getDisplayItem();
 					disItem.remove();
 				}
 				else{
-					Shop shop = plugin.getShop(b.getLocation());
+					Shop shop = plugin.getShopManager().getShop(b.getLocation());
 					shop.delete();
 				}
 			}
