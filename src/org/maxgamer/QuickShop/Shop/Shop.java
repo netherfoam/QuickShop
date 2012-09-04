@@ -352,7 +352,7 @@ public class Shop{
 	}
 	
 	/**
-	 * Updates signs
+	 * Updates signs attached to the shop
 	 */
 	public void setSignText(){
 		String[] lines = new String[4];
