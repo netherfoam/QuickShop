@@ -51,7 +51,7 @@ public class Shop{
 	 * @return The number of items available for purchase.
 	 */
 	public int getRemainingStock(){
-		if(this.unlimited) return 9999;
+		if(this.unlimited) return 10000;
 		
 		Chest chest = (Chest) loc.getBlock().getState();
 		int stock = 0;
@@ -72,7 +72,7 @@ public class Shop{
 	 * @return
 	 */
 	public int getRemainingSpace(int stackSize){
-		if(this.unlimited) return 9999;
+		if(this.unlimited) return 10000;
 		
 		Chest chest = (Chest) loc.getBlock().getState();
 		int space = 0;
