@@ -41,22 +41,22 @@ public class QS implements CommandExecutor{
 						if(shop != null){
 							shop.setUnlimited(true);
 							shop.update();
-							sender.sendMessage(ChatColor.GREEN + "Unlimited QuickShop created.");
+							sender.sendMessage(plugin.getMessage("command.success-created-unlimited"));
 							return true;
 						}
 					}
-					sender.sendMessage(ChatColor.RED + "No QuickShop found.  You must be looking at one.");
+					sender.sendMessage(plugin.getMessage("not-looking-at-shop"));
 					return true;
 				}
 				else{
-					sender.sendMessage(ChatColor.RED + "You cannot do that.");
+					sender.sendMessage(plugin.getMessage("no-permission"));
 					return true;
 				}
 			}
 			else if(subArg.equals("setowner")){
 				if(sender instanceof Player && sender.hasPermission("quickshop.setowner")){
 					if(args.length < 2){
-						sender.sendMessage(ChatColor.RED + "No owner given.  /qs setowner <player>");
+						sender.sendMessage(plugin.getMessage("command.no-owner-given"));
 						return true;
 					}
 					BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
@@ -71,9 +71,11 @@ public class QS implements CommandExecutor{
 							return true;
 						}
 					}
+					sender.sendMessage(plugin.getMessage("not-looking-at-shop"));
+					return true;
 				}
 				else{
-					sender.sendMessage(ChatColor.RED + "You cannot do that.");
+					sender.sendMessage(plugin.getMessage("no-permission"));
 					return true;
 				}
 			}
@@ -89,14 +91,14 @@ public class QS implements CommandExecutor{
 							shop.setSignText();
 							shop.update();
 							
-							sender.sendMessage(ChatColor.GREEN + "Now "+ChatColor.LIGHT_PURPLE + "BUYING" + ChatColor.GREEN+": " + shop.getDataName());
+							sender.sendMessage(plugin.getMessage("command.now-buying", shop.getDataName()));
 							return true;
 						}
 					}
-					sender.sendMessage(ChatColor.RED + "No QuickShop found.  You must be looking at one.");
+					sender.sendMessage(plugin.getMessage("not-looking-at-shop"));
 					return true;
 				}
-				sender.sendMessage(ChatColor.RED + "You cannot do that.");
+				sender.sendMessage(plugin.getMessage("no-permission"));
 				return true;
 			}
 			
@@ -110,21 +112,20 @@ public class QS implements CommandExecutor{
 							shop.setShopType(ShopType.SELLING);
 							shop.setSignText();
 							shop.update();
-							
-							sender.sendMessage(ChatColor.GREEN + "Now "+ChatColor.AQUA + "SELLING" + ChatColor.GREEN+": " + shop.getDataName());
+							sender.sendMessage(plugin.getMessage("command.now-selling", shop.getDataName()));
 							return true;
 						}
 					}
-					sender.sendMessage(ChatColor.RED + "No QuickShop found.  You must be looking at one.");
+					sender.sendMessage(plugin.getMessage("not-looking-at-shop"));
 					return true;
 				}
-				sender.sendMessage(ChatColor.RED + "You cannot do that.");
+				sender.sendMessage(plugin.getMessage("no-permission"));
 				return true;
 			}
 			
 			else if(subArg.equals("clean")){
 				if(sender.hasPermission("quickshop.clean")){
-					sender.sendMessage(ChatColor.RED + "Cleaning up shops with 0 Stock...");
+					sender.sendMessage(plugin.getMessage("command.cleaning"));
 					int i = 0;
 					List<Shop> toRemove = new ArrayList<Shop>(10);
 					for(Entry<String, HashMap<ShopChunk, HashMap<Location, Shop>>> worlds : plugin.getShopManager().getShops().entrySet()){
@@ -142,10 +143,10 @@ public class QS implements CommandExecutor{
 					for(Shop shop : toRemove){
 						plugin.getShopManager().removeShop(shop);
 					}
-					sender.sendMessage(ChatColor.GREEN + "Cleaned " + i + " shops.");
+					sender.sendMessage(plugin.getMessage("command.cleaned", ""+i));
 					return true;
 				}
-				sender.sendMessage(ChatColor.RED + "You cannot do that.");
+				sender.sendMessage(plugin.getMessage("no-permission"));
 				return true;
 			}
 			else if(subArg.equals("debug")){
@@ -154,7 +155,7 @@ public class QS implements CommandExecutor{
 					sender.sendMessage(ChatColor.RED + "[QuickShop] Debug is now " + plugin.debug + ". Pfft - As if there's bugs.");
 					return true;
 				}
-				sender.sendMessage(ChatColor.RED + "You cannot do that.");
+				sender.sendMessage(plugin.getMessage("no-permission"));
 				return true;
 			}
 			
@@ -174,7 +175,7 @@ public class QS implements CommandExecutor{
 					
 					return true;
 				}
-				sender.sendMessage(ChatColor.RED + "You cannot do that.");
+				sender.sendMessage(plugin.getMessage("no-permission"));
 				return true;
 			}
 		}
@@ -182,13 +183,12 @@ public class QS implements CommandExecutor{
 		return true;
 	}
 	
-	
 	public void sendHelp(CommandSender s){
-		s.sendMessage(ChatColor.GREEN + "QuickShop Help");
-		if(s.hasPermission("quickshop.unlimited")) s.sendMessage(ChatColor.GREEN + "/qs unlimited" + ChatColor.YELLOW + " - Makes a shop unlimited");
-		if(s.hasPermission("quickshop.setowner")) s.sendMessage(ChatColor.GREEN + "/qs setowner <player>" + ChatColor.YELLOW + " - Sets the owner of a shop");
-		if(s.hasPermission("quickshop.create.buy")) s.sendMessage(ChatColor.GREEN + "/qs buy" + ChatColor.YELLOW + " - Changes a shop to BUY mode");
-		if(s.hasPermission("quickshop.create.sell")) s.sendMessage(ChatColor.GREEN + "/qs sell" + ChatColor.YELLOW + " - Changes a shop to SELL mode");
-		if(s.hasPermission("quickshop.clean")) s.sendMessage(ChatColor.GREEN + "/qs clean" + ChatColor.YELLOW + " - Removes all shops who have 0 stock");
+		s.sendMessage(plugin.getMessage("command.description.title"));
+		if(s.hasPermission("quickshop.unlimited")) s.sendMessage(ChatColor.GREEN + "/qs unlimited" + ChatColor.YELLOW + " - "+plugin.getMessage("command.description.unlimited"));
+		if(s.hasPermission("quickshop.setowner")) s.sendMessage(ChatColor.GREEN + "/qs setowner <player>" + ChatColor.YELLOW + " - "+plugin.getMessage("command.description.setowner"));
+		if(s.hasPermission("quickshop.create.buy")) s.sendMessage(ChatColor.GREEN + "/qs buy" + ChatColor.YELLOW + " - "+plugin.getMessage("command.description.buy"));
+		if(s.hasPermission("quickshop.create.sell")) s.sendMessage(ChatColor.GREEN + "/qs sell" + ChatColor.YELLOW + " - "+plugin.getMessage("command.description.sell"));
+		if(s.hasPermission("quickshop.clean")) s.sendMessage(ChatColor.GREEN + "/qs clean" + ChatColor.YELLOW + " - "+plugin.getMessage("command.description.clean"));
 	}
 }

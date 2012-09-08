@@ -38,14 +38,18 @@ public class ShopManager{
 	 * @return
 	 */
 	public HashMap<Location, Shop> getShops(Chunk c){
-		HashMap<ShopChunk, HashMap<Location, Shop>> inWorld = this.getShops(c.getWorld().getName());
+		return getShops(c.getWorld().getName(), c.getX(), c.getZ());
+	}
+	
+	public HashMap<Location, Shop> getShops(String world, int chunkX, int chunkZ){
+		HashMap<ShopChunk, HashMap<Location, Shop>> inWorld = this.getShops(world);
 		
 		if(inWorld == null){
 			plugin.debug("No world shops");
 			return null;
 		}
 		
-		ShopChunk shopChunk = new ShopChunk(c.getWorld().getName(), c.getX(), c.getZ());
+		ShopChunk shopChunk = new ShopChunk(world, chunkX, chunkZ);
 		plugin.debug("Getting shops in ShopChunk " + shopChunk.getX() + "," + shopChunk.getZ());
 		return inWorld.get(shopChunk);
 	}

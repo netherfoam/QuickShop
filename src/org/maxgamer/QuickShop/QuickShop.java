@@ -1,6 +1,7 @@
 package org.maxgamer.QuickShop;
 
 import java.io.File;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,12 +11,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -67,6 +71,8 @@ public class QuickShop extends JavaPlugin{
 	public HashSet<String> warnings = new HashSet<String>(10);
 	
 	private Database database;
+	
+	public YamlConfiguration messages;
 	
 	/* Hooking into plugins */
 	//PreciousStones
@@ -128,7 +134,7 @@ public class QuickShop extends JavaPlugin{
 		File configFile = new File(this.getDataFolder(), "config.yml");
 		if(!configFile.exists()){
 			//Copy config with comments
-			getLogger().info("Generating config");
+			getLogger().info("Generating config.yml");
 			this.saveDefaultConfig();
 		}
 		else{
@@ -136,6 +142,28 @@ public class QuickShop extends JavaPlugin{
 			saveConfig();
 		}
 		
+		File messageFile = new File(this.getDataFolder(), "messages.yml");
+		if(!messageFile.exists()){
+			getLogger().info("Creating messages.yml");
+			this.saveResource("messages.yml", true);
+		}
+		
+		this.messages = YamlConfiguration.loadConfiguration(messageFile);
+		
+		this.messages.options().copyDefaults(true);
+		
+		getLogger().info("Message1: " + messages.getString("menu.owner"));
+		InputStream defMessageStream = this.getResource("messages.yml");
+		if(defMessageStream != null){
+			YamlConfiguration defMessages = YamlConfiguration.loadConfiguration(defMessageStream);
+			this.messages.setDefaults(defMessages);
+		}
+		else{
+			this.getLogger().severe("Messages.yml not found inside plugin! This will cause errors! Update!");
+		}
+		getLogger().info("Message2: " + messages.getString("menu.owner"));
+		parseColours(this.messages);
+		getLogger().info("Message3: " + messages.getString("menu.owner"));
 		/* Hook into other plugins */
 		Plugin plug;
 		
@@ -280,6 +308,46 @@ public class QuickShop extends JavaPlugin{
 	 */
 	public Economy getEcon(){
 		return economy;
+	}
+	
+	public void parseColours(YamlConfiguration config){
+		Set<String> keys = config.getKeys(true);
+		
+		for(String key : keys){
+			String filtered = config.getString(key);
+			if(filtered.startsWith("MemorySection")){
+				getLogger().info("Skipped: " + filtered);
+				continue;
+			}
+			char[] chars = filtered.toCharArray();
+			
+			for(int i = 0; i < chars.length - 1; i++){
+				if(chars[i] == '&' 
+					&& ((chars[i+1] >= '0' && chars[i+1] <= '9')
+						|| (chars[i+1] >= 'a' && chars[i+1] <= 'f'))){
+					chars[i] = ChatColor.COLOR_CHAR;
+				}
+			}
+			
+			filtered = new String(chars);
+			config.set(key, filtered);
+		}
+	}
+	
+	public String getMessage(String loc, String... args){
+		String raw = this.messages.getString(loc);
+		
+		if(raw == null || raw.isEmpty()){
+			return "Invalid message: " + loc;
+		}
+		if(args == null){
+			return raw;
+		}
+		
+		for(int i = 0; i < args.length; i++){
+			raw = raw.replace("{"+i+"}", args[i]);
+		}
+		return raw;
 	}
 	
 	/**

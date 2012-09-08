@@ -1,6 +1,5 @@
 package org.maxgamer.QuickShop.Listeners;
 
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -37,14 +36,14 @@ public class BlockListener implements Listener{
 			if(plugin.lock){
 				if(!shop.getOwner().equalsIgnoreCase(p.getName()) && !p.hasPermission("quickshop.other.destroy")){
 					e.setCancelled(true);
-					p.sendMessage(ChatColor.RED + "You don't have permission to destroy " + shop.getOwner() + "'s shop");
+					p.sendMessage(plugin.getMessage("no-permission"));
 					return;
 				}
 			}
 			
 			if(p.getGameMode() == GameMode.CREATIVE && !p.getName().equalsIgnoreCase(shop.getOwner())){
 				e.setCancelled(true);
-				p.sendMessage(ChatColor.RED + "You cannot break other players shops in creative mode.  Use survival instead.");
+				p.sendMessage(plugin.getMessage("no-creative-break"));
 				return;
 			}
 			Info action = plugin.getActions().get(p.getName());
@@ -52,7 +51,7 @@ public class BlockListener implements Listener{
 				action.setAction(ShopAction.CANCELLED);
 			}
 			shop.delete();
-			p.sendMessage(ChatColor.GREEN + "Shop Removed");
+			p.sendMessage(plugin.getMessage("success-removed-shop"));
 		}
 	}
 	/**
@@ -65,7 +64,7 @@ public class BlockListener implements Listener{
 		Block chest = plugin.getChestNextTo(b);
 		if(chest != null && plugin.getShopManager().getShop(chest.getLocation()) != null){
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(ChatColor.RED + "Double Chest shops are disabled.");
+			e.getPlayer().sendMessage(plugin.getMessage("no-double-chests"));
 		}
 	}
 	/**

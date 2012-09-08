@@ -54,30 +54,30 @@ public class ChatListener implements Listener{
 				if(info.getAction() == ShopAction.CREATE){
 					try{
 						if(plugin.getShopManager().getShop(info.getLocation()) != null){
-							p.sendMessage(ChatColor.RED + "Someone else has claimed that shop.");
+							p.sendMessage(plugin.getMessage("shop-already-owned"));
 							return;
 						}
 						
 						if(plugin.getChestNextTo(info.getLocation().getBlock()) != null){
-							p.sendMessage(ChatColor.RED + "Double chest shops are disabled.");
+							p.sendMessage(plugin.getMessage("no-double-chests"));
 							return;
 						}
 						
 						if(info.getLocation().getBlock().getType() != Material.CHEST){
-							p.sendMessage(ChatColor.RED + "That chest was removed.");
+							p.sendMessage(plugin.getMessage("chest-was-removed"));
 							return;
 						}
 						
 						//Price per item
 						double price = Double.parseDouble(e.getMessage());
 						if(price < 0.01){
-							p.sendMessage(ChatColor.RED + "Price must be greater than " + ChatColor.YELLOW + "$0.01");
+							p.sendMessage(plugin.getMessage("price-too-cheap"));
 							return;
 						}
 						double tax = plugin.getConfig().getDouble("shop.cost"); 
 						
 						if(tax != 0 && plugin.getEcon().getBalance(p.getName()) <= tax){
-							p.sendMessage(ChatColor.RED + "It costs $" + tax + " to create a new shop.");
+							p.sendMessage(plugin.getMessage("you-cant-afford-a-new-shop", plugin.getEcon().format(tax)));
 							return;
 						}
 						
@@ -86,7 +86,7 @@ public class ChatListener implements Listener{
 
 						plugin.getShopManager().addShop(shop.getLocation().getWorld().getName(), shop);
 						
-						if(tax == 0) p.sendMessage(ChatColor.GREEN + "Created a shop");
+						if(tax == 0) p.sendMessage(plugin.getMessage("success-created-shop"));
 						else{
 							plugin.getEcon().withdrawPlayer(p.getName(), tax);
 							plugin.getEcon().depositPlayer(plugin.getConfig().getString("tax-account"), tax);
@@ -98,7 +98,7 @@ public class ChatListener implements Listener{
 						if(!plugin.getConfig().getBoolean("shop.lock")){
 							//Warn them if they haven't been warned since reboot
 							if(!plugin.warnings.contains(p.getName())){
-								p.sendMessage(ChatColor.DARK_RED + "[QuickShop] " +ChatColor.RED+"Remember, shops are NOT protected from theft! If you want to stop thieves, lock it!");
+								p.sendMessage(plugin.getMessage("shops-arent-locked"));
 								plugin.warnings.add(p.getName());
 							}
 						}
@@ -129,7 +129,7 @@ public class ChatListener implements Listener{
 					}
 					/* They didn't enter a number. */
 					catch(NumberFormatException ex){
-						p.sendMessage(ChatColor.RED + "Cancelled Shop Creation");
+						p.sendMessage(plugin.getMessage("shop-creation-cancelled"));
 						return;
 					}
 				}
@@ -140,7 +140,7 @@ public class ChatListener implements Listener{
 						amount = Integer.parseInt(e.getMessage());
 					}
 					catch(NumberFormatException e){
-						p.sendMessage(ChatColor.RED + "Cancelled Shop Purchase");
+						p.sendMessage(plugin.getMessage("shop-purchase-cancelled"));
 						return;
 					}
 					
@@ -149,7 +149,7 @@ public class ChatListener implements Listener{
 					
 					//It's not valid anymore
 					if(shop == null || info.getLocation().getBlock().getType() != Material.CHEST){
-						p.sendMessage(ChatColor.RED + "That shop was removed.");
+						p.sendMessage(plugin.getMessage("chest-was-removed"));
 						return;
 					}
 					
@@ -157,12 +157,12 @@ public class ChatListener implements Listener{
 						int stock = shop.getRemainingStock();
 						
 						if(stock <  amount){
-							p.sendMessage(ChatColor.RED + "The shop only has " + ChatColor.YELLOW + shop.getRemainingStock() + " " + shop.getMaterial().toString() + ChatColor.RED + " left.");
+							p.sendMessage(plugin.getMessage("shop-stock-too-low", ""+shop.getRemainingStock(), shop.getDataName()));
 							return;
 						}
 						//Check their balance.  Works with *most* economy plugins*
 						if(!plugin.getEcon().has(p.getName(), amount * shop.getPrice())){
-							p.sendMessage(ChatColor.RED + "That costs " + ChatColor.YELLOW + amount * shop.getPrice() + ChatColor.RED + ", but you only have " + ChatColor.YELLOW + plugin.getEcon().getBalance(p.getName()));
+							p.sendMessage(plugin.getMessage("you-cant-afford-to-buy", ""+amount * shop.getPrice(), ""+plugin.getEcon().getBalance(p.getName())));
 							return;
 						}
 						if(amount == 0){
@@ -172,7 +172,7 @@ public class ChatListener implements Listener{
 						}
 						else if(amount < 0){
 							// & Dumber
-							p.sendMessage(ChatColor.RED + "Derrrrp, Can't buy negative amounts.");
+							p.sendMessage(plugin.getMessage("negative-amount"));
 							return;
 						}
 						
@@ -185,7 +185,7 @@ public class ChatListener implements Listener{
 							
 							EconomyResponse r = plugin.getEcon().withdrawPlayer(p.getName(), total);
 							if(!r.transactionSuccess()){
-								e.getPlayer().sendMessage(ChatColor.RED + "[QuickShop] Transaction failed.");
+								p.sendMessage(plugin.getMessage("you-cant-afford-to-buy", ""+amount * shop.getPrice(), ""+plugin.getEcon().getBalance(p.getName())));
 								return;
 							}
 							
@@ -200,8 +200,8 @@ public class ChatListener implements Listener{
 							//Notify the shop owner
 							Player owner = Bukkit.getPlayerExact(shop.getOwner());
 							if(owner != null){
-								owner.sendMessage(ChatColor.GREEN + p.getName() + " just purchased " + amount + " " + ChatColor.YELLOW + shop.getDataName() + ChatColor.GREEN + " from your store.");
-								if(stock == amount) owner.sendMessage(ChatColor.DARK_PURPLE + "Your shop at " + shop.getLocation().getBlockX() + ", " + shop.getLocation().getBlockY() + ", " + shop.getLocation().getBlockZ() + " has run out of " + shop.getDataName());
+								owner.sendMessage(plugin.getMessage("player-just-bought-from-your-store", p.getName(), ""+amount, shop.getDataName()));
+								if(stock == amount) owner.sendMessage(plugin.getMessage("shop-out-of-stock", ""+shop.getLocation().getBlockX(), ""+shop.getLocation().getBlockY(), ""+shop.getLocation().getBlockZ(), shop.getDataName()));
 							}
 						}
 						//Transfers the item from A to B
@@ -212,7 +212,7 @@ public class ChatListener implements Listener{
 						int space = shop.getRemainingSpace(shop.getMaterial().getMaxStackSize());
 						
 						if(space <  amount){
-							p.sendMessage(ChatColor.RED + "The shop only has room for " +space+ " more " + shop.getDataName() +".");
+							p.sendMessage(plugin.getMessage("shop-has-no-space", ""+space, shop.getDataName()));
 							return;
 						}
 						
@@ -225,13 +225,13 @@ public class ChatListener implements Listener{
 						
 						//Broke
 						if(amount > count){
-							p.sendMessage(ChatColor.RED + "You only have "+ count + " " + shop.getDataName() + ".");
+							p.sendMessage(plugin.getMessage("you-dont-have-that-many-items", ""+count, shop.getDataName()));
 							return;
 						}
 						
 						//Tries to check their balance nicely to see if they can afford it.
 						if(!plugin.getEcon().has(shop.getOwner(), amount * shop.getPrice())){
-							p.sendMessage(ChatColor.RED + "That costs $" + ChatColor.YELLOW + amount * shop.getPrice() + ChatColor.RED + ", but the owner only has $" + ChatColor.YELLOW + plugin.getEcon().getBalance(shop.getOwner()));
+							p.sendMessage(plugin.getMessage("the-owner-cant-afford-to-buy-from-you", plugin.getEcon().format(amount * shop.getPrice()), plugin.getEcon().format(plugin.getEcon().getBalance(shop.getOwner()))));
 							return;
 						}
 						if(amount == 0){
@@ -241,7 +241,8 @@ public class ChatListener implements Listener{
 						}
 						else if(amount < 0){
 							// & Dumber
-							p.sendMessage(ChatColor.RED + "Derrrrp, Can't sell negative amounts.");
+							//p.sendMessage(ChatColor.RED + "Derrrrp, Can't sell negative amounts.");
+							p.sendMessage(plugin.getMessage("negative-amount"));
 							return;
 						}
 						
@@ -257,7 +258,8 @@ public class ChatListener implements Listener{
 								
 								//Check for plugins faking econ.has(amount)
 								if(!r.transactionSuccess()){
-									p.sendMessage(ChatColor.RED + "[QuickShop] Transaction failed.  Does the owner have enough cash?");
+									//p.sendMessage(ChatColor.RED + "[QuickShop] Transaction failed.  Does the owner have enough cash?");
+									p.sendMessage(plugin.getMessage("the-owner-cant-afford-to-buy-from-you", plugin.getEcon().format(amount * shop.getPrice()), plugin.getEcon().format(plugin.getEcon().getBalance(shop.getOwner()))));
 									return;
 								}
 								
@@ -271,8 +273,9 @@ public class ChatListener implements Listener{
 							//Notify the owner of the purchase.
 							Player owner = Bukkit.getPlayerExact(shop.getOwner());
 							if(owner != null){
-								owner.sendMessage(ChatColor.GREEN + p.getName() + " just sold " + amount + " " + ChatColor.YELLOW + shop.getDataName() + ChatColor.GREEN + " to your store.");
-								if(space == amount) owner.sendMessage(ChatColor.DARK_PURPLE + "Your shop at " + shop.getLocation().getBlockX() + ", " + shop.getLocation().getBlockY() + ", " + shop.getLocation().getBlockZ() + " has run out of space");
+								//owner.sendMessage(ChatColor.GREEN + p.getName() + " just sold " + amount + " " + ChatColor.YELLOW + shop.getDataName() + ChatColor.GREEN + " to your store.");
+								owner.sendMessage(plugin.getMessage("player-just-sold-to-your-store", p.getName(), ""+amount, shop.getDataName()));
+								if(space == amount) owner.sendMessage(plugin.getMessage("shop-out-of-space", ""+shop.getLocation().getBlockX(), ""+shop.getLocation().getBlockY(), ""+shop.getLocation().getBlockZ())); 
 							}
 						}
 						
@@ -294,12 +297,12 @@ public class ChatListener implements Listener{
 	}
 	private void sendPurchaseSuccess(Player p, Shop shop, int amount){
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Successfully purchased:");
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + amount + " " + shop.getItem().getType() + ChatColor.GREEN + " for " + ChatColor.YELLOW + amount * shop.getPrice());
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.successful-purchase"));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), ""+(amount * shop.getPrice())));
 
 		Map<Enchantment, Integer> enchs = shop.getEnchants();
 		if(enchs != null && enchs.size() > 0){
-			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------ENCHANTS-----------------------+");
+			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+plugin.getMessage("menu.enchants")+"-----------------------+");
 			for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
 				p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
 			}
@@ -309,12 +312,12 @@ public class ChatListener implements Listener{
 	
 	private void sendSellSuccess(Player p, Shop shop, int amount){
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Successfully Sold:");
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + amount + " " + shop.getItem().getType() + ChatColor.GREEN + " for " + ChatColor.YELLOW + amount * shop.getPrice());
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.successfully-sold"));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), ""+(amount * shop.getPrice())));
 
 		Map<Enchantment, Integer> enchs = shop.getEnchants();
 		if(enchs != null && enchs.size() > 0){
-			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------ENCHANTS-----------------------+");
+			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+plugin.getMessage("menu.enchants")+"-----------------------+");
 			for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
 				p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
 			}

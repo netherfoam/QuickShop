@@ -63,10 +63,10 @@ public class ClickListener implements Listener{
 				Shop shop = plugin.getShopManager().getShop(e.getClickedBlock().getLocation());
 				if(shop != null && !shop.getOwner().equalsIgnoreCase(e.getPlayer().getName())){
 					if(e.getPlayer().hasPermission("quickshop.other.open")){
-						e.getPlayer().sendMessage(ChatColor.RED + "Bypassing a QuickShop lock!");
+						e.getPlayer().sendMessage(plugin.getMessage("bypassing-lock"));
 						return;
 					}
-					e.getPlayer().sendMessage(ChatColor.RED + "[QuickShop] That shop is locked.  Left click if you wish to buy!");
+					e.getPlayer().sendMessage(plugin.getMessage("that-is-locked"));
 					e.setCancelled(true);
 					return;
 				}
@@ -100,10 +100,10 @@ public class ClickListener implements Listener{
 			//Text menu
 			sendShopInfo(p, shop);
 			if(shop.isSelling()){
-				p.sendMessage(ChatColor.GREEN + "Enter how many you wish to " + ChatColor.AQUA + "BUY" + ChatColor.GREEN + " in chat.");
+				p.sendMessage(plugin.getMessage("how-many-buy"));
 			}
 			else{
-				p.sendMessage(ChatColor.GREEN + "Enter how many you wish to " + ChatColor.LIGHT_PURPLE + "SELL" + ChatColor.GREEN + " in chat.");
+				p.sendMessage(plugin.getMessage("how-many-sell"));
 			}
 			
 			//Add the new action
@@ -119,16 +119,16 @@ public class ClickListener implements Listener{
 		 */
 		else if(shop == null && item != null && item.getType() != Material.AIR && p.hasPermission("quickshop.create.sell") && b.getType() == Material.CHEST){
 			if(!plugin.canBuildShop(p, b)){
-				p.sendMessage(ChatColor.RED + "You may not create a shop here.");
+				p.sendMessage(plugin.getMessage("not-allowed-to-create"));
 				return;
 			}
 			if(plugin.getChestNextTo(b) != null){
-				p.sendMessage(ChatColor.RED + "Double chest shops are disabled.");
+				p.sendMessage(plugin.getMessage("no-double-chests"));
 				return;
 			}
 			
 			if(blacklist.contains(item.getType()) && !p.hasPermission("quickshop.bypass."+item.getTypeId())){
-				p.sendMessage(ChatColor.RED + "That item is blacklisted. You may not sell it.");
+				p.sendMessage(plugin.getMessage("blacklisted-item"));
 				return;
 			}
 			
@@ -148,7 +148,7 @@ public class ClickListener implements Listener{
 			//Send creation menu.
 			Info info = new Info(b.getLocation(), ShopAction.CREATE, e.getItem(), last);
 			plugin.getActions().put(p.getName(), info);
-			p.sendMessage(ChatColor.GREEN + "Enter how much you wish to trade one "+ ChatColor.YELLOW  + item.getType().toString() + ChatColor.GREEN + " for.");
+			p.sendMessage(plugin.getMessage("how-much-to-trade-for", plugin.getDataName(info.getItem().getType(), info.getItem().getDurability())));
 		}
 	}
 	
@@ -162,33 +162,34 @@ public class ClickListener implements Listener{
 		p.sendMessage("");
 		
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Shop Information:");
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Owner: " + shop.getOwner());
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Item: " + ChatColor.YELLOW + plugin.getDataName(items.getType(), items.getDurability()));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.shop-information"));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.owner", shop.getOwner()));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.item", plugin.getDataName(items.getType(), items.getDurability())));
 		
 		if(shop.isSelling()){
-			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Stock: " + ChatColor.YELLOW + stock);
+			p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.stock", ""+stock));
 		}
 		else{
-			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Space: " + ChatColor.YELLOW + shop.getRemainingSpace(shop.getMaterial().getMaxStackSize()));
+			p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.space", ""+shop.getRemainingSpace(shop.getMaterial().getMaxStackSize())));
 		}
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Price per "+ChatColor.YELLOW + items.getType() + ChatColor.GREEN + " - " + ChatColor.YELLOW + plugin.getEcon().format(shop.getPrice()));
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "Total Value of Chest: " + ChatColor.YELLOW + plugin.getEcon().format(shop.getPrice() * stock));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.price-per", plugin.getDataName(shop.getMaterial(), shop.getDurability()), plugin.getEcon().format(shop.getPrice())));
+		
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.total-value-of-chest", plugin.getEcon().format(shop.getPrice() * stock)));
 		
 		if(plugin.isTool(items.getType())){
-			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + plugin.getToolPercentage(items) + "% Remaining"); 
+			p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.damage-percent-remaining", plugin.getToolPercentage(items)));
 		}
 		
 		if(shop.isBuying()){
-			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "This shop is " + ChatColor.LIGHT_PURPLE + "BUYING" + ChatColor.GREEN + " items.");
+			p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.this-shop-is-buying"));
 		}
 		else{
-			p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.GREEN + "This shop is " + ChatColor.AQUA + "SELLING" + ChatColor.GREEN + " items.");
+			p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.this-shop-is-selling"));
 		}
 			
 		Map<Enchantment, Integer> enchs = items.getEnchantments();
 		if(enchs != null && enchs.size() > 0){
-			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------ENCHANTS-----------------------+");
+			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+plugin.getMessage("menu.enchants")+"-----------------------+");
 			for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
 				p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
 			}
