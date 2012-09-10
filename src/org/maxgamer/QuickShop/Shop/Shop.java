@@ -111,6 +111,14 @@ public class Shop{
 	public double getPrice(){
 		return this.price;
 	}
+	
+	/**
+	 * Sets the price of the shop. Does not update it in the database. Use shop.update() for that.
+	 * @param price The new price of the shop.
+	 */
+	public void setPrice(double price){
+		this.price = price;
+	}
 	/**
 	 * @return The ItemStack type of this shop
 	 */
