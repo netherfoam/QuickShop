@@ -152,7 +152,6 @@ public class QuickShop extends JavaPlugin{
 		
 		this.messages.options().copyDefaults(true);
 		
-		getLogger().info("Message1: " + messages.getString("menu.owner"));
 		InputStream defMessageStream = this.getResource("messages.yml");
 		if(defMessageStream != null){
 			YamlConfiguration defMessages = YamlConfiguration.loadConfiguration(defMessageStream);
@@ -161,9 +160,7 @@ public class QuickShop extends JavaPlugin{
 		else{
 			this.getLogger().severe("Messages.yml not found inside plugin! This will cause errors! Update!");
 		}
-		getLogger().info("Message2: " + messages.getString("menu.owner"));
 		parseColours(this.messages);
-		getLogger().info("Message3: " + messages.getString("menu.owner"));
 		/* Hook into other plugins */
 		Plugin plug;
 		
@@ -316,7 +313,6 @@ public class QuickShop extends JavaPlugin{
 		for(String key : keys){
 			String filtered = config.getString(key);
 			if(filtered.startsWith("MemorySection")){
-				getLogger().info("Skipped: " + filtered);
 				continue;
 			}
 			char[] chars = filtered.toCharArray();
