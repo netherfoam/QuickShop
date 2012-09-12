@@ -25,6 +25,9 @@ you-dont-have-that-many-items: "&cYou only have {0} {1}."
 the-owner-cant-afford-to-buy-from-you: "&cThat costs {0} but the owner only has {1}"
 player-just-sold-to-your-store: "&a{0} just sold {1} {2} to your store."
 shop-out-of-space: "&5Your shop at {0}, {1}, {2}, is now full."
+price-is-now: "&aThe shops new price is &e{0}"
+thats-not-a-number: "&cInvalid number"
+no-price-given: "&cPlease give a valid price."
 
 menu:
     successful-purchase: "&aSuccessfully Purchased:"
