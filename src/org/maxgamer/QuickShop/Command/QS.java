@@ -123,6 +123,43 @@ public class QS implements CommandExecutor{
 				return true;
 			}
 			
+			else if(subArg.startsWith("price")){
+				if(sender instanceof Player && sender.hasPermission("quickshop.create.changeprice")){
+					if(args.length < 2){
+						sender.sendMessage(plugin.getMessage("no-price-given"));
+						return true;
+					}
+					double price;
+					try{
+						price = Double.parseDouble(args[1]);
+					}
+					catch(NumberFormatException e){
+						sender.sendMessage(plugin.getMessage("thats-not-a-number"));
+						return true;
+					}
+					
+					BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
+					//Loop through every block they're looking at upto 10 blocks away
+					while(bIt.hasNext()){
+						Block b = bIt.next();
+						Shop shop = plugin.getShopManager().getShop(b.getLocation());
+						
+						if(shop != null && shop.getOwner().equalsIgnoreCase(((Player) sender).getName())){
+							//Update the shop
+							shop.setPrice(price);
+							shop.setSignText();
+							shop.update();
+							sender.sendMessage(plugin.getMessage("price-is-now", plugin.getEcon().format(shop.getPrice())));
+							return true;
+						}
+					}
+					sender.sendMessage(plugin.getMessage("not-looking-at-shop"));
+					return true;
+				}
+				sender.sendMessage(plugin.getMessage("no-permission"));
+				return true;
+			}
+			
 			else if(subArg.equals("clean")){
 				if(sender.hasPermission("quickshop.clean")){
 					sender.sendMessage(plugin.getMessage("command.cleaning"));
