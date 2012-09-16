@@ -826,6 +826,19 @@ public class QuickShop extends JavaPlugin{
 	}
 	
 	/**
+	 * External API Component.
+	 * Returns true if the location is a shop block.
+	 * If you want to use the shop, use QuickShop.getShopManager().getShop(Location) instead.
+	 * @param loc The location to check
+	 * @return true is it's a shop, false if it's not.
+	 * 
+	 * 
+	 */
+	public boolean isShop(Location loc){
+		return this.getShopManager().getShop(loc.getBlock().getLocation()) != null;
+	}
+	
+	/**
 	 * Returns the ShopManager.  This is used for fetching, adding and removing shops.
 	 * @return The ShopManager.
 	 */
