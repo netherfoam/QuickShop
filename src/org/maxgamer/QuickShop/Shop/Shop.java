@@ -365,13 +365,13 @@ public class Shop{
 		String[] lines = new String[4];
 		lines[0] = ChatColor.RED + "[QuickShop]";
 		if(this.isBuying()){
-			lines[1] = plugin.getMessage("sign.buying");
+			lines[1] = plugin.getMessage("signs.buying");
 		}
 		if(this.isSelling()){
-			lines[1] = plugin.getMessage("sign.selling");
+			lines[1] = plugin.getMessage("signs.selling");
 		}
 		lines[2] = plugin.getDataName(this.getMaterial(), this.getDurability());
-		lines[3] = plugin.getMessage("sign.price", ""+this.getPrice());
+		lines[3] = plugin.getMessage("signs.price", ""+this.getPrice());
 		this.setSignText(lines);
 	}
 	
