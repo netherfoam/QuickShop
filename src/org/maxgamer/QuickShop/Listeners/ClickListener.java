@@ -186,6 +186,8 @@ public class ClickListener implements Listener{
 		else{
 			p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.this-shop-is-selling"));
 		}
+		
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("average-price-nearby", ""+shop.getAverage(48)));
 			
 		Map<Enchantment, Integer> enchs = items.getEnchantments();
 		if(enchs != null && enchs.size() > 0){
