@@ -28,6 +28,7 @@ shop-out-of-space: "&5Your shop at {0}, {1}, {2}, is now full."
 price-is-now: "&aThe shops new price is &e{0}"
 thats-not-a-number: "&cInvalid number"
 no-price-given: "&cPlease give a valid price."
+average-price-nearby: "&aAverage Price Nearby: {0}"
 
 menu:
     successful-purchase: "&aSuccessfully Purchased:"
