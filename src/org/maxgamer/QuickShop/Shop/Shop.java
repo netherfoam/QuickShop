@@ -352,7 +352,7 @@ public class Shop{
 	}
 	
 	/**
-	 * Changes a shop type to Buying or Selling. Also updates the signs nearby TODO: Why doesn ti update shops again? EDIT: oh it should. okay.
+	 * Changes a shop type to Buying or Selling. Also updates the signs nearby.
 	 * @param shopType The new type (ShopType.BUYING or ShopType.SELLING)
 	 */
 	public void setShopType(ShopType shopType){
