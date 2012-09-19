@@ -5,8 +5,10 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
@@ -42,7 +44,7 @@ public class Shop{
 		this.item = item.clone();
 		this.plugin = (QuickShop) Bukkit.getPluginManager().getPlugin("QuickShop");
 		this.item.setAmount(1);
-		this.displayItem = new DisplayItem(/*plugin,*/ this, this.item);
+		this.displayItem = new DisplayItem(this, this.item);
 		
 		this.shopType = ShopType.SELLING;
 	}
@@ -482,5 +484,41 @@ public class Shop{
 			//Delete it from memory
 			plugin.getShopManager().removeShop(this);
 		}
+	}
+	
+	/**
+	 * Returns the average price
+	 * @param radius The radius in blocks to check around it.  Note this is rounded to chunks anyway
+	 * @return the average price of shops within the radius offering the same kind of trade
+	 */
+	public double getAverage(int radius){
+		radius = (int) Math.ceil(radius / 16D);
+		
+		Chunk center = this.getLocation().getChunk();
+		World world = this.getLocation().getWorld();
+		
+		double total = 0;
+		int count = 0;
+		
+		for(int x = center.getX() - radius; x <= center.getX() + radius; x++){
+			for(int z = center.getZ() - radius; z <= center.getZ() + radius; z++){
+				HashMap<Location, Shop> shops = plugin.getShopManager().getShops(world.getName(), x, z);
+				if(shops == null) continue;
+				for(Shop shop : shops.values()){
+					//Same shop type (buying/selling)
+					//Same item for sale
+					//Has space if they're buying, or stock if they're selling
+					if(shop.getShopType() == this.getShopType() && shop.matches(this.getItem()) 
+							&& 	(shop.isSelling() && shop.getRemainingStock() > 0 
+								 || shop.isBuying() && shop.getRemainingSpace(shop.getMaterial().getMaxStackSize()) > 0)){
+						
+						total += shop.getPrice();
+						count++;
+					}
+				}
+			}
+		}
+		
+		return total / count;
 	}
 }
