@@ -73,6 +73,7 @@ command:
        buy: "&eChanges a shop to &dBUY&a mode"
        sell: "&eChanges a shop to &bSELL&a mode"
        clean: "&eRemoves all (loaded) shops with 0 stock"
+       price: "&eChanges the buy/selling price of one of your shops"
        
 signs:
     #Line 1 is used as an identifier at the moment, so I kind of need it to work, thats why I won't let you change it
