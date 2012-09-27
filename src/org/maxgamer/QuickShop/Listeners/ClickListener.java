@@ -167,10 +167,22 @@ public class ClickListener implements Listener{
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.item", plugin.getDataName(items.getType(), items.getDurability())));
 		
 		if(shop.isSelling()){
-			p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.stock", ""+stock));
+			//TODO: Can I send infinity chars?
+			//if(stock == 10000){
+			//	p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.stock", "\u236A"));
+			//}
+			//else{
+				p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.stock", ""+stock));
+			//}
 		}
 		else{
-			p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.space", ""+shop.getRemainingSpace(shop.getMaterial().getMaxStackSize())));
+			int space = shop.getRemainingSpace(shop.getMaterial().getMaxStackSize());
+			//if(space == 10000){
+			//	p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.space", "\u236A"));
+			//}
+			//else{
+				p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.space", ""+space));
+			//}
 		}
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.price-per", plugin.getDataName(shop.getMaterial(), shop.getDurability()), plugin.getEcon().format(shop.getPrice())));
 		
@@ -187,7 +199,7 @@ public class ClickListener implements Listener{
 			p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.this-shop-is-selling"));
 		}
 		
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("average-price-nearby", ""+shop.getAverage(48)));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("average-price-nearby", plugin.getEcon().format(shop.getAverage(48))));
 			
 		Map<Enchantment, Integer> enchs = items.getEnchantments();
 		if(enchs != null && enchs.size() > 0){
