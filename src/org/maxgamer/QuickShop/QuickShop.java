@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +36,7 @@ import org.maxgamer.QuickShop.Listeners.BlockListener;
 import org.maxgamer.QuickShop.Listeners.ChatListener;
 import org.maxgamer.QuickShop.Listeners.ChunkListener;
 import org.maxgamer.QuickShop.Listeners.ClickListener;
+import org.maxgamer.QuickShop.Listeners.JoinListener;
 import org.maxgamer.QuickShop.Listeners.MoveListener;
 import org.maxgamer.QuickShop.Listeners.QuitListener;
 import org.maxgamer.QuickShop.Listeners.WorldListener;
@@ -97,6 +99,7 @@ public class QuickShop extends JavaPlugin{
 	private ChunkListener chunkListener = new ChunkListener(this);
 	private QuitListener quitListener = new QuitListener(this);
 	private WorldListener worldListener = new WorldListener(this);
+	private JoinListener joinListener = new JoinListener(this);
 	
 	private int itemWatcherID;
 	public boolean lock;
@@ -120,6 +123,7 @@ public class QuickShop extends JavaPlugin{
 		Bukkit.getServer().getPluginManager().registerEvents(chunkListener, this);
 		Bukkit.getServer().getPluginManager().registerEvents(quitListener, this);
 		Bukkit.getServer().getPluginManager().registerEvents(worldListener, this);
+		Bukkit.getServer().getPluginManager().registerEvents(joinListener, this);
 		
 		//Command handlers
 		QS commandExecutor = new QS(this);
@@ -221,14 +225,24 @@ public class QuickShop extends JavaPlugin{
 		loadTools();
 		
 		/* Creates DB table 'shops' */
-		if(!getDB().hasTable()){
+		if(!getDB().hasTable("shops")){
 			try {
-				getDB().createTable();
+				getDB().createShopsTable();
 			} catch (SQLException e) {
 				e.printStackTrace();
-				getLogger().severe("Could not create database table");
+				getLogger().severe("Could not create shops table");
 			}
 		}
+		if(!getDB().hasTable("messages")){
+			try{
+				getDB().createMessagesTable();
+			}
+			catch (SQLException e) {
+				e.printStackTrace();
+				getLogger().severe("Could not create messages table");
+			}
+		}
+		
 		//Make the database up to date
 		getDB().checkColumns();
 		
@@ -844,5 +858,39 @@ public class QuickShop extends JavaPlugin{
 	 */
 	public ShopManager getShopManager(){
 		return this.shopManager;
+	}
+	
+	public List<String> getMessages(String player){
+		player = player.toLowerCase();
+		
+		List<String> messages = new ArrayList<String>(5);
+		
+		String q = "SELECT * FROM messages WHERE owner = '"+player+"' ORDER BY time ASC";
+		
+		try{
+			PreparedStatement ps = getDB().getConnection().prepareStatement(q);
+			ResultSet rs = ps.executeQuery();
+			
+			while(rs.next()){
+				messages.add(rs.getString("message"));
+			}
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+			this.getLogger().info("Could not load messages for " + player);
+		}
+		return messages;
+	}
+	
+	public void addMessage(String player, String msg){
+		player = player.toLowerCase();
+		
+		String q = "INSERT INTO messages (owner, message, time) VALUES ('"+player+"','"+msg+"','"+System.currentTimeMillis()+"')";
+		
+		getDB().writeToBuffer(q);
+	}
+	
+	public void deleteMessages(String player){
+		getDB().writeToBuffer("DELETE FROM messages WHERE owner = '"+player.toLowerCase()+"'");
 	}
 }
