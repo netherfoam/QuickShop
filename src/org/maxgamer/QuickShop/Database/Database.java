@@ -8,7 +8,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.maxgamer.QuickShop.QuickShop;
@@ -17,7 +19,7 @@ import org.maxgamer.QuickShop.Watcher.BufferWatcher;
 public class Database{
 	QuickShop plugin;
 	File file;
-	public HashSet<String> queries = new HashSet<String>(5);
+	public List<String> queries = new ArrayList<String>(5);
 	public boolean queriesInUse = false;
 	private int bufferWatcherID;
 	
