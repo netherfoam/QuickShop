@@ -19,12 +19,11 @@ public class Messenger implements Runnable{
 		List<String> messages = plugin.getMessages(player);
 		
 		if(messages == null){
-			plugin.getLogger().severe("No messages!");
 			return;
 		}
 		Player p = Bukkit.getPlayerExact(player);
 		if(p == null){
-			plugin.getLogger().severe("No such player! " + player);
+			//Gets thrown when a player joins for the first time, believe it or not.
 			return;
 		}
 		
