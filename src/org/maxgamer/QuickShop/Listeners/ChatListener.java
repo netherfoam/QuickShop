@@ -200,12 +200,16 @@ public class ChatListener implements Listener{
 							
 							//Notify the shop owner
 							Player owner = Bukkit.getPlayerExact(shop.getOwner());
-							if(owner != null){
-								owner.sendMessage(plugin.getMessage("player-just-bought-from-your-store", p.getName(), ""+amount, shop.getDataName()));
-								if(stock == amount) owner.sendMessage(plugin.getMessage("shop-out-of-stock", ""+shop.getLocation().getBlockX(), ""+shop.getLocation().getBlockY(), ""+shop.getLocation().getBlockZ(), shop.getDataName()));
+							
+							String msg = plugin.getMessage("player-just-bought-from-your-store", p.getName(), ""+amount, shop.getDataName());
+							
+							if(stock == amount) msg += "\n" + plugin.getMessage("shop-out-of-stock", ""+shop.getLocation().getBlockX(), ""+shop.getLocation().getBlockY(), ""+shop.getLocation().getBlockZ(), shop.getDataName());
+							
+							if(owner != null && owner.isOnline()){
+								owner.sendMessage(msg);
 							}
 							else{
-								//TODO: Log this, spit it to them when they log in.
+								plugin.addMessage(shop.getOwner(), msg);
 							}
 						}
 						//Transfers the item from A to B
@@ -276,9 +280,15 @@ public class ChatListener implements Listener{
 							
 							//Notify the owner of the purchase.
 							Player owner = Bukkit.getPlayerExact(shop.getOwner());
-							if(owner != null){
-								owner.sendMessage(plugin.getMessage("player-just-sold-to-your-store", p.getName(), ""+amount, shop.getDataName()));
-								if(space == amount) owner.sendMessage(plugin.getMessage("shop-out-of-space", ""+shop.getLocation().getBlockX(), ""+shop.getLocation().getBlockY(), ""+shop.getLocation().getBlockZ())); 
+							String msg = plugin.getMessage("player-just-sold-to-your-store", p.getName(), ""+amount, shop.getDataName());
+							
+							if(space == amount) msg += "\n" + plugin.getMessage("shop-out-of-space", ""+shop.getLocation().getBlockX(), ""+shop.getLocation().getBlockY(), ""+shop.getLocation().getBlockZ());
+							
+							if(owner != null && owner.isOnline()){
+								owner.sendMessage(msg);
+							}
+							else{
+								plugin.addMessage(shop.getOwner(), msg);
 							}
 						}
 						
@@ -302,7 +312,7 @@ public class ChatListener implements Listener{
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.successful-purchase"));
 		
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), ""+(amount * shop.getPrice())));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), plugin.getEcon().format((amount * shop.getPrice()))));
 		
 
 		Map<Enchantment, Integer> enchs = shop.getEnchants();
@@ -318,7 +328,7 @@ public class ChatListener implements Listener{
 	private void sendSellSuccess(Player p, Shop shop, int amount){
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.successfully-sold"));
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), ""+(amount * shop.getPrice())));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), plugin.getEcon().format((amount * shop.getPrice()))));
 
 		Map<Enchantment, Integer> enchs = shop.getEnchants();
 		if(enchs != null && enchs.size() > 0){
