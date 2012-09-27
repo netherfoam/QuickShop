@@ -233,11 +233,6 @@ public class ChatListener implements Listener{
 							return;
 						}
 						
-						//Tries to check their balance nicely to see if they can afford it.
-						if(!plugin.getEcon().has(shop.getOwner(), amount * shop.getPrice())){
-							p.sendMessage(plugin.getMessage("the-owner-cant-afford-to-buy-from-you", plugin.getEcon().format(amount * shop.getPrice()), plugin.getEcon().format(plugin.getEcon().getBalance(shop.getOwner()))));
-							return;
-						}
 						if(amount == 0){
 							//Dumb.
 							sendPurchaseSuccess(p, shop, amount);
@@ -245,7 +240,6 @@ public class ChatListener implements Listener{
 						}
 						else if(amount < 0){
 							// & Dumber
-							//p.sendMessage(ChatColor.RED + "Derrrrp, Can't sell negative amounts.");
 							p.sendMessage(plugin.getMessage("negative-amount"));
 							return;
 						}
@@ -258,6 +252,12 @@ public class ChatListener implements Listener{
 							double total = amount * shop.getPrice();
 							
 							if(!shop.isUnlimited() || plugin.getConfig().getBoolean("shop.pay-unlimited-shop-owners")){
+								//Tries to check their balance nicely to see if they can afford it.
+								if(!plugin.getEcon().has(shop.getOwner(), amount * shop.getPrice())){
+									p.sendMessage(plugin.getMessage("the-owner-cant-afford-to-buy-from-you", plugin.getEcon().format(amount * shop.getPrice()), plugin.getEcon().format(plugin.getEcon().getBalance(shop.getOwner()))));
+									return;
+								}
+								
 								EconomyResponse r = plugin.getEcon().withdrawPlayer(shop.getOwner(), total);
 								
 								//Check for plugins faking econ.has(amount)
