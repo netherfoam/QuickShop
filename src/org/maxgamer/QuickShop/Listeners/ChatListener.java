@@ -277,7 +277,6 @@ public class ChatListener implements Listener{
 							//Notify the owner of the purchase.
 							Player owner = Bukkit.getPlayerExact(shop.getOwner());
 							if(owner != null){
-								//owner.sendMessage(ChatColor.GREEN + p.getName() + " just sold " + amount + " " + ChatColor.YELLOW + shop.getDataName() + ChatColor.GREEN + " to your store.");
 								owner.sendMessage(plugin.getMessage("player-just-sold-to-your-store", p.getName(), ""+amount, shop.getDataName()));
 								if(space == amount) owner.sendMessage(plugin.getMessage("shop-out-of-space", ""+shop.getLocation().getBlockX(), ""+shop.getLocation().getBlockY(), ""+shop.getLocation().getBlockZ())); 
 							}
