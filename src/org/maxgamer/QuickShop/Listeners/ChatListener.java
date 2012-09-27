@@ -160,11 +160,6 @@ public class ChatListener implements Listener{
 							p.sendMessage(plugin.getMessage("shop-stock-too-low", ""+shop.getRemainingStock(), shop.getDataName()));
 							return;
 						}
-						//Check their balance.  Works with *most* economy plugins*
-						if(!plugin.getEcon().has(p.getName(), amount * shop.getPrice())){
-							p.sendMessage(plugin.getMessage("you-cant-afford-to-buy", ""+amount * shop.getPrice(), ""+plugin.getEcon().getBalance(p.getName())));
-							return;
-						}
 						if(amount == 0){
 							//Dumb.
 							sendPurchaseSuccess(p, shop, amount);
@@ -178,6 +173,12 @@ public class ChatListener implements Listener{
 						
 						//Money handling
 						if(!p.getName().equalsIgnoreCase(shop.getOwner())){
+							//Check their balance.  Works with *most* economy plugins*
+							if(!plugin.getEcon().has(p.getName(), amount * shop.getPrice())){
+								p.sendMessage(plugin.getMessage("you-cant-afford-to-buy", ""+amount * shop.getPrice(), ""+plugin.getEcon().getBalance(p.getName())));
+								return;
+							}
+							
 							//Don't tax them if they're purchasing from themselves.
 							//Do charge an amount of tax though.
 							double tax = plugin.getConfig().getDouble("tax");
@@ -203,6 +204,9 @@ public class ChatListener implements Listener{
 								owner.sendMessage(plugin.getMessage("player-just-bought-from-your-store", p.getName(), ""+amount, shop.getDataName()));
 								if(stock == amount) owner.sendMessage(plugin.getMessage("shop-out-of-stock", ""+shop.getLocation().getBlockX(), ""+shop.getLocation().getBlockY(), ""+shop.getLocation().getBlockZ(), shop.getDataName()));
 							}
+							else{
+								//TODO: Log this, spit it to them when they log in.
+							}
 						}
 						//Transfers the item from A to B
 						shop.sell(p, shop.getItem(), amount);
@@ -218,7 +222,7 @@ public class ChatListener implements Listener{
 						
 						int count = 0;
 						for(ItemStack item : p.getInventory().getContents()){
-							if(item != null && item.getType() == shop.getMaterial() && item.getDurability() == shop.getDurability() && item.getEnchantments().equals(shop.getEnchants())){
+							if(shop.matches(item)){
 								count += item.getAmount();
 							}
 						}
