@@ -85,9 +85,9 @@ public class Database{
 	/**
 	 * @return Returns true if the shops table exists 
 	 */
-	public boolean hasTable(){
+	public boolean hasTable(String t){
 		try {
-			PreparedStatement ps = this.getConnection().prepareStatement("SELECT name FROM sqlite_master WHERE type='table' AND name='shops';");
+			PreparedStatement ps = this.getConnection().prepareStatement("SELECT name FROM sqlite_master WHERE type='table' AND name='"+t+"';");
 			ResultSet rs = ps.executeQuery();
 			while(rs.next()){
 				ps.close();
@@ -128,7 +128,7 @@ public class Database{
 	 * Creates the database table 'shops'.
 	 * @throws SQLException If the connection is invalid.
 	 */
-	public void createTable() throws SQLException{
+	public void createShopsTable() throws SQLException{
 		Statement st = getConnection().createStatement();
 		String createTable = 
 		"CREATE TABLE \"shops\" (" + 
@@ -142,6 +142,17 @@ public class Database{
 				"\"unlimited\"  boolean, " +
 				"\"type\"  boolean, " +
 				"PRIMARY KEY ('x', 'y','z','world') " +
+				");";
+		st.execute(createTable);
+	}
+	
+	public void createMessagesTable() throws SQLException{
+		Statement st = getConnection().createStatement();
+		String createTable = 
+		"CREATE TABLE \"messages\" (" + 
+				"\"owner\"  TEXT(20) NOT NULL, " +
+				"\"message\"  TEXT(200) NOT NULL, " +
+				"\"time\"  INTEGER(32) NOT NULL, " +
 				");";
 		st.execute(createTable);
 	}
