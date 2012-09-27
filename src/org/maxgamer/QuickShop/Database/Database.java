@@ -154,7 +154,7 @@ public class Database{
 		"CREATE TABLE \"messages\" (" + 
 				"\"owner\"  TEXT(20) NOT NULL, " +
 				"\"message\"  TEXT(200) NOT NULL, " +
-				"\"time\"  INTEGER(32) NOT NULL, " +
+				"\"time\"  INTEGER(32) NOT NULL " +
 				");";
 		st.execute(createTable);
 	}
