@@ -82,7 +82,7 @@ public class ChatListener implements Listener{
 						}
 						
 						//Add the shop to the list.
-						final Shop shop = new Shop(info.getLocation(), price, info.getItem(), p.getName());
+						Shop shop = new Shop(info.getLocation(), price, info.getItem(), p.getName());
 
 						plugin.getShopManager().addShop(shop.getLocation().getWorld().getName(), shop);
 						
