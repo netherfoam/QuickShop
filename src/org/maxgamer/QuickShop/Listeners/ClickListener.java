@@ -166,6 +166,10 @@ public class ClickListener implements Listener{
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.owner", shop.getOwner()));
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.item", plugin.getDataName(items.getType(), items.getDurability())));
 		
+		if(plugin.isTool(items.getType())){
+			p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.damage-percent-remaining", plugin.getToolPercentage(items)));
+		}
+		
 		if(shop.isSelling()){
 			//TODO: Can I send infinity chars?
 			//if(stock == 10000){
@@ -184,13 +188,14 @@ public class ClickListener implements Listener{
 				p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.space", ""+space));
 			//}
 		}
+		
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.price-per", plugin.getDataName(shop.getMaterial(), shop.getDurability()), plugin.getEcon().format(shop.getPrice())));
+		
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("average-price-nearby", plugin.getEcon().format(shop.getAverage(48))));
 		
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.total-value-of-chest", plugin.getEcon().format(shop.getPrice() * stock)));
 		
-		if(plugin.isTool(items.getType())){
-			p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.damage-percent-remaining", plugin.getToolPercentage(items)));
-		}
+		
 		
 		if(shop.isBuying()){
 			p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.this-shop-is-buying"));
@@ -198,8 +203,6 @@ public class ClickListener implements Listener{
 		else{
 			p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.this-shop-is-selling"));
 		}
-		
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("average-price-nearby", plugin.getEcon().format(shop.getAverage(48))));
 			
 		Map<Enchantment, Integer> enchs = items.getEnchantments();
 		if(enchs != null && enchs.size() > 0){
