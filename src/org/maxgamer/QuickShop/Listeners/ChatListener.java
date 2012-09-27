@@ -293,15 +293,17 @@ public class ChatListener implements Listener{
 					return; //It was cancelled, go away.
 				}
 			}
-			
 		});
+		
 		
 		e.setCancelled(true);
 	}
 	private void sendPurchaseSuccess(Player p, Shop shop, int amount){
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.successful-purchase"));
+		
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), ""+(amount * shop.getPrice())));
+		
 
 		Map<Enchantment, Integer> enchs = shop.getEnchants();
 		if(enchs != null && enchs.size() > 0){
