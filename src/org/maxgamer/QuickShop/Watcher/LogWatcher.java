@@ -44,6 +44,7 @@ public class LogWatcher implements Runnable{
 		for(String s : logs){
 			ps.println(s);
 		}
+		logs.clear();
 		
 		lock = false;
 	}
