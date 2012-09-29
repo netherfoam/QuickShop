@@ -298,7 +298,7 @@ public class QuickShop extends JavaPlugin{
 		itemWatcherID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, itemWatcher, 150, 150);
 		
 		if(this.getConfig().getBoolean("log-actions")){
-			this.logWatcher = new LogWatcher(this, new File(this.getDataFolder(), "log.txt"));
+			this.logWatcher = new LogWatcher(this, new File(this.getDataFolder(), "qs.log"));
 			Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, this.logWatcher, 150, 150);
 		}
 		
