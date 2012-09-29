@@ -45,6 +45,7 @@ import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.Shop.ShopType;
 import org.maxgamer.QuickShop.Watcher.BufferWatcher;
 import org.maxgamer.QuickShop.Watcher.ItemWatcher;
+import org.maxgamer.QuickShop.Watcher.LogWatcher;
 
 import com.bekvon.bukkit.residence.Residence;
 import com.palmergames.bukkit.towny.Towny;
@@ -104,6 +105,8 @@ public class QuickShop extends JavaPlugin{
 	private int itemWatcherID;
 	public boolean lock;
 	public boolean sneak;
+	
+	private LogWatcher logWatcher;
 	
 	public void onEnable(){
 		getLogger().info("Hooking Vault");
@@ -294,6 +297,9 @@ public class QuickShop extends JavaPlugin{
 		ItemWatcher itemWatcher = new ItemWatcher(this);
 		itemWatcherID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, itemWatcher, 150, 150);
 		
+		this.logWatcher = new LogWatcher(this, new File(this.getDataFolder(), "log.txt"));
+		Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, this.logWatcher, 150, 150);
+		
 		this.sneak = this.getConfig().getBoolean("shop.sneak-only");
 		this.lock = this.getConfig().getBoolean("shop.lock");
 	}
@@ -319,6 +325,10 @@ public class QuickShop extends JavaPlugin{
 	 */
 	public Economy getEcon(){
 		return economy;
+	}
+	
+	public void log(String s){
+		this.logWatcher.add(s);
 	}
 	
 	public void parseColours(YamlConfiguration config){

@@ -8,6 +8,7 @@ import net.milkbowl.vault.economy.EconomyResponse;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -91,6 +92,9 @@ public class ChatListener implements Listener{
 							plugin.getEcon().withdrawPlayer(p.getName(), tax);
 							plugin.getEcon().depositPlayer(plugin.getConfig().getString("tax-account"), tax);
 						}
+						
+						Location loc = shop.getLocation();
+						plugin.log(p.getName() + " created a "+shop.getDataName()+" shop at ("+loc.getWorld().getName()+" - "+loc.getX()+","+loc.getY()+","+loc.getZ()+")");
 						
 						//Writes the shop to the database
 						shop.update(true);
@@ -215,6 +219,8 @@ public class ChatListener implements Listener{
 						//Transfers the item from A to B
 						shop.sell(p, shop.getItem(), amount);
 						sendPurchaseSuccess(p, shop, amount);
+						Location loc = shop.getLocation();
+						plugin.log(p.getName() + " bought " + amount + " " +shop.getDataName()+" from shop at ("+loc.getWorld().getName()+" - "+loc.getX()+","+loc.getY()+","+loc.getZ()+") for " + (shop.getPrice() * amount));
 					}
 					else if(shop.isBuying()){
 						int space = shop.getRemainingSpace(shop.getMaterial().getMaxStackSize());
@@ -294,6 +300,9 @@ public class ChatListener implements Listener{
 						
 						shop.buy(p, shop.getItem(), amount);
 						sendSellSuccess(p, shop, amount);
+						
+						Location loc = shop.getLocation();
+						plugin.log(p.getName() + " sold " + amount + " " +shop.getDataName()+" to shop at ("+loc.getWorld().getName()+" - "+loc.getX()+","+loc.getY()+","+loc.getZ()+") for " + (shop.getPrice() * amount));
 					}
 				}
 				/*
