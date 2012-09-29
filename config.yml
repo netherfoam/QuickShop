@@ -2,6 +2,9 @@
 tax: 0.05
 tax-account: tax
 
+#Should we log transactions/creations to Bukkit\Plugins\QuickShop\qs.log?
+log-actions: true
+
 shop:
     #Cost to make a stall
     cost: 10
