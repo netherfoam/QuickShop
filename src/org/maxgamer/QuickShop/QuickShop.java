@@ -297,8 +297,10 @@ public class QuickShop extends JavaPlugin{
 		ItemWatcher itemWatcher = new ItemWatcher(this);
 		itemWatcherID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, itemWatcher, 150, 150);
 		
-		this.logWatcher = new LogWatcher(this, new File(this.getDataFolder(), "log.txt"));
-		Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, this.logWatcher, 150, 150);
+		if(this.getConfig().getBoolean("log-actions")){
+			this.logWatcher = new LogWatcher(this, new File(this.getDataFolder(), "log.txt"));
+			Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, this.logWatcher, 150, 150);
+		}
 		
 		this.sneak = this.getConfig().getBoolean("shop.sneak-only");
 		this.lock = this.getConfig().getBoolean("shop.lock");
@@ -328,6 +330,7 @@ public class QuickShop extends JavaPlugin{
 	}
 	
 	public void log(String s){
+		if(this.logWatcher == null) return;
 		this.logWatcher.add(s);
 	}
 	
