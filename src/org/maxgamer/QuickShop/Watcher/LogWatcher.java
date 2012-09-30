@@ -1,6 +1,5 @@
 package org.maxgamer.QuickShop.Watcher;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -8,13 +7,13 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.maxgamer.QuickShop.QuickShop;
 
 public class LogWatcher implements Runnable{
 	private QuickShop plugin;
 	private PrintStream ps;
+	public int taskId = 0;
 	
 	private List<String> logs = new ArrayList<String>(5);
 	private boolean lock = false;
@@ -31,7 +30,6 @@ public class LogWatcher implements Runnable{
 			e.printStackTrace();
 			plugin.getLogger().severe("Log file not found!");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			plugin.getLogger().severe("Could not create log file!");
 		}

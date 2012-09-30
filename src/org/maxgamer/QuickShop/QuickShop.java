@@ -299,7 +299,7 @@ public class QuickShop extends JavaPlugin{
 		
 		if(this.getConfig().getBoolean("log-actions")){
 			this.logWatcher = new LogWatcher(this, new File(this.getDataFolder(), "qs.log"));
-			Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, this.logWatcher, 150, 150);
+			logWatcher.taskId = Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, this.logWatcher, 150, 150);
 		}
 		
 		this.sneak = this.getConfig().getBoolean("shop.sneak-only");
@@ -307,6 +307,9 @@ public class QuickShop extends JavaPlugin{
 	}
 	public void onDisable(){
 		Bukkit.getScheduler().cancelTask(itemWatcherID);
+		Bukkit.getScheduler().cancelTask(logWatcher.taskId);
+		logWatcher.close(); //Closes the file
+		
 		/* Remove all display items, and any dupes we can find */
 		shopManager.clear();
 		
