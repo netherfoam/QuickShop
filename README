@@ -1,0 +1,107 @@
+== QuickShop ==
+== The Predecessors ==
+Showcase was abandoned.  Chestshop needed a display, with signs whose order you could never remember. SCS has too many commands. I'm yet to find someone who uses essentials shops.
+
+Don't get me wrong though, they're all awesome plugins each in a few ways. 
+\\
+\\
+== A Warning ==
+As much as I want this plugin to succeed, it does involve cloning (Duping) items, and disabling them from being picked up.  If something goes wrong, you may have an item dupe on your hands. I have tried my best to dupe the items in latest versions, however I've had no success, and run every build with a chance of item dupe on my server of 10 players (average) before releasing it.  If you succeed in duping (Within reason...), tell me how you did it in a ticket.  I do **NOT **recommend using this on big servers just yet!
+\\
+\\
+== QuickShop ==
+So, I set out to write this.  QuickShop.  QuickShop is a shop plugin, that allows players to sell items from a chest with no commands.  It allows players to purchase any number of items easily.  In fact, this plugin doesn't even have any commands that a player would ever need!
+\\
+\\
+== Features ==
+* Vault Support
+* Easy to use
+* Easy to remember
+* Quick (Oh, really?)
+* Display Item on top of chest
+* Enchant support
+* Potion, Mob eggs, sapling type, etc support
+* Tool damage support
+* Unlimited chest support
+* Blacklist support & bypass permissions
+* Buy & Sell support
+* Optionally hooks into WorldGuard, Precious Stones, Lockette, Towny, Residence and GriefPrevention to stop players creating shops they shouldn't!
+\\
+\\
+
+
+For those people that hate reading, here's an awesome video from UltiByte:
+<<youtube 6NpkVd2mA7Y>>
+\\
+\\
+== How to Create a Shop ==
+# Place a chest on the ground
+# Hit the chest with the item you want to trade
+# Type in price for the item (As prompted) in chat
+# Fill the chest with the items you wish to sell
+\\
+\\
+== Advanced ==
+# Face the chest
+# Type either /qs sell or /qs buy to make the shop buy/sell instead (Optional: use /shop instead of /qs)
+# Stock the shop accordingly, if necessary.
+\\
+\\
+== How to Buy/Sell to a Shop ==
+# Find a shop
+# Hit / Left click the shop
+# Enter the amount you wish to trade in chat
+
+Menu Example:
+{{http://dev.bukkit.org/media/images/43/375/How_Many.png|Menu}}
+\\
+\\
+See it in action:
+http://maxgamer.org or
+play.maxgamer.org:25571 and /warp market!
+\\
+\\
+== Commands ==
+* **/qs unlimited** - Makes the shop you're looking at become unlimited.
+* **/qs setowner <player>** - Changes shop owner to <player>.
+* **/qs buy** - Changes your shop you're looking at to one that buys items
+* **/qs sell** - Changes your shop you're looking at to one that sells items
+* **/qs price <price>** - Change the price of your shop that you're looking at
+* **/qs clean** - Removes any existing shop that has 0 stock.
+* **/shop** - Alias (Optional) of /qs
+
+== Player Nodes ==
+* **quickshop.use** - Required to use ANY quickshop
+* **quickshop.create.sell** - Required to make a QuickShop (At all)
+* **quickshop.create.buy** - Required to use /qs buy (Change the shop type from Sell -> Buy)
+* **quickshop.create.changeprice** - Required to use /qs price (Ability to change the price of a shop without destroying it.  This **may allow** for some scammers to quickly change the price while someone is buying.
+* **quickshop.bypass.ItemID** - Required to sell blacklisted items (E.g. bedrock)
+
+== Admin Nodes ==
+* **quickshop.unlimited** - Required to use /quickshop unlimited
+* **quickshop.setowner** - Allows use of /qs setowner
+* **quickshop.other.destroy** - Allow breaking other peoples QuickShops if they're locked by this plugin
+* **quickshop.other.open** - Allow opening (And stealing/Stocking) other players QuickShops
+* **quickshop.clean** - Permission to purge any shops that have 0 stock.
+
+\\
+\\
+Source: [[https://github.com/netherfoam/QuickShop|**Source on Github**]]
+
+Checkout the config over [[http://dev.bukkit.org/server-mods/quickshop/pages/config/|here]].
+
+ToDo:
+* Compatibility with HeroChat [Coming in v2.1 - Promise!]
+* Prevent other players breaking signs
+* Optionally disable display items
+* Min/max values on a global and per-item basis
+* Command to locate nearest shop (E.g. /qs find diamonds will mark the nearest diamond shop)
+* Store NBT tags better (E.g. Written book support)
+
+
+\\
+\\
+Hi, I'm an 18 year old University student studying Software Engineering.  I spend my time writing code that I receive practically no reward for other than people asking questions I've answered a hundred times before.  I know server Admin's and Owners aren't the richest of people - But if you're feeling particularly generous, I always appreciate any amount for the time and patience I put into coding Bukkit plugins.
+\\
+\\
+<<center>><<size 200%>><<color FFC03A>>[[https://www.paypal.com/cgi-bin/webscr?return=http%3A%2F%2Fdev.bukkit.org%2Fserver-mods%2Fquickshop%2F&cn=Add+special+instructions+to+the+addon+author%28s%29&business=i.got.burnt%40gmail.com&bn=PP-DonationsBF%3Abtn_donateCC_LG.gif%3ANonHosted&cancel_return=http%3A%2F%2Fdev.bukkit.org%2Fserver-mods%2Fquickshop%2F&lc=US&item_name=QuickShop+%28from+Bukkit.org%29&cmd=_donations&rm=1&no_shipping=1&currency_code=USD|Donate]]<</color>><</size>><</center>>
