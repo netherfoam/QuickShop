@@ -1,7 +1,10 @@
 package org.maxgamer.QuickShop.Watcher;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -23,7 +26,7 @@ public class ItemWatcher implements Runnable{
 	}
 	
 	public void run(){
-		HashSet<Shop> toRemove = new HashSet<Shop>(1);
+		List<Shop> toRemove = new ArrayList<Shop>(1);
 		plugin.debug("Sweeping shops...");
 		for(HashMap<ShopChunk, HashMap<Location, Shop>> inWorld : plugin.getShopManager().getShops().values()){
 			for(HashMap<Location, Shop> inChunk : inWorld.values()){
