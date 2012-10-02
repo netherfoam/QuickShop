@@ -94,7 +94,7 @@ public class QuickShop extends JavaPlugin{
 	//LWC
 	private LWC lwc;
 	
-	private ChatListener chatListener = new ChatListener(this);
+	private ChatListener chatListener;
 	private HeroChatListener heroChatListener;
 	private ClickListener clickListener;
 	private BlockListener blockListener = new BlockListener(this);
@@ -124,9 +124,12 @@ public class QuickShop extends JavaPlugin{
 			this.heroChatListener = new HeroChatListener(this);
 			Bukkit.getServer().getPluginManager().registerEvents(heroChatListener, this);
 		}
-		
+		else{
+			this.chatListener = new ChatListener(this);
+			Bukkit.getServer().getPluginManager().registerEvents(chatListener, this);
+		}
 		//Register events
-		Bukkit.getServer().getPluginManager().registerEvents(chatListener, this);
+		
 		Bukkit.getServer().getPluginManager().registerEvents(clickListener, this);
 		Bukkit.getServer().getPluginManager().registerEvents(blockListener, this);
 		Bukkit.getServer().getPluginManager().registerEvents(moveListener, this);
