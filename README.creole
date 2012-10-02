@@ -30,8 +30,7 @@ So, I set out to write this.  QuickShop.  QuickShop is a shop plugin, that allow
 \\
 
 
-For those people that hate reading, here's an awesome video from UltiByte:
-<<youtube 6NpkVd2mA7Y>>
+For those people that hate reading, here's an awesome video from UltiByte: http://youtube.com/watch?v=6NpkVd2mA7Y
 \\
 \\
 == How to Create a Shop ==
