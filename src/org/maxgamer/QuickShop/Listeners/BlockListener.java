@@ -1,6 +1,7 @@
 package org.maxgamer.QuickShop.Listeners;
 
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -27,32 +28,61 @@ public class BlockListener implements Listener{
 	 */
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBreak(final BlockBreakEvent e){
-		if(e.isCancelled() || e.getBlock().getType() != Material.CHEST) return;
-		Shop shop = plugin.getShopManager().getShop(e.getBlock().getLocation());
+		if(e.isCancelled()) return;
 		
-		//If the chest was a shop
-		if(shop != null){
-			Player p = e.getPlayer();
-			if(plugin.lock){
-				if(!shop.getOwner().equalsIgnoreCase(p.getName()) && !p.hasPermission("quickshop.other.destroy")){
+		Block b = e.getBlock();
+		Player p = e.getPlayer();
+		
+		//If the chest was a chest
+		if(b.getType() == Material.CHEST){
+			Shop shop = plugin.getShopManager().getShop(b.getLocation());
+			//If it was a shop
+			if(shop != null){
+				if(plugin.lock){
+					//If they owned it or have bypass perms, they can destroy it
+					if(!shop.getOwner().equalsIgnoreCase(p.getName()) && !p.hasPermission("quickshop.other.destroy")){
+						e.setCancelled(true);
+						p.sendMessage(plugin.getMessage("no-permission"));
+						return;
+					}
+				}
+				
+				//If they're either survival or the owner, they can break it
+				if(p.getGameMode() == GameMode.CREATIVE && !p.getName().equalsIgnoreCase(shop.getOwner())){
 					e.setCancelled(true);
-					p.sendMessage(plugin.getMessage("no-permission"));
+					p.sendMessage(plugin.getMessage("no-creative-break"));
+					return;
+				}
+				
+				//Cancel their current menu... Doesnt cancel other's menu's.
+				Info action = plugin.getActions().get(p.getName());
+				if(action != null){
+					action.setAction(ShopAction.CANCELLED);
+				}
+				shop.delete();
+				p.sendMessage(plugin.getMessage("success-removed-shop"));
+			}
+		}
+		else if(b.getType() == Material.WALL_SIGN){
+			Shop shop = getShopNextTo(e.getBlock().getLocation());
+			if(shop != null){ //It is a shop sign we're dealing with.
+				if(plugin.lock){
+					//If they're the shop owner or have bypass perms, they can destroy it.
+					if(!shop.getOwner().equalsIgnoreCase(p.getName()) && !e.getPlayer().hasPermission("quickshop.other.destroy")){
+						e.setCancelled(true);
+						p.sendMessage(plugin.getMessage("no-permission"));
+						return;
+					}
+				}
+				//If they're in creative and not the owner, don't let them (accidents happen)
+				if(p.getGameMode() == GameMode.CREATIVE && !p.getName().equalsIgnoreCase(shop.getOwner())){
+					e.setCancelled(true);
+					p.sendMessage(plugin.getMessage("no-creative-break"));
 					return;
 				}
 			}
-			
-			if(p.getGameMode() == GameMode.CREATIVE && !p.getName().equalsIgnoreCase(shop.getOwner())){
-				e.setCancelled(true);
-				p.sendMessage(plugin.getMessage("no-creative-break"));
-				return;
-			}
-			Info action = plugin.getActions().get(p.getName());
-			if(action != null){
-				action.setAction(ShopAction.CANCELLED);
-			}
-			shop.delete();
-			p.sendMessage(plugin.getMessage("success-removed-shop"));
 		}
+		
 	}
 	/**
 	 * Listens for chest placement, so a doublechest shop can't be created.
@@ -88,5 +118,25 @@ public class BlockListener implements Listener{
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Gets the shop a sign is attached to
+	 * @param loc The location of the sign
+	 * @return The shop
+	 */
+	private Shop getShopNextTo(Location loc){
+		Block[] blocks = new Block[4];
+		blocks[0] = loc.getBlock().getRelative(1, 0, 0);
+		blocks[1] = loc.getBlock().getRelative(-1, 0, 0);
+		blocks[2] = loc.getBlock().getRelative(0, 0, 1);
+		blocks[3] = loc.getBlock().getRelative(0, 0, -1);
+		
+		for(Block b : blocks){
+			if(b.getType() != Material.CHEST) continue;
+			Shop shop = plugin.getShopManager().getShop(b.getLocation());
+			if(shop != null && shop.isAttached(loc.getBlock())) return shop;
+		}
+		return null;
 	}
 }
