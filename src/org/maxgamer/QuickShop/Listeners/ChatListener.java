@@ -6,9 +6,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.maxgamer.QuickShop.QuickShop;
 
-import com.dthielke.herochat.ChannelChatEvent;
-import com.dthielke.herochat.Chatter.Result;
-
 /**
  * 
  * @author Netherfoam
