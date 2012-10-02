@@ -61,9 +61,12 @@ public class WorldListener implements Listener{
 				 * 3. Fix each shops display item's item's world
 				 * 4. Put the shops back in the new inChunk
 				 */
+
 				plugin.debug("Inspecting shop");
 				Shop shop = entry.getValue();
 				shop.getLocation().setWorld(world);
+				
+				//TODO: Check display items are enabled
 				shop.getDisplayItem().getDisplayLocation().setWorld(world);
 				if(shop.getDisplayItem().getItem() != null){
 					shop.getDisplayItem().getItem().getLocation().setWorld(world);

@@ -2,7 +2,6 @@ package org.maxgamer.QuickShop.Watcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import org.bukkit.Location;
