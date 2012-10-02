@@ -6,7 +6,7 @@ author: Netherfoam
 description: Economy Shops plugin
 website: http://maxgamer.org
 depend: [Vault]
-soft-depend: [Towny, PreciousStones, Lockette, WorldGuard, GriefPrevention, Residence]
+soft-depend: [Towny, PreciousStones, Lockette, WorldGuard, GriefPrevention, Residence, HeroChat]
 
 commands:
     qs:

@@ -36,6 +36,7 @@ import org.maxgamer.QuickShop.Listeners.BlockListener;
 import org.maxgamer.QuickShop.Listeners.ChatListener;
 import org.maxgamer.QuickShop.Listeners.ChunkListener;
 import org.maxgamer.QuickShop.Listeners.ClickListener;
+import org.maxgamer.QuickShop.Listeners.HeroChatListener;
 import org.maxgamer.QuickShop.Listeners.JoinListener;
 import org.maxgamer.QuickShop.Listeners.MoveListener;
 import org.maxgamer.QuickShop.Listeners.QuitListener;
@@ -94,6 +95,7 @@ public class QuickShop extends JavaPlugin{
 	private LWC lwc;
 	
 	private ChatListener chatListener = new ChatListener(this);
+	private HeroChatListener heroChatListener;
 	private ClickListener clickListener;
 	private BlockListener blockListener = new BlockListener(this);
 	private MoveListener moveListener = new MoveListener(this);
@@ -117,6 +119,11 @@ public class QuickShop extends JavaPlugin{
 		//Safe to initialize now - It accesses config!
 		this.clickListener = new ClickListener(this);
 		getLogger().info("Registering Listeners");
+		
+		if(Bukkit.getPluginManager().getPlugin("HeroChat") != null){
+			this.heroChatListener = new HeroChatListener(this);
+			Bukkit.getServer().getPluginManager().registerEvents(heroChatListener, this);
+		}
 		
 		//Register events
 		Bukkit.getServer().getPluginManager().registerEvents(chatListener, this);

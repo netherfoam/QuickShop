@@ -108,7 +108,7 @@ public class ClickListener implements Listener{
 			
 			//Add the new action
 			HashMap<String, Info> actions = plugin.getActions();
-			actions.remove(p.getName());
+			//actions.remove(p.getName());
 			Info info = new Info(shop.getLocation(), ShopAction.BUY, null, null);
 			actions.put(p.getName(), info);
 			
