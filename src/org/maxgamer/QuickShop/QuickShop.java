@@ -317,8 +317,10 @@ public class QuickShop extends JavaPlugin{
 	}
 	public void onDisable(){
 		Bukkit.getScheduler().cancelTask(itemWatcherID);
-		Bukkit.getScheduler().cancelTask(logWatcher.taskId);
-		logWatcher.close(); //Closes the file
+		if(logWatcher != null){
+			Bukkit.getScheduler().cancelTask(logWatcher.taskId);
+			logWatcher.close(); //Closes the file
+		}
 		
 		/* Remove all display items, and any dupes we can find */
 		shopManager.clear();
