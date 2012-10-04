@@ -267,6 +267,11 @@ public class ShopManager{
 						return;
 					}
 					
+					if(info.hasChanged(shop)){
+						p.sendMessage(plugin.getMessage("shop-has-changed"));
+						return;
+					}
+					
 					if(shop.isSelling()){
 						int stock = shop.getRemainingStock();
 						

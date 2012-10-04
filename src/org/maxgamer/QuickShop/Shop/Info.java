@@ -6,10 +6,11 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 public class Info{
-	Location loc;
-	ShopAction action;
-	ItemStack item;
-	Block last;
+	private Location loc;
+	private ShopAction action;
+	private ItemStack item;
+	private Block last;
+	private Shop shop;
 	
 	/**
 	 * Stores info for the players last shop interact.
@@ -24,6 +25,38 @@ public class Info{
 		this.last = last;
 		if(item != null) this.item = item.clone();
 	}
+	/**
+	 * Stores info for the players last shop interact.
+	 * @param loc The location they clicked (Block.getLocation())
+	 * @param action The action (ShopAction.*)
+	 * @param material The material they were holding
+	 * @param data The data value of the material
+	 * @param shop The shop they interacted with, or null if none
+	 */
+	public Info(Location loc, ShopAction action, ItemStack item, Block last, Shop shop){
+		this.loc = loc;
+		this.action = action;
+		this.last = last;
+		if(item != null) this.item = item.clone();
+		
+		if(shop != null){
+			this.shop = new Shop(shop.getLocation().clone(), shop.getPrice(), shop.getItem().clone(), shop.getOwner());
+			this.shop.setShopType(shop.getShopType());
+			this.shop.setUnlimited(shop.isUnlimited());
+		}
+	}
+	
+	public boolean hasChanged(Shop shop){
+		if(this.shop.isUnlimited() != shop.isUnlimited()) return true;
+		if(this.shop.getShopType() != shop.getShopType()) return true;
+		if(!this.shop.getOwner().equals(shop.getOwner())) return true;
+		if(this.shop.getPrice() != shop.getPrice()) return true;
+		if(!this.shop.getLocation().equals(shop.getLocation())) return true;
+		if(!this.shop.matches(shop.getItem())) return true;
+		
+		return false;
+	}
+	
 	public ShopAction getAction(){
 		return this.action;
 	}
