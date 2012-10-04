@@ -6,8 +6,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -346,7 +349,9 @@ public class QuickShop extends JavaPlugin{
 	
 	public void log(String s){
 		if(this.logWatcher == null) return;
-		this.logWatcher.add(s);
+		Date date = Calendar.getInstance().getTime();
+		Timestamp time = new Timestamp(date.getTime());
+		this.logWatcher.add("["+time.toString()+"] "+ s);
 	}
 	
 	public void parseColours(YamlConfiguration config){
