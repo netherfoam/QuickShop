@@ -323,7 +323,7 @@ public class ShopManager{
 							//Notify the shop owner
 							Player owner = Bukkit.getPlayerExact(shop.getOwner());
 							
-							String msg = plugin.getMessage("player-just-bought-from-your-store", p.getName(), ""+amount, shop.getDataName());
+							String msg = plugin.getMessage("player-bought-from-your-store", p.getName(), ""+amount, shop.getDataName());
 							
 							if(stock == amount) msg += "\n" + plugin.getMessage("shop-out-of-stock", ""+shop.getLocation().getBlockX(), ""+shop.getLocation().getBlockY(), ""+shop.getLocation().getBlockZ(), shop.getDataName());
 							
@@ -390,7 +390,6 @@ public class ShopManager{
 								
 								//Check for plugins faking econ.has(amount)
 								if(!r.transactionSuccess()){
-									//p.sendMessage(ChatColor.RED + "[QuickShop] Transaction failed.  Does the owner have enough cash?");
 									p.sendMessage(plugin.getMessage("the-owner-cant-afford-to-buy-from-you", plugin.getEcon().format(amount * shop.getPrice()), plugin.getEcon().format(plugin.getEcon().getBalance(shop.getOwner()))));
 									return;
 								}
@@ -404,7 +403,7 @@ public class ShopManager{
 							
 							//Notify the owner of the purchase.
 							Player owner = Bukkit.getPlayerExact(shop.getOwner());
-							String msg = plugin.getMessage("player-just-sold-to-your-store", p.getName(), ""+amount, shop.getDataName());
+							String msg = plugin.getMessage("player-sold-to-your-store", p.getName(), ""+amount, shop.getDataName());
 							
 							if(space == amount) msg += "\n" + plugin.getMessage("shop-out-of-space", ""+shop.getLocation().getBlockX(), ""+shop.getLocation().getBlockY(), ""+shop.getLocation().getBlockZ());
 							
