@@ -36,8 +36,6 @@ public class ChunkListener implements Listener{
 			disItem.removeDupe();
 			disItem.remove();
 			disItem.spawn();
-			
-			plugin.debug("Chunk loading spawning item: " + (disItem.getItem() == null ? "Null item? " : disItem.getItem().getItemStack().getType()));
 		}
 	}
 	
@@ -53,8 +51,6 @@ public class ChunkListener implements Listener{
 			DisplayItem disItem = shop.getDisplayItem();
 			disItem.removeDupe();
 			disItem.remove();
-			
-			plugin.debug("Chunk unloading unspawning item: " + (disItem.getItem() == null ? "Null item? " : disItem.getItem().getItemStack().getType()));
 		}
 	}
 }

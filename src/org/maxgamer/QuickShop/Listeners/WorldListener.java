@@ -35,7 +35,6 @@ public class WorldListener implements Listener{
 		 *		store the new world in the world list
 		 */
 		
-		plugin.debug("Fixing depreciated world references");
 		World world = e.getWorld();
 		
 		//New world data
@@ -48,7 +47,6 @@ public class WorldListener implements Listener{
 		if(oldInWorld == null) return;
 		
 		for(Entry<ShopChunk, HashMap<Location, Shop>> oldInChunk : oldInWorld.entrySet()){
-			plugin.debug("Inspecting chunk");
 			HashMap<Location, Shop> inChunk = new HashMap<Location, Shop>(1);
 			
 			//Put the new chunk were the old chunk was
@@ -62,7 +60,6 @@ public class WorldListener implements Listener{
 				 * 4. Put the shops back in the new inChunk
 				 */
 
-				plugin.debug("Inspecting shop");
 				Shop shop = entry.getValue();
 				shop.getLocation().setWorld(world);
 				

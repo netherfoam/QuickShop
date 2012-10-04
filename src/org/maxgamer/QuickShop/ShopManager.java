@@ -43,7 +43,6 @@ public class ShopManager{
 	 * @return a hashmap of Chunk -> Shop
 	 */
 	public HashMap<ShopChunk, HashMap<Location, Shop>> getShops(String world){
-		plugin.debug("Getting shops in world " + world);
 		return this.shops.get(world);
 	}
 	/**
@@ -59,12 +58,10 @@ public class ShopManager{
 		HashMap<ShopChunk, HashMap<Location, Shop>> inWorld = this.getShops(world);
 		
 		if(inWorld == null){
-			plugin.debug("No world shops");
 			return null;
 		}
 		
 		ShopChunk shopChunk = new ShopChunk(world, chunkX, chunkZ);
-		plugin.debug("Getting shops in ShopChunk " + shopChunk.getX() + "," + shopChunk.getZ());
 		return inWorld.get(shopChunk);
 	}
 	
@@ -76,7 +73,6 @@ public class ShopManager{
 	public Shop getShop(Location loc){
 		HashMap<Location, Shop> inChunk = getShops(loc.getChunk());
 		if(inChunk == null){
-			plugin.debug("No shops in that chunk");
 			return null;
 		}
 		//We can do this because WorldListener updates the world reference so the world in loc is the same as world in inChunk.get(loc)
@@ -90,11 +86,9 @@ public class ShopManager{
 	 */
 	public void addShop(String world, Shop shop){
 		HashMap<ShopChunk, HashMap<Location, Shop>> inWorld = this.getShops().get(world);
-		plugin.debug("Creating shop...");
 		
 		//There's no world storage yet. We need to create that hashmap.
 		if(inWorld == null){
-			plugin.debug("Creating world storage for " + world);
 			inWorld = new HashMap<ShopChunk, HashMap<Location, Shop>>(3);
 			//Put it in the data universe
 			this.getShops().put(world, inWorld);
@@ -110,7 +104,6 @@ public class ShopManager{
 		
 		//That chunk data hasn't been created yet - Create it!
 		if(inChunk == null){
-			plugin.debug("Creating chunk storage..");
 			inChunk = new HashMap<Location, Shop>(1);
 			//Put it in the world
 			inWorld.put(shopChunk, inChunk);
@@ -126,7 +119,6 @@ public class ShopManager{
 	 * @param shop The shop to remove
 	 */
 	public void removeShop(Shop shop){
-		plugin.debug("Removing shop...");
 		Location loc = shop.getLocation();
 		String world = loc.getWorld().getName();
 		HashMap<ShopChunk, HashMap<Location, Shop>> inWorld = this.getShops().get(world);
