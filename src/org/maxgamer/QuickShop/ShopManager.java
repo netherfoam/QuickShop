@@ -171,7 +171,7 @@ public class ShopManager{
 							return;
 						}
 						
-						if(plugin.getChestNextTo(info.getLocation().getBlock()) != null){
+						if(plugin.getChestNextTo(info.getLocation().getBlock()) != null && !p.hasPermission("quickshop.create.double")){
 							p.sendMessage(plugin.getMessage("no-double-chests"));
 							return;
 						}

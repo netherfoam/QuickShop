@@ -91,7 +91,7 @@ public class ClickListener implements Listener{
 		//Get the shop
 		Shop shop = plugin.getShopManager().getShop(loc);
 		//If that wasn't a shop, search nearby shops
-		if(shop == null) shop = getShopNextTo(loc);
+		if(shop == null && b.getType() == Material.WALL_SIGN) shop = getShopNextTo(loc);
 
 		/* 
 		 * Purchase Handling
@@ -122,7 +122,7 @@ public class ClickListener implements Listener{
 				p.sendMessage(plugin.getMessage("not-allowed-to-create"));
 				return;
 			}
-			if(plugin.getChestNextTo(b) != null){
+			if(plugin.getChestNextTo(b) != null  && !p.hasPermission("quickshop.create.double")){
 				p.sendMessage(plugin.getMessage("no-double-chests"));
 				return;
 			}

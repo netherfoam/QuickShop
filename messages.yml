@@ -5,7 +5,7 @@
 not-looking-at-shop: "&cNo QuickShop found. You must be looking at one."
 no-permission: "&cYou do not have permission to do that."
 no-creative-break: "&cYou cannot break other players shops in creative mode.  Use survival instead."
-no-double-chests: "&cDouble Chest shops are disabled."
+no-double-chests: "&cYou don't have permission to create a double-chest shop."
 shop-already-owned: "&cThat is already a shop."
 chest-was-removed: "&cThat chest was removed."
 price-too-cheap: "&cPrice must be greater than &e$0.01"

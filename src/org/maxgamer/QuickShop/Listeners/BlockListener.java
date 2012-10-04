@@ -92,7 +92,7 @@ public class BlockListener implements Listener{
 		if(e.isCancelled() || e.getBlock().getType() != Material.CHEST) return;
 		Block b = e.getBlock();
 		Block chest = plugin.getChestNextTo(b);
-		if(chest != null && plugin.getShopManager().getShop(chest.getLocation()) != null){
+		if(chest != null && plugin.getShopManager().getShop(chest.getLocation()) != null && !e.getPlayer().hasPermission("quickshop.create.double")){
 			e.setCancelled(true);
 			e.getPlayer().sendMessage(plugin.getMessage("no-double-chests"));
 		}
