@@ -1,7 +1,6 @@
 package org.maxgamer.QuickShop.Shop;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
@@ -40,9 +39,7 @@ public class Info{
 		if(item != null) this.item = item.clone();
 		
 		if(shop != null){
-			this.shop = new Shop(shop.getLocation().clone(), shop.getPrice(), shop.getItem(), shop.getOwner());
-			this.shop.setShopType(shop.getShopType());
-			this.shop.setUnlimited(shop.isUnlimited());
+			this.shop = shop.clone();
 		}
 	}
 	
@@ -63,12 +60,13 @@ public class Info{
 	public Location getLocation(){
 		return this.loc;
 	}
+	/*
 	public Material getMaterial(){
 		return this.item.getType();
 	}
 	public byte getData(){
 		return this.getData();
-	}
+	}*/
 	public ItemStack getItem(){
 		return this.item;
 	}

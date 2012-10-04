@@ -31,6 +31,30 @@ public class Shop{
 	private QuickShop plugin;
 	
 	/**
+	 * Returns a clone of this shop.
+	 * References to the same display item,
+	 * itemstack, location and owner as
+	 * this shop does. Do not modify them or
+	 * you will modify this shop.
+	 */
+	public Shop clone(){
+		Shop s = new Shop();
+		s.displayItem = this.displayItem;
+		s.shopType = this.shopType;
+		s.item = this.item;
+		s.loc = this.loc;
+		s.plugin = this.plugin;
+		s.unlimited = this.unlimited;
+		s.owner = this.owner;
+		s.price = this.price;
+		return s;
+	}
+	
+	private Shop(){
+		//Nothing
+	}
+	
+	/**
 	 * Adds a new shop.
 	 * @param loc The location of the chest block
 	 * @param price The cost per item
@@ -458,7 +482,6 @@ public class Shop{
 		//Delete the display item
 		
 		if(plugin.display){
-			System.out.println("Removing A");
 			this.getDisplayItem().remove();
 		}
 		
