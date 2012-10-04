@@ -59,6 +59,7 @@ public class BlockListener implements Listener{
 				if(action != null){
 					action.setAction(ShopAction.CANCELLED);
 				}
+				System.out.println("Deleting B");
 				shop.delete();
 				p.sendMessage(plugin.getMessage("success-removed-shop"));
 			}

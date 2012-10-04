@@ -13,6 +13,7 @@ shop:
     sneak-only: false
     auto-sign: true
     pay-unlimited-shop-owners: false
+    display-items: true
 
 plugins:
     #Whether or not to hook into these plugins, and stop players claiming chests as shops when they can't use the chest.

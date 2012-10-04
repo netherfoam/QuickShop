@@ -137,11 +137,13 @@ public class ShopManager{
 	 * Call this on plugin disable ONLY.
 	 */
 	public void clear(){
-		for(HashMap<ShopChunk, HashMap<Location, Shop>> inWorld : this.getShops().values()){
-			for(HashMap<Location, Shop> inChunk : inWorld.values()){
-				for(Shop shop : inChunk.values()){
-					shop.getDisplayItem().removeDupe();
-					shop.getDisplayItem().remove();
+		if(plugin.display){
+			for(HashMap<ShopChunk, HashMap<Location, Shop>> inWorld : this.getShops().values()){
+				for(HashMap<Location, Shop> inChunk : inWorld.values()){
+					for(Shop shop : inChunk.values()){
+						shop.getDisplayItem().removeDupe();
+						shop.getDisplayItem().remove();
+					}
 				}
 			}
 		}

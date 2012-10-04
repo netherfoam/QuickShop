@@ -77,6 +77,8 @@ public class QuickShop extends JavaPlugin{
 	public boolean debug = false;
 	public HashSet<String> warnings = new HashSet<String>(10);
 	
+	public boolean display = true;
+	
 	private Database database;
 	
 	public YamlConfiguration messages;
@@ -114,38 +116,6 @@ public class QuickShop extends JavaPlugin{
 	private LogWatcher logWatcher;
 	
 	public void onEnable(){
-		getLogger().info("Hooking Vault");
-		setupEconomy();
-		
-		this.shopManager = new ShopManager(this);
-		
-		//Safe to initialize now - It accesses config!
-		this.clickListener = new ClickListener(this);
-		getLogger().info("Registering Listeners");
-		
-		if(Bukkit.getPluginManager().getPlugin("HeroChat") != null){
-			this.heroChatListener = new HeroChatListener(this);
-			Bukkit.getServer().getPluginManager().registerEvents(heroChatListener, this);
-		}
-		else{
-			this.chatListener = new ChatListener(this);
-			Bukkit.getServer().getPluginManager().registerEvents(chatListener, this);
-		}
-		//Register events
-		
-		Bukkit.getServer().getPluginManager().registerEvents(clickListener, this);
-		Bukkit.getServer().getPluginManager().registerEvents(blockListener, this);
-		Bukkit.getServer().getPluginManager().registerEvents(moveListener, this);
-		Bukkit.getServer().getPluginManager().registerEvents(chunkListener, this);
-		Bukkit.getServer().getPluginManager().registerEvents(quitListener, this);
-		Bukkit.getServer().getPluginManager().registerEvents(worldListener, this);
-		Bukkit.getServer().getPluginManager().registerEvents(joinListener, this);
-		
-		//Command handlers
-		QS commandExecutor = new QS(this);
-		getCommand("qs").setExecutor(commandExecutor);
-		getCommand("shop").setExecutor(commandExecutor);
-		
 		/* Create plugin folder */
 		if(!this.getDataFolder().exists()){
 			this.getDataFolder().mkdir();
@@ -158,9 +128,12 @@ public class QuickShop extends JavaPlugin{
 			this.saveDefaultConfig();
 		}
 		else{
+			reloadConfig(); //Reload it just in case this plugin was manually reloaded
 			getConfig().options().copyDefaults(true);
 			saveConfig();
 		}
+		
+		this.display = getConfig().getBoolean("shop.display-items");
 		
 		File messageFile = new File(this.getDataFolder(), "messages.yml");
 		if(!messageFile.exists()){
@@ -181,6 +154,42 @@ public class QuickShop extends JavaPlugin{
 			this.getLogger().severe("Messages.yml not found inside plugin! This will cause errors! Update!");
 		}
 		parseColours(this.messages);
+		
+		getLogger().info("Hooking Vault");
+		if(!setupEconomy()) getLogger().severe("Couldn't load vault!!! Errors will ensue!");
+		
+		this.shopManager = new ShopManager(this);
+		
+		//Safe to initialize now - It accesses config!
+		this.clickListener = new ClickListener(this);
+		getLogger().info("Registering Listeners");
+		
+		if(Bukkit.getPluginManager().getPlugin("HeroChat") != null){
+			this.heroChatListener = new HeroChatListener(this);
+			Bukkit.getServer().getPluginManager().registerEvents(heroChatListener, this);
+		}
+		else{
+			this.chatListener = new ChatListener(this);
+			Bukkit.getServer().getPluginManager().registerEvents(chatListener, this);
+		}
+		//Register events
+		
+		Bukkit.getServer().getPluginManager().registerEvents(clickListener, this);
+		Bukkit.getServer().getPluginManager().registerEvents(blockListener, this);
+		Bukkit.getServer().getPluginManager().registerEvents(moveListener, this);
+		
+		if(this.display){
+			Bukkit.getServer().getPluginManager().registerEvents(chunkListener, this);
+		}
+		Bukkit.getServer().getPluginManager().registerEvents(quitListener, this);
+		Bukkit.getServer().getPluginManager().registerEvents(worldListener, this);
+		Bukkit.getServer().getPluginManager().registerEvents(joinListener, this);
+		
+		//Command handlers
+		QS commandExecutor = new QS(this);
+		getCommand("qs").setExecutor(commandExecutor);
+		getCommand("shop").setExecutor(commandExecutor);
+		
 		/* Hook into other plugins */
 		Plugin plug;
 		
@@ -303,14 +312,20 @@ public class QuickShop extends JavaPlugin{
 			getLogger().severe("Could not load shops.");
 		}
 		getLogger().info("Loaded "+count+" shops.");
-		/**
-		 * Display item handler thread
-		 */
-		getLogger().info("Starting item scheduler");
-		ItemWatcher itemWatcher = new ItemWatcher(this);
-		itemWatcherID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, itemWatcher, 150, 150);
+		
+		if(this.display){
+			/**
+			 * Display item handler thread
+			 */
+			getLogger().info("Starting item scheduler");
+			ItemWatcher itemWatcher = new ItemWatcher(this);
+			itemWatcherID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, itemWatcher, 150, 150);
+		}
 		
 		if(this.getConfig().getBoolean("log-actions")){
+			/**
+			 * Logging handler
+			 */
 			this.logWatcher = new LogWatcher(this, new File(this.getDataFolder(), "qs.log"));
 			logWatcher.taskId = Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, this.logWatcher, 150, 150);
 		}
@@ -319,7 +334,9 @@ public class QuickShop extends JavaPlugin{
 		this.lock = this.getConfig().getBoolean("shop.lock");
 	}
 	public void onDisable(){
-		Bukkit.getScheduler().cancelTask(itemWatcherID);
+		if(this.display){
+			Bukkit.getScheduler().cancelTask(itemWatcherID);
+		}
 		if(logWatcher != null){
 			Bukkit.getScheduler().cancelTask(logWatcher.taskId);
 			logWatcher.close(); //Closes the file

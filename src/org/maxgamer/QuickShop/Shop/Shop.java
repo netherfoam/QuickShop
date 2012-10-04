@@ -45,8 +45,9 @@ public class Shop{
 		this.plugin = (QuickShop) Bukkit.getPluginManager().getPlugin("QuickShop");
 		this.item.setAmount(1);
 		
-		//TODO: Check enabled display items
-		this.displayItem = new DisplayItem(this, this.item);
+		if(plugin.display){
+			this.displayItem = new DisplayItem(this, this.item);
+		}
 		
 		this.shopType = ShopType.SELLING;
 	}
@@ -455,8 +456,11 @@ public class Shop{
 	 */
 	public void delete(boolean fromMemory){
 		//Delete the display item
-		//TODO: Check display items are enabled
-		this.getDisplayItem().remove();
+		
+		if(plugin.display){
+			System.out.println("Removing A");
+			this.getDisplayItem().remove();
+		}
 		
 		//Delete the signs around it
 		Block[] blocks = new Block[4];

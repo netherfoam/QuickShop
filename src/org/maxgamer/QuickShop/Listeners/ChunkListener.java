@@ -22,7 +22,6 @@ public class ChunkListener implements Listener{
 	}
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onChunkLoad(ChunkLoadEvent e){
-		//Testing
 		Chunk c = e.getChunk();
 		if(plugin.getShopManager().getShops() == null) return;
 		
@@ -31,7 +30,6 @@ public class ChunkListener implements Listener{
 		if(inChunk == null) return;
 		
 		for(Shop shop : inChunk.values()){
-			//TODO: Check display items are enabled
 			DisplayItem disItem = shop.getDisplayItem();
 			disItem.removeDupe();
 			disItem.remove();
@@ -46,7 +44,6 @@ public class ChunkListener implements Listener{
 		HashMap<Location, Shop> inChunk = plugin.getShopManager().getShops(c);
 		
 		if(inChunk == null) return;
-		//TODO: Check display items are enabled
 		for(Shop shop : inChunk.values()){
 			DisplayItem disItem = shop.getDisplayItem();
 			disItem.removeDupe();

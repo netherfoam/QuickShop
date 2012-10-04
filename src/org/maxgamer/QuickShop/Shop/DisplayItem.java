@@ -86,7 +86,9 @@ public class DisplayItem{
 	 * Removes the display item.
 	 */
 	public void remove(){
+		System.out.println("Removing C");
 		if(this.item == null) return;
+		System.out.println("Removing D");
 		this.item.remove();
 	}
 	

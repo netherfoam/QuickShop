@@ -40,7 +40,7 @@ public class Info{
 		if(item != null) this.item = item.clone();
 		
 		if(shop != null){
-			this.shop = new Shop(shop.getLocation().clone(), shop.getPrice(), shop.getItem().clone(), shop.getOwner());
+			this.shop = new Shop(shop.getLocation().clone(), shop.getPrice(), shop.getItem(), shop.getOwner());
 			this.shop.setShopType(shop.getShopType());
 			this.shop.setUnlimited(shop.isUnlimited());
 		}

@@ -63,10 +63,11 @@ public class WorldListener implements Listener{
 				Shop shop = entry.getValue();
 				shop.getLocation().setWorld(world);
 				
-				//TODO: Check display items are enabled
-				shop.getDisplayItem().getDisplayLocation().setWorld(world);
-				if(shop.getDisplayItem().getItem() != null){
-					shop.getDisplayItem().getItem().getLocation().setWorld(world);
+				if(plugin.display){
+					shop.getDisplayItem().getDisplayLocation().setWorld(world);
+					if(shop.getDisplayItem().getItem() != null){
+						shop.getDisplayItem().getItem().getLocation().setWorld(world);
+					}
 				}
 				
 				inChunk.put(shop.getLocation(), shop);
