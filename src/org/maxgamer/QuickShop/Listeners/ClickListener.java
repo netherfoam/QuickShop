@@ -103,7 +103,15 @@ public class ClickListener implements Listener{
 				p.sendMessage(plugin.getMessage("how-many-buy"));
 			}
 			else{
-				p.sendMessage(plugin.getMessage("how-many-sell"));
+				int items = 0;
+				for(ItemStack iStack : p.getInventory().getContents()){
+					if(iStack == null) continue;
+					if(shop.matches(iStack)){
+						items += iStack.getAmount();
+					}
+				}
+				
+				p.sendMessage(plugin.getMessage("how-many-sell", ""+items));
 			}
 			
 			//Add the new action
