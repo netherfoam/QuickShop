@@ -190,7 +190,7 @@ public class ShopManager{
 						double tax = plugin.getConfig().getDouble("shop.cost"); 
 						
 						if(tax != 0 && plugin.getEcon().getBalance(p.getName()) <= tax){
-							p.sendMessage(plugin.getMessage("you-cant-afford-a-new-shop", plugin.getEcon().format(tax)));
+							p.sendMessage(plugin.getMessage("you-cant-afford-a-new-shop", plugin.format(tax)));
 							return;
 						}
 						
@@ -381,7 +381,7 @@ public class ShopManager{
 							if(!shop.isUnlimited() || plugin.getConfig().getBoolean("shop.pay-unlimited-shop-owners")){
 								//Tries to check their balance nicely to see if they can afford it.
 								if(!plugin.getEcon().has(shop.getOwner(), amount * shop.getPrice())){
-									p.sendMessage(plugin.getMessage("the-owner-cant-afford-to-buy-from-you", plugin.getEcon().format(amount * shop.getPrice()), plugin.getEcon().format(plugin.getEcon().getBalance(shop.getOwner()))));
+									p.sendMessage(plugin.getMessage("the-owner-cant-afford-to-buy-from-you", plugin.format(amount * shop.getPrice()), plugin.format(plugin.getEcon().getBalance(shop.getOwner()))));
 									return;
 								}
 								
@@ -389,7 +389,7 @@ public class ShopManager{
 								
 								//Check for plugins faking econ.has(amount)
 								if(!r.transactionSuccess()){
-									p.sendMessage(plugin.getMessage("the-owner-cant-afford-to-buy-from-you", plugin.getEcon().format(amount * shop.getPrice()), plugin.getEcon().format(plugin.getEcon().getBalance(shop.getOwner()))));
+									p.sendMessage(plugin.getMessage("the-owner-cant-afford-to-buy-from-you", plugin.format(amount * shop.getPrice()), plugin.format(plugin.getEcon().getBalance(shop.getOwner()))));
 									return;
 								}
 								
@@ -434,7 +434,7 @@ public class ShopManager{
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.successful-purchase"));
 		
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), plugin.getEcon().format((amount * shop.getPrice()))));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), plugin.format((amount * shop.getPrice()))));
 		
 
 		Map<Enchantment, Integer> enchs = shop.getEnchants();
@@ -450,7 +450,7 @@ public class ShopManager{
 	private void sendSellSuccess(Player p, Shop shop, int amount){
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.successfully-sold"));
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), plugin.getEcon().format((amount * shop.getPrice()))));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), plugin.format((amount * shop.getPrice()))));
 
 		Map<Enchantment, Integer> enchs = shop.getEnchants();
 		if(enchs != null && enchs.size() > 0){

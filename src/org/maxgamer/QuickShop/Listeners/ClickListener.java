@@ -197,11 +197,11 @@ public class ClickListener implements Listener{
 			//}
 		}
 		
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.price-per", plugin.getDataName(shop.getMaterial(), shop.getDurability()), plugin.getEcon().format(shop.getPrice())));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.price-per", plugin.getDataName(shop.getMaterial(), shop.getDurability()), plugin.format(shop.getPrice())));
 		
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("average-price-nearby", plugin.getEcon().format(shop.getAverage(48))));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("average-price-nearby", plugin.format(shop.getAverage(48))));
 		
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.total-value-of-chest", plugin.getEcon().format(shop.getPrice() * stock)));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.total-value-of-chest", plugin.format(shop.getPrice() * stock)));
 		
 		
 		

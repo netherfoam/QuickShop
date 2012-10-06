@@ -956,4 +956,8 @@ public class QuickShop extends JavaPlugin{
 	public void deleteMessages(String player){
 		getDB().writeToBuffer("DELETE FROM messages WHERE owner = '"+player.toLowerCase()+"'");
 	}
+	
+	public String format(double n){
+		return this.economy.format(n);
+	}
 }
