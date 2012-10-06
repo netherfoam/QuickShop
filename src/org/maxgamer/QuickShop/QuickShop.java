@@ -1,6 +1,7 @@
 package org.maxgamer.QuickShop;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -112,6 +113,8 @@ public class QuickShop extends JavaPlugin{
 	private int itemWatcherID;
 	public boolean lock;
 	public boolean sneak;
+	
+	private Metrics metrics;
 	
 	private LogWatcher logWatcher;
 	
@@ -332,6 +335,16 @@ public class QuickShop extends JavaPlugin{
 		QS commandExecutor = new QS(this);
 		getCommand("qs").setExecutor(commandExecutor);
 		getCommand("shop").setExecutor(commandExecutor);
+		
+		try{
+			this.metrics = new Metrics(this);
+			if(this.metrics.start()){
+				getLogger().info("Metrics started.");
+			}
+		}
+		catch(IOException e){
+			getLogger().info("Could not start metrics.");
+		}
 	}
 	public void onDisable(){
 		if(this.display){
