@@ -705,7 +705,7 @@ public class QuickShop extends JavaPlugin{
 			case 0: return "OAK_SAPLING";
 			case 1: return "PINE_SAPLING";
 			case 2: return "BIRCH_SAPLING";
-			case 3: return "JUNGLE_TREE_SPALING";
+			case 3: return "JUNGLE_TREE_SAPLING";
 			}
 			return mat.toString();
 		
