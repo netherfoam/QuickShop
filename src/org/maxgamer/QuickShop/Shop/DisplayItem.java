@@ -1,11 +1,13 @@
 package org.maxgamer.QuickShop.Shop;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.maxgamer.QuickShop.QuickShop;
 
 /**
  * @author Netherfoam
@@ -61,7 +63,7 @@ public class DisplayItem{
 	 */
 	public void removeDupe(){
 		if(shop.getLocation().getWorld() == null) return;
-		
+		QuickShop qs = (QuickShop) Bukkit.getPluginManager().getPlugin("QuickShop");
 		Location displayLoc = shop.getLocation().getBlock().getRelative(0, 1, 0).getLocation();
 		
 		Chunk c = displayLoc.getChunk();
@@ -77,6 +79,7 @@ public class DisplayItem{
 						(this.item == null || near.getAmount() == iStack.getAmount()) &&
 						near.getDurability() == iStack.getDurability()){
 					e.remove();
+					qs.log("[Debug] Removed dupe @" + ((Item) e).getItemStack().getType());
 				}
 			}
 		}

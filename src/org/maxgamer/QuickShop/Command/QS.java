@@ -15,6 +15,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.util.BlockIterator;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Shop.Shop;
@@ -72,6 +73,50 @@ public class QS implements CommandExecutor{
 						}
 					}
 					sender.sendMessage(plugin.getMessage("not-looking-at-shop"));
+					return true;
+				}
+				else{
+					sender.sendMessage(plugin.getMessage("no-permission"));
+					return true;
+				}
+			}
+			else if(subArg.equals("find")){
+				if(sender instanceof Player && sender.hasPermission("quickshop.find")){
+					if(args.length < 2){
+						sender.sendMessage(plugin.getMessage("command.no-type-given"));
+						return true;
+					}
+					String lookFor = args[1].toUpperCase();
+					Player p = (Player) sender;
+					Location loc = p.getLocation().clone().add(0, 1.62, 0);
+					
+					double minDistanceSquared = 10000;
+					Shop closest = null;
+					
+					Chunk c = loc.getChunk();
+					
+					for(int x = -2 + c.getX(); x < 3 + c.getX(); x++){
+						for(int z = -2 + c.getZ(); z < 3 + c.getZ(); z++){
+							Chunk d = c.getWorld().getChunkAt(x, z);
+							HashMap<Location, Shop> inChunk = plugin.getShopManager().getShops(d);
+							if(inChunk == null) continue;
+							for(Shop shop : inChunk.values()){
+								if(shop.getItem().getType().toString().startsWith(lookFor) && shop.getLocation().distanceSquared(loc) < minDistanceSquared){
+									closest = shop;
+									minDistanceSquared = shop.getLocation().distanceSquared(loc);
+								}
+							}
+						}
+					}
+					if(closest == null){
+						sender.sendMessage(plugin.getMessage("no-nearby-shop", args[1]));
+						return true;
+					}
+					Location lookat = closest.getLocation().clone().add(0.5, 0.5, 0.5);
+					
+					p.teleport(this.lookAt(loc, lookat).add(0, -1.62, 0), TeleportCause.COMMAND);
+					p.sendMessage(plugin.getMessage("nearby-shop-this-way", ""+(int) Math.floor(Math.sqrt(minDistanceSquared))));
+					
 					return true;
 				}
 				else{
@@ -220,6 +265,49 @@ public class QS implements CommandExecutor{
 		return true;
 	}
 	
+	/**
+	 * Returns loc with modified pitch/yaw angles so it faces lookat
+	 * @param loc The location a players head is
+	 * @param lookat The location they should be looking
+	 * @return The location the player should be facing to have their crosshairs on the location lookAt
+	 * Kudos to bergerkiller for most of this function
+	 */
+	public Location lookAt(Location loc, Location lookat) {
+        //Clone the loc to prevent applied changes to the input loc
+        loc = loc.clone();
+
+        // Values of change in distance (make it relative)
+        double dx = lookat.getX() - loc.getX();
+        double dy = lookat.getY() - loc.getY();
+        double dz = lookat.getZ() - loc.getZ();
+
+        // Set yaw
+        if (dx != 0) {
+            // Set yaw start value based on dx
+            if (dx < 0) {
+                loc.setYaw((float) (1.5 * Math.PI));
+            } else {
+                loc.setYaw((float) (0.5 * Math.PI));
+            }
+            loc.setYaw((float) loc.getYaw() - (float) Math.atan(dz / dx));
+        } else if (dz < 0) {
+            loc.setYaw((float) Math.PI);
+        }
+
+        // Get the distance from dx/dz
+        double dxz = Math.sqrt(Math.pow(dx, 2) + Math.pow(dz, 2));
+
+        float pitch = (float) -Math.atan(dy/dxz);
+
+        // Set values, convert to degrees
+        // Minecraft yaw (vertical) angles are inverted (negative)
+        loc.setYaw(-loc.getYaw() * 180f / (float) Math.PI + 360);
+        // But pitch angles are normal
+        loc.setPitch(pitch * 180f / (float) Math.PI);
+        
+        return loc;
+    }
+	
 	public void sendHelp(CommandSender s){
 		s.sendMessage(plugin.getMessage("command.description.title"));
 		if(s.hasPermission("quickshop.unlimited")) s.sendMessage(ChatColor.GREEN + "/qs unlimited" + ChatColor.YELLOW + " - "+plugin.getMessage("command.description.unlimited"));
@@ -228,6 +316,7 @@ public class QS implements CommandExecutor{
 		if(s.hasPermission("quickshop.create.sell")) s.sendMessage(ChatColor.GREEN + "/qs sell" + ChatColor.YELLOW + " - "+plugin.getMessage("command.description.sell"));
 		if(s.hasPermission("quickshop.create.changeprice")) s.sendMessage(ChatColor.GREEN + "/qs price" + ChatColor.YELLOW + " - "+plugin.getMessage("command.description.price"));
 		if(s.hasPermission("quickshop.clean")) s.sendMessage(ChatColor.GREEN + "/qs clean" + ChatColor.YELLOW + " - "+plugin.getMessage("command.description.clean"));
+		if(s.hasPermission("quickshop.find")) s.sendMessage(ChatColor.GREEN + "/qs find <item>" + ChatColor.YELLOW + " - "+plugin.getMessage("command.description.find"));
 		
 	}
 }
