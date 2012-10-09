@@ -1,5 +1,5 @@
 name: QuickShop
-version: 2.2
+version: 2.3
 main: org.maxgamer.QuickShop.QuickShop
 author: Netherfoam
 
@@ -33,3 +33,5 @@ permissions:
         description: Allows a Staff Member to open someone elses shop if they are locked in the config
     quickshop.setowner:
         description: Allows a Staff Member to change the owner of any shop
+    quickshop.find:
+        description: Allows a player to locate the nearest shop of a specific item type. Works in a 3 chunk radius.
