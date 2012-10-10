@@ -48,7 +48,9 @@ public class ItemWatcher implements Runnable{
 					}
 					else if(/*disItem != null && */(disItem.getItem() == null || disItem.getItem().getTicksLived() >= 5000 || disItem.getItem().isDead())){
 						//Needs respawning (its about to despawn)
-						disItem.removeDupe();
+						if(disItem.removeDupe()){
+							plugin.log("[Debug] Item watcher was forced to remove that!");
+						}
 						disItem.respawn();
 					}
 					else if(disItem.getDisplayLocation().distanceSquared(disItem.getItem().getLocation()) > 1){
