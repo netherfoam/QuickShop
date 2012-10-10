@@ -101,7 +101,7 @@ public class QS implements CommandExecutor{
 							HashMap<Location, Shop> inChunk = plugin.getShopManager().getShops(d);
 							if(inChunk == null) continue;
 							for(Shop shop : inChunk.values()){
-								if(shop.getItem().getType().toString().startsWith(lookFor) && shop.getLocation().distanceSquared(loc) < minDistanceSquared){
+								if(shop.getDataName().startsWith(lookFor) && shop.getLocation().distanceSquared(loc) < minDistanceSquared){
 									closest = shop;
 									minDistanceSquared = shop.getLocation().distanceSquared(loc);
 								}
