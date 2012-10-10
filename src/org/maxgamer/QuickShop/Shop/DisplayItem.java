@@ -61,28 +61,29 @@ public class DisplayItem{
 	 * Removes all items floating ontop of the chest
 	 * that aren't the display item.
 	 */
-	public void removeDupe(){
-		if(shop.getLocation().getWorld() == null) return;
+	public boolean removeDupe(){
+		if(shop.getLocation().getWorld() == null) return false;
 		QuickShop qs = (QuickShop) Bukkit.getPluginManager().getPlugin("QuickShop");
 		Location displayLoc = shop.getLocation().getBlock().getRelative(0, 1, 0).getLocation();
 		
+		boolean removed = false;
+		
 		Chunk c = displayLoc.getChunk();
 		for (Entity e : c.getEntities()) {
+			if(!(e instanceof Item)) continue;
+			if(this.item != null && e.getEntityId() == this.item.getEntityId()) continue;
 			Location eLoc = e.getLocation().getBlock().getLocation();
-			if(e != null 
-					&& (this.item == null || e.getEntityId() != this.item.getEntityId()) 
-					&& (eLoc.equals(displayLoc) || eLoc.equals(shop.getLocation())) 
-					&& e instanceof Item) {
+			
+			if(eLoc.equals(displayLoc)) {
 				ItemStack near = ((Item) e).getItemStack();
-				
-				if(near.getType() == iStack.getType() && 
-						(this.item == null || near.getAmount() == iStack.getAmount()) &&
-						near.getDurability() == iStack.getDurability()){
+				if(!this.shop.matches(near)){
 					e.remove();
-					qs.log("[Debug] Removed dupe @" + ((Item) e).getItemStack().getType());
+					qs.log("[Debug] Removed dupe @" + near.getType());
+					removed = true;
 				}
 			}
 		}
+		return removed;
 	}
 	
 	/**
