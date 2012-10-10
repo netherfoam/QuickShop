@@ -90,13 +90,16 @@ public class QS implements CommandExecutor{
 					Player p = (Player) sender;
 					Location loc = p.getLocation().clone().add(0, 1.62, 0);
 					
-					double minDistanceSquared = 10000;
+					//double minDistanceSquared = plugin.getConfig().getInt("shop.find-distance") * plugin.getConfig().getInt("shop-find);
+					double minDistance = plugin.getConfig().getInt("shop.find-distance");
+					double minDistanceSquared = minDistance * minDistance;
+					int chunkRadius = (int) minDistance/16 + 1;
 					Shop closest = null;
 					
 					Chunk c = loc.getChunk();
 					
-					for(int x = -2 + c.getX(); x < 3 + c.getX(); x++){
-						for(int z = -2 + c.getZ(); z < 3 + c.getZ(); z++){
+					for(int x = -chunkRadius + c.getX(); x < chunkRadius + c.getX(); x++){
+						for(int z = -chunkRadius + c.getZ(); z < chunkRadius + c.getZ(); z++){
 							Chunk d = c.getWorld().getChunkAt(x, z);
 							HashMap<Location, Shop> inChunk = plugin.getShopManager().getShops(d);
 							if(inChunk == null) continue;
@@ -108,6 +111,7 @@ public class QS implements CommandExecutor{
 							}
 						}
 					}
+					sender.sendMessage("ChunkRad: " + chunkRadius);
 					if(closest == null){
 						sender.sendMessage(plugin.getMessage("no-nearby-shop", args[1]));
 						return true;

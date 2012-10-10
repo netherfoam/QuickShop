@@ -336,6 +336,10 @@ public class QuickShop extends JavaPlugin{
 		getCommand("qs").setExecutor(commandExecutor);
 		getCommand("shop").setExecutor(commandExecutor);
 		
+		if(getConfig().getInt("shop.find-distance") > 100){
+			getLogger().severe("Shop.find-distance is TOO HIGH! This will cause you LAG! Pick a number under 100 or don't whinge.");
+		}
+		
 		try{
 			this.metrics = new Metrics(this);
 			if(this.metrics.start()){
