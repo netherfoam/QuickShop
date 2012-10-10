@@ -104,14 +104,13 @@ public class QS implements CommandExecutor{
 							HashMap<Location, Shop> inChunk = plugin.getShopManager().getShops(d);
 							if(inChunk == null) continue;
 							for(Shop shop : inChunk.values()){
-								if(shop.getDataName().startsWith(lookFor) && shop.getLocation().distanceSquared(loc) < minDistanceSquared){
+								if(shop.getDataName().contains(lookFor) && shop.getLocation().distanceSquared(loc) < minDistanceSquared){
 									closest = shop;
 									minDistanceSquared = shop.getLocation().distanceSquared(loc);
 								}
 							}
 						}
 					}
-					sender.sendMessage("ChunkRad: " + chunkRadius);
 					if(closest == null){
 						sender.sendMessage(plugin.getMessage("no-nearby-shop", args[1]));
 						return true;
