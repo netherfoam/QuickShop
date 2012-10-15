@@ -186,6 +186,11 @@ public class QS implements CommandExecutor{
 						return true;
 					}
 					
+					if(price < 0.10){
+						sender.sendMessage(plugin.getMessage("price-too-cheap"));
+						return true;
+					}
+					
 					BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
 					//Loop through every block they're looking at upto 10 blocks away
 					while(bIt.hasNext()){
