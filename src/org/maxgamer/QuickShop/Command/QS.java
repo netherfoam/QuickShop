@@ -186,7 +186,7 @@ public class QS implements CommandExecutor{
 						return true;
 					}
 					
-					if(price < 0.10){
+					if(price < 0.01){
 						sender.sendMessage(plugin.getMessage("price-too-cheap"));
 						return true;
 					}
