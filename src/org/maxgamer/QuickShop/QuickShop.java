@@ -313,6 +313,7 @@ public class QuickShop extends JavaPlugin{
 		//Safe to initialize now - It accesses config!
 		this.clickListener = new ClickListener(this);
 		if(Bukkit.getPluginManager().getPlugin("Herochat") != null){
+			this.getLogger().info("Found Herochat... Hooking!");
 			this.heroChatListener = new HeroChatListener(this);
 			Bukkit.getServer().getPluginManager().registerEvents(heroChatListener, this);
 		}
