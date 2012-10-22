@@ -1,5 +1,6 @@
 package org.maxgamer.QuickShop.Shop;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -264,7 +265,8 @@ public class Shop{
 	public void sell(Player p, ItemStack item, int amount){
 		if(amount < 0) this.buy(p, item, -amount);
 		//Items to drop on floor
-		HashMap<Integer, ItemStack> floor = new HashMap<Integer, ItemStack>(30);
+		ArrayList<ItemStack> floor = new ArrayList<ItemStack>(5);
+		
 		//We do NOT want to modify this
 		ItemStack transfer = item.clone();
 		
@@ -283,7 +285,7 @@ public class Shop{
 			//Give the player the items.
 			//Store the leftover items they didn't have room for
 			//Clone because otherwise we just fiddle with the same stack over and over
-			floor.putAll(p.getInventory().addItem(transfer.clone()));
+			floor.addAll(p.getInventory().addItem(transfer.clone()).values());
 			amount -= stackSize;
 		}
 		
