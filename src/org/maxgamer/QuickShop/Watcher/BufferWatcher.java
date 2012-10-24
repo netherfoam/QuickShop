@@ -14,6 +14,7 @@ import org.maxgamer.QuickShop.Database.Database;
  */
 public class BufferWatcher implements Runnable{
 	public void run(){
+		//TODO: Can this be optimised as an argument?
 		QuickShop plugin = (QuickShop) Bukkit.getPluginManager().getPlugin("QuickShop");
 		
 		Database db = plugin.getDB();
@@ -30,6 +31,9 @@ public class BufferWatcher implements Runnable{
 				st.addBatch(q);
 			}
 			plugin.getDB().queries.clear();
+			
+			db.bufferWatcherID = 0;
+			
 			plugin.getDB().queriesInUse = false;
 			
 			st.executeBatch();
@@ -38,6 +42,7 @@ public class BufferWatcher implements Runnable{
 		} catch (SQLException e) {
 			e.printStackTrace();
 			plugin.getLogger().severe("Could not execute query");
+			db.bufferWatcherID = 0;
 		}
 	}
 }

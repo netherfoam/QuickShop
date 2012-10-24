@@ -20,7 +20,7 @@ public class Database{
 	File file;
 	public List<String> queries = new ArrayList<String>(5);
 	public boolean queriesInUse = false;
-	private int bufferWatcherID;
+	public int bufferWatcherID;
 	
 	/**
 	 * Creates a new database handler.
@@ -34,7 +34,11 @@ public class Database{
 		/**
 		 * Database query handler thread
 		 */
-		bufferWatcherID = Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, new BufferWatcher(), 300, 300);
+		startBufferWatcher();
+	}
+	
+	public void startBufferWatcher(){
+		this.bufferWatcherID = Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, new BufferWatcher(), 300);
 	}
 	/**
 	 * Returns a new connection to execute SQL statements on.
@@ -107,19 +111,21 @@ public class Database{
 	 * @param s The String to write to the buffer (In SQL syntax... E.g. UPDATE table SET x = 'y', owner = 'bob'
 	 */
 	public void writeToBuffer(final String s){
+		final Database db = this;
 		Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable(){
-			
 			@Override
 			public void run() {
-				QuickShop plugin = (QuickShop) Bukkit.getPluginManager().getPlugin("QuickShop");
-				
-				while(plugin.getDB().queriesInUse){
+				while(db.queriesInUse){
 					//Wait
 				}
 				
-				plugin.getDB().queriesInUse = true;
-				plugin.getDB().queries.add(s);
-				plugin.getDB().queriesInUse = false;
+				db.queriesInUse = true;
+				db.queries.add(s);
+				db.queriesInUse = false;
+
+				if(db.bufferWatcherID == 0){
+					db.startBufferWatcher();
+				}
 			}
 			
 		}, 0);
