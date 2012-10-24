@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockIterator;
 import org.maxgamer.QuickShop.QuickShop;
+import org.maxgamer.QuickShop.Util;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.ShopAction;
@@ -156,7 +157,7 @@ public class ClickListener implements Listener{
 			//Send creation menu.
 			Info info = new Info(b.getLocation(), ShopAction.CREATE, e.getItem(), last);
 			plugin.getActions().put(p.getName(), info);
-			p.sendMessage(plugin.getMessage("how-much-to-trade-for", plugin.getDataName(info.getItem().getType(), info.getItem().getDurability())));
+			p.sendMessage(plugin.getMessage("how-much-to-trade-for", Util.getDataName(info.getItem().getType(), info.getItem().getDurability())));
 		}
 	}
 	
@@ -172,10 +173,10 @@ public class ClickListener implements Listener{
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.shop-information"));
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.owner", shop.getOwner()));
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.item", plugin.getDataName(items.getType(), items.getDurability())));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.item", Util.getDataName(items.getType(), items.getDurability())));
 		
-		if(plugin.isTool(items.getType())){
-			p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.damage-percent-remaining", plugin.getToolPercentage(items)));
+		if(Util.isTool(items.getType())){
+			p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.damage-percent-remaining", Util.getToolPercentage(items)));
 		}
 		
 		if(shop.isSelling()){
@@ -197,7 +198,7 @@ public class ClickListener implements Listener{
 			//}
 		}
 		
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.price-per", plugin.getDataName(shop.getMaterial(), shop.getDurability()), plugin.format(shop.getPrice())));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.price-per", Util.getDataName(shop.getMaterial(), shop.getDurability()), plugin.format(shop.getPrice())));
 		
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("average-price-nearby", plugin.format(shop.getAverage(48))));
 		

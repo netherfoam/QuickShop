@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.maxgamer.QuickShop.QuickShop;
+import org.maxgamer.QuickShop.Util;
 
 public class Shop{
 	private Location loc;
@@ -171,10 +172,10 @@ public class Shop{
 
 		String q = "";
 		if(isNew){
-			q = "INSERT INTO shops VALUES ('"+this.getOwner()+"', '"+this.getPrice()+"', '"+plugin.makeString(this.item)+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"', '"+unlimited+"', '"+ShopType.toID(this.shopType)+"')";
+			q = "INSERT INTO shops VALUES ('"+this.getOwner()+"', '"+this.getPrice()+"', '"+Util.makeString(this.item)+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"', '"+unlimited+"', '"+ShopType.toID(this.shopType)+"')";
 		}
 		else{
-			q = "UPDATE shops SET owner = '"+this.getOwner()+"', itemString = '"+plugin.makeString(this.item)+"', unlimited = '"+unlimited+"', type = '"+ShopType.toID(this.shopType)+"', price = '"+this.price+"' WHERE x = '"+x+"' AND y = '"+y+"' AND z = '"+z+"' AND world = '"+world+"'";  
+			q = "UPDATE shops SET owner = '"+this.getOwner()+"', itemString = '"+Util.makeString(this.item)+"', unlimited = '"+unlimited+"', type = '"+ShopType.toID(this.shopType)+"', price = '"+this.price+"' WHERE x = '"+x+"' AND y = '"+y+"' AND z = '"+z+"' AND world = '"+world+"'";  
 		}
 		
 		plugin.getDB().writeToBuffer(q);
@@ -401,7 +402,7 @@ public class Shop{
 		if(this.isSelling()){
 			lines[1] = plugin.getMessage("signs.selling");
 		}
-		lines[2] = plugin.getDataName(this.getMaterial(), this.getDurability());
+		lines[2] = Util.getDataName(this.getMaterial(), this.getDurability());
 		lines[3] = plugin.getMessage("signs.price", ""+this.getPrice());
 		this.setSignText(lines);
 	}
@@ -463,7 +464,7 @@ public class Shop{
 	}
 	
 	public String getDataName(){
-		return plugin.getDataName(this.getMaterial(), this.getDurability());
+		return Util.getDataName(this.getMaterial(), this.getDurability());
 	}
 	
 	/**
