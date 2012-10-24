@@ -11,7 +11,6 @@ import java.util.List;
 import org.maxgamer.QuickShop.QuickShop;
 
 public class LogWatcher implements Runnable{
-	private QuickShop plugin;
 	private PrintStream ps;
 	public int taskId = 0;
 	
@@ -19,7 +18,6 @@ public class LogWatcher implements Runnable{
 	private boolean lock = false;
 	
 	public LogWatcher(QuickShop plugin, File log){
-		this.plugin = plugin;
 		try {
 			if(!log.exists()){
 				log.createNewFile();
