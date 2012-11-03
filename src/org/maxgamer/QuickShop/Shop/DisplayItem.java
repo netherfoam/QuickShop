@@ -44,8 +44,10 @@ public class DisplayItem{
 	public void spawn(){
 		if(shop.getLocation().getWorld() == null) return;
 		
-		this.item = shop.getLocation().getWorld().dropItem(this.getDisplayLocation(), this.iStack);
-		this.item.setVelocity(new Vector(0, 0.01, 0));
+		Location dispLoc = this.getDisplayLocation();
+		this.item = shop.getLocation().getWorld().dropItem(dispLoc, this.iStack);
+		this.item.setVelocity(new Vector(0, 0.1, 0));
+		this.item.teleport(dispLoc);
 		this.item.setPickupDelay(Integer.MAX_VALUE);  
 	}
 	

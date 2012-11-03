@@ -260,37 +260,53 @@ public class Shop{
 	/**
 	 * Sells amount of item to Player p.  Does NOT check our inventory, or balances
 	 * @param p The player to sell to
-	 * @param item The itemStack to sell
 	 * @param amount The amount to sell
 	 */
-	public void sell(Player p, ItemStack item, int amount){
-		if(amount < 0) this.buy(p, item, -amount);
+	public void sell(Player p, int amount){
+		if(amount < 0) this.buy(p, -amount);
 		//Items to drop on floor
 		ArrayList<ItemStack> floor = new ArrayList<ItemStack>(5);
-		
-		//We do NOT want to modify this
-		ItemStack transfer = item.clone();
-		
-		if(!this.isUnlimited()){
-			this.remove(transfer, amount);
+		Inventory pInv = p.getInventory();
+		if(this.isUnlimited()){
+			ItemStack item = this.item.clone();
+			
+			while(amount > 0){
+				int stackSize = Math.min(amount, this.item.getMaxStackSize());
+				item.setAmount(stackSize);
+				pInv.addItem(item);
+			}
 		}
-		
-		while(amount > 0){
-			int stackSize = Math.min(amount, transfer.getMaxStackSize());
-			if(stackSize == -1){
-				stackSize = amount;
+		else{
+			ItemStack[] chestContents = this.getChest().getInventory().getContents();
+			for(int i = 0; amount > 0 && i < chestContents.length; i++){
+				//Can't clone it here, it could be null
+				ItemStack item = chestContents[i];
+				
+				if(item != null && this.matches(item)){
+					//Copy it, we don't want to interfere
+					item = item.clone();
+					
+					//Amount = total, item.getAmount() = how many items in the stack
+					int stackSize = Math.min(amount, item.getAmount());
+					
+					//If Amount is item.getAmount(), then this sets the amount to 0
+					//Else it sets it to the remainder
+					chestContents[i].setAmount(chestContents[i].getAmount() - stackSize);
+					
+					//We can modify this, it is a copy.
+					item.setAmount(stackSize);
+					
+					//Add the items to the players inventory
+					floor.addAll(pInv.addItem(item).values());
+					
+					amount -= stackSize;
+				}
 			}
 			
-			transfer.setAmount(stackSize);
-			
-			//Give the player the items.
-			//Store the leftover items they didn't have room for
-			//Clone because otherwise we just fiddle with the same stack over and over
-			floor.addAll(p.getInventory().addItem(transfer.clone()).values());
-			amount -= stackSize;
+			//We now have to update the chests inventory manually.
+			this.getChest().getInventory().setContents(chestContents);
 		}
 		
-		//Drop the remainder on the floor.
 		for(int i = 0; i < floor.size(); i++){
 			p.getWorld().dropItem(p.getLocation(), floor.get(i));								
 		}
@@ -302,29 +318,56 @@ public class Shop{
 	 * @param item The itemStack to buy
 	 * @param amount The amount to buy
 	 */
-	public void buy(Player p, ItemStack item, int amount){
-		if(amount < 0) this.sell(p, item, -amount);
-		//We do NOT want to modify this
-		ItemStack transfer = item.clone();
+	public void buy(Player p, int amount){
+		if(amount < 0) this.sell(p, -amount);
 		
-		transfer.setAmount(amount);
-		p.getInventory().removeItem(transfer);
-		
-		while(amount > 0 && !this.isUnlimited()){
-			int stackSize = Math.min(amount, transfer.getMaxStackSize());
-			if(stackSize == -1){
-				stackSize = amount;
+		if(this.isUnlimited()){
+			Inventory pInv = p.getInventory();
+			ItemStack item = this.item.clone();
+			
+			while(amount > 0){
+				int stackSize = Math.min(amount, this.item.getMaxStackSize());
+				item.setAmount(stackSize);
+				pInv.removeItem(item);
+			}
+		}
+		else{
+			ItemStack[] playerContents = p.getInventory().getContents();
+			Inventory chestInv = this.getChest().getInventory();
+			
+			for(int i = 0; amount > 0 && i < playerContents.length; i++){
+				ItemStack item = playerContents[i];
+				
+				if(item != null && this.matches(item)){
+					//Copy it, we don't want to interfere
+					item = item.clone();
+					//Amount = total, item.getAmount() = how many items in the stack
+					int stackSize = Math.min(amount, item.getAmount());
+					
+					//If Amount is item.getAmount(), then this sets the amount to 0
+					//Else it sets it to the remainder
+					playerContents[i].setAmount(playerContents[i].getAmount() - stackSize);
+					
+					//We can modify this, it is a copy.
+					item.setAmount(stackSize);
+					
+					//Add the items to the players inventory
+					chestInv.addItem(item);
+					
+					amount -= stackSize;
+				}
 			}
 			
-			transfer.setAmount(stackSize);
-			
-			//Clone because otherwise we just fiddle with the same stack over and over
-			this.add(transfer.clone(), stackSize);
-			
-			amount -= stackSize;
+			//Now update the players inventory.
+			p.getInventory().setContents(playerContents);
 		}
 	}
 	
+	/**
+	 * Changes the owner of this shop to the given player.
+	 * @param owner The name of the owner.
+	 * You must do shop.update() after to save it after a reboot.
+	 */
 	public void setOwner(String owner){
 		this.owner = owner;
 	}

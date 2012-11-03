@@ -334,7 +334,7 @@ public class ShopManager{
 							}
 						}
 						//Transfers the item from A to B
-						shop.sell(p, shop.getItem(), amount);
+						shop.sell(p, amount);
 						sendPurchaseSuccess(p, shop, amount);
 						Location loc = shop.getLocation();
 						plugin.log(p.getName() + " bought " + amount + " " +shop.getDataName()+" from shop at ("+loc.getWorld().getName()+" - "+loc.getX()+","+loc.getY()+","+loc.getZ()+") for " + (shop.getPrice() * amount));
@@ -414,7 +414,7 @@ public class ShopManager{
 							}
 						}
 						
-						shop.buy(p, shop.getItem(), amount);
+						shop.buy(p, amount);
 						sendSellSuccess(p, shop, amount);
 						
 						Location loc = shop.getLocation();
