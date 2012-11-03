@@ -274,6 +274,8 @@ public class Shop{
 				int stackSize = Math.min(amount, this.item.getMaxStackSize());
 				item.setAmount(stackSize);
 				pInv.addItem(item);
+				
+				amount -= stackSize;
 			}
 		}
 		else{
@@ -329,6 +331,8 @@ public class Shop{
 				int stackSize = Math.min(amount, this.item.getMaxStackSize());
 				item.setAmount(stackSize);
 				pInv.removeItem(item);
+				
+				amount -= stackSize;
 			}
 		}
 		else{
