@@ -33,7 +33,12 @@ public class ItemWatcher implements Runnable{
 					DisplayItem disItem = shop.getDisplayItem();
 					
 					if(loc.getWorld() == null){
-						continue;
+						//Unloaded world.
+						break;
+					}
+					else if(!loc.getChunk().isLoaded()){
+						//Unloaded chunk
+						break;
 					}
 					else if(loc.getBlock() != null && loc.getBlock().getType() != Material.CHEST){
 						//The block is nolonger a chest (Maybe WorldEdit or something?)
