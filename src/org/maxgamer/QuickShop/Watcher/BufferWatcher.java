@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.bukkit.Bukkit;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Database.Database;
 
@@ -13,9 +12,14 @@ import org.maxgamer.QuickShop.Database.Database;
  * Maintains the buffer, and safely puts it in the database when possible.
  */
 public class BufferWatcher implements Runnable{
+	private QuickShop plugin;
+	public BufferWatcher(QuickShop plugin){
+		this.plugin = plugin;
+	}
+	
 	public void run(){
 		//TODO: Can this be optimised as an argument?
-		QuickShop plugin = (QuickShop) Bukkit.getPluginManager().getPlugin("QuickShop");
+		//QuickShop plugin = (QuickShop) Bukkit.getPluginManager().getPlugin("QuickShop");
 		
 		Database db = plugin.getDB();
 		

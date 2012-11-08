@@ -39,7 +39,7 @@ public class Database{
 	}
 	
 	public void startBufferWatcher(){
-		this.bufferWatcherID = Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, new BufferWatcher(), 300);
+		this.bufferWatcherID = Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, new BufferWatcher(this.plugin), 300);
 	}
 	/**
 	 * Returns a new connection to execute SQL statements on.

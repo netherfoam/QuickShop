@@ -354,7 +354,7 @@ public class QuickShop extends JavaPlugin{
 		shopManager.clear();
 		
 		/* Empty the buffer */
-		new BufferWatcher().run();
+		new BufferWatcher(this).run();
 		this.database.stopBuffer();
 		
 		this.actions.clear();
