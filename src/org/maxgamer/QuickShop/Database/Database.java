@@ -21,6 +21,7 @@ public class Database{
 	public List<String> queries = new ArrayList<String>(5);
 	public boolean queriesInUse = false;
 	public int bufferWatcherID;
+	private Connection connection;
 	
 	/**
 	 * Creates a new database handler.
@@ -45,7 +46,51 @@ public class Database{
 	 * @return A new connection to execute SQL statements on.
 	 */
 	public Connection getConnection(){
+		try{
+			//If we have a current connection, fetch it
+			//TODO: Will this ever expire? :/
+			if(this.connection != null && !this.connection.isClosed()){
+				return this.connection;
+			}
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+			plugin.getLogger().severe("Could not retrieve SQLite connection!");
+		}
+		
+		if(this.getFile().exists()){
+			//So we need a new connection
+			try{
+				Class.forName("org.sqlite.JDBC");
+				this.connection = DriverManager.getConnection("jdbc:sqlite:" + this.getFile());
+				return this.connection;
+			}
+			catch (ClassNotFoundException e) {
+				e.printStackTrace();
+				return null;
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+		else{
+			//So we need a new file too.
+			try {
+				//Create the file
+				this.getFile().createNewFile();
+				//Now we won't need a new file, just a connection.
+				//This will return that new connection.
+				return this.getConnection();
+			} catch (IOException e) {
+				e.printStackTrace();
+				plugin.getLogger().severe("Could not create database file!");
+				return null;
+			}
+		}
+		
+		
 		//Handles first creation
+		/*
 		if(!this.getFile().exists()){
 			plugin.getLogger().info("Database does not exist");
 			try {
@@ -78,7 +123,7 @@ public class Database{
 			e.printStackTrace();
 			plugin.getLogger().info("SQLite library not found, was it removed?");
 		}
-		return null;
+		return null;*/
 	}
 	/**
 	 * @return Returns the database file
@@ -123,6 +168,7 @@ public class Database{
 				db.queries.add(s);
 				db.queriesInUse = false;
 
+				//If the buffer isn't running yet, start it.
 				if(db.bufferWatcherID == 0){
 					db.startBufferWatcher();
 				}
