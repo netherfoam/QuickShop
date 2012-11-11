@@ -31,11 +31,12 @@ public class ItemWatcher implements Runnable{
 		System.out.println("Sweeping shop...");
 		List<Shop> toRemove = new ArrayList<Shop>(1);
 		for(Entry<String, HashMap<ShopChunk, HashMap<Location, Shop>>> inWorld : plugin.getShopManager().getShops().entrySet()){
+			//This world
 			World world = Bukkit.getWorld(inWorld.getKey());
 			
 			for(Entry<ShopChunk, HashMap<Location, Shop>> inChunk : inWorld.getValue().entrySet()){
 				if(!world.isChunkLoaded(inChunk.getKey().getX(), inChunk.getKey().getZ())){
-					System.out.println("Skipping unloaded chunk!");
+					//If the chunk is not loaded, next chunk!
 					continue;
 				}
 				
