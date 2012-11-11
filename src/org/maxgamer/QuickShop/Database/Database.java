@@ -48,7 +48,6 @@ public class Database{
 	public Connection getConnection(){
 		try{
 			//If we have a current connection, fetch it
-			//TODO: Will this ever expire? :/
 			if(this.connection != null && !this.connection.isClosed()){
 				return this.connection;
 			}
@@ -87,43 +86,6 @@ public class Database{
 				return null;
 			}
 		}
-		
-		
-		//Handles first creation
-		/*
-		if(!this.getFile().exists()){
-			plugin.getLogger().info("Database does not exist");
-			try {
-				this.getFile().createNewFile();
-				Class.forName("org.sqlite.JDBC");
-				Connection dbCon = DriverManager.getConnection("jdbc:sqlite:" + this.getFile());
-				return dbCon;
-			} 
-			catch (IOException e) {
-				e.printStackTrace();
-				plugin.getLogger().info("Could not create file " + this.getFile().toString());
-			} 
-			catch (ClassNotFoundException e) {
-				e.printStackTrace();
-				plugin.getLogger().info("You need the SQLite JBDC library.  Put it in MinecraftServer/lib folder.");
-			} catch (SQLException e) {
-				e.printStackTrace();
-				plugin.getLogger().info("SQLite exception on initialize " + e);
-			}
-		}
-		try{
-			Class.forName("org.sqlite.JDBC");
-			return DriverManager.getConnection("jdbc:sqlite:" + this.getFile());
-		}
-		catch(SQLException e){
-			e.printStackTrace();
-			plugin.getLogger().info("SQLite exception on initialize.");
-		}
-		catch(ClassNotFoundException e){
-			e.printStackTrace();
-			plugin.getLogger().info("SQLite library not found, was it removed?");
-		}
-		return null;*/
 	}
 	/**
 	 * @return Returns the database file
