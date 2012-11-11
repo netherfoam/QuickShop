@@ -28,7 +28,6 @@ public class ItemWatcher implements Runnable{
 	}
 	
 	public void run(){
-		System.out.println("Sweeping shop...");
 		List<Shop> toRemove = new ArrayList<Shop>(1);
 		for(Entry<String, HashMap<ShopChunk, HashMap<Location, Shop>>> inWorld : plugin.getShopManager().getShops().entrySet()){
 			//This world
@@ -41,7 +40,6 @@ public class ItemWatcher implements Runnable{
 				}
 				
 				for(Shop shop : inChunk.getValue().values()){
-					System.out.println("Iterating shops...");
 					Location loc = shop.getLocation();
 					DisplayItem disItem = shop.getDisplayItem();
 					/* This should no longer be needed
