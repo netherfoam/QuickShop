@@ -163,9 +163,7 @@ public class ShopManager{
 				Info info = actions.get(p.getName());
 				plugin.getActions().remove(p.getName());
 				if(info == null) return;
-				/*
-				 * Creation handling
-				 */
+				/* Creation handling */
 				if(info.getAction() == ShopAction.CREATE){
 					try{
 						if(plugin.getShopManager().getShop(info.getLocation()) != null){
@@ -423,9 +421,7 @@ public class ShopManager{
 						plugin.log(p.getName() + " sold " + amount + " " +shop.getDataName()+" to shop at ("+loc.getWorld().getName()+" - "+loc.getX()+","+loc.getY()+","+loc.getZ()+") for " + (shop.getPrice() * amount));
 					}
 				}
-				/*
-				 * If it was already cancelled (from destroyed)
-				 */
+				/* If it was already cancelled (from destroyed) */
 				else{
 					return; //It was cancelled, go away.
 				}
