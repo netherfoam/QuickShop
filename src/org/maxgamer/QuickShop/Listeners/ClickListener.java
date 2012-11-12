@@ -59,8 +59,8 @@ public class ClickListener implements Listener{
 		if(e.isCancelled()) return;
 		if(e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.WALL_SIGN) return;
 		
-		if(e.getAction() == Action.RIGHT_CLICK_BLOCK){
-			if(e.getClickedBlock().getType() == Material.CHEST && plugin.lock){
+		if(e.getAction() == Action.RIGHT_CLICK_BLOCK && plugin.lock){
+			if(e.getClickedBlock().getType() == Material.CHEST){
 				Shop shop = plugin.getShopManager().getShop(e.getClickedBlock().getLocation());
 				if(shop != null && !shop.getOwner().equalsIgnoreCase(e.getPlayer().getName())){
 					if(e.getPlayer().hasPermission("quickshop.other.open")){
