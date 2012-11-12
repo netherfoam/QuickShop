@@ -27,6 +27,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.maxgamer.QuickShop.Command.QS;
@@ -144,8 +145,28 @@ public class QuickShop extends JavaPlugin{
 		Util.parseColours(this.messages);
 		
 		/* Hook into other plugins */
-		getLogger().info("Hooking Vault");
-		if(!setupEconomy()) getLogger().severe("Couldn't load vault!!! Errors will ensue!");
+		
+		if(Bukkit.getPluginManager().getPlugin("Vault") == null){
+			getLogger().severe(ChatColor.RED + "You don't have Vault installed!");
+			getLogger().severe(ChatColor.RED + "Download it from: ");
+			getLogger().severe(ChatColor.RED + "http://dev.bukkit.org/server-mods/vault");
+			getLogger().severe(ChatColor.RED + "And place it in your plugins folder!");
+			getLogger().severe(ChatColor.RED + "This plugin will not function (at all) until you install vault.");
+		}
+		else{
+			getLogger().info("Hooking Vault");
+			if(!setupEconomy()){
+				getLogger().severe(ChatColor.YELLOW + "Vault was found, but does not have an economy to hook into!");
+				getLogger().severe(ChatColor.YELLOW + "Download an economy plugin such as:");
+				getLogger().severe(ChatColor.YELLOW + "BOSEconomy, EssentialsEcon, 3Co, MultiCurrency, MineConomy, CraftConomy");
+				getLogger().severe(ChatColor.YELLOW + "from http://dev.bukkit.org!");
+				getLogger().severe(ChatColor.YELLOW + "This plugin will not function (at all) until you install an economy.");
+			}
+			else{
+				getLogger().info(ChatColor.GREEN + "Vault hooked!");
+			}
+		}
+		
 		/*
 		Plugin plug;
 		
