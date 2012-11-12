@@ -127,8 +127,9 @@ public class ClickListener implements Listener{
 		 * Creation handling
 		 */
 		else if(shop == null && item != null && item.getType() != Material.AIR && p.hasPermission("quickshop.create.sell") && b.getType() == Material.CHEST){
-			if(!plugin.canBuildShop(p, b)){
-				p.sendMessage(plugin.getMessage("not-allowed-to-create"));
+			if(!plugin.canBuildShop(p, b, e.getBlockFace())){
+				//As of the new checking system, most plugins will tell the player why they can't create a shop there.
+				//So telling them a message would cause spam etc.
 				return;
 			}
 			if(plugin.getChestNextTo(b) != null  && !p.hasPermission("quickshop.create.double")){

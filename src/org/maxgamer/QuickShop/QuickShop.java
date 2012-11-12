@@ -21,10 +21,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.maxgamer.QuickShop.Command.QS;
@@ -45,21 +47,6 @@ import org.maxgamer.QuickShop.Watcher.BufferWatcher;
 import org.maxgamer.QuickShop.Watcher.ItemWatcher;
 import org.maxgamer.QuickShop.Watcher.LogWatcher;
 
-import com.bekvon.bukkit.residence.Residence;
-import com.palmergames.bukkit.towny.Towny;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import com.griefcraft.lwc.LWC;
-import org.yi.acru.bukkit.Lockette.Lockette;
-import com.bekvon.bukkit.residence.protection.ClaimedResidence;
-import com.palmergames.bukkit.towny.object.TownBlock;
-import com.palmergames.bukkit.towny.object.TownyUniverse;
-import me.ryanhamshire.GriefPrevention.Claim;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
-import net.sacredlabyrinth.Phaed.PreciousStones.FieldFlag;
-import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
-import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
-
-
 import net.milkbowl.vault.economy.Economy;
 
 public class QuickShop extends JavaPlugin{
@@ -78,6 +65,7 @@ public class QuickShop extends JavaPlugin{
 	public YamlConfiguration messages;
 	
 	/* Hooking into plugins */
+	/*
 	//PreciousStones
 	private PreciousStones preciousStones;
 	//Towny
@@ -92,7 +80,7 @@ public class QuickShop extends JavaPlugin{
 	private Lockette lockette;
 	//LWC
 	private LWC lwc;
-	
+	*/
 	private ChatListener chatListener;
 	private HeroChatListener heroChatListener;
 	private ClickListener clickListener;
@@ -158,7 +146,7 @@ public class QuickShop extends JavaPlugin{
 		/* Hook into other plugins */
 		getLogger().info("Hooking Vault");
 		if(!setupEconomy()) getLogger().severe("Couldn't load vault!!! Errors will ensue!");
-		
+		/*
 		Plugin plug;
 		
 		//PreciousStones
@@ -210,7 +198,7 @@ public class QuickShop extends JavaPlugin{
 				this.lwc = (LWC) lwc;
 			}
 		}
-		
+		*/
 		//Create the shop manager.
 		this.shopManager = new ShopManager(this);
 		
@@ -448,7 +436,7 @@ public class QuickShop extends JavaPlugin{
 	}
 	
 	
-	
+	/*
 	public WorldGuardPlugin getWorldGuard(){
 		return this.worldGuardPlugin;
 	}
@@ -469,14 +457,23 @@ public class QuickShop extends JavaPlugin{
 	}
 	public LWC getLWC(){
 		return this.lwc;
-	}
+	}*/
 	/**
 	 * Checks other plugins to make sure they can use the chest they're making a shop.
 	 * @param p The player to check
 	 * @param b The block to check
 	 * @return True if they're allowed to place a shop there.
 	 */
-	public boolean canBuildShop(Player p, Block b){
+	public boolean canBuildShop(Player p, Block b, BlockFace bf){
+		PlayerInteractEvent event = new PlayerInteractEvent(p, Action.RIGHT_CLICK_BLOCK, new ItemStack(Material.AIR), b, bf);
+		Bukkit.getPluginManager().callEvent(event);
+		if(event.isCancelled()){
+			return false;
+		}
+		else{
+			return true;
+		}
+		/*
 		if(getWorldGuard() != null){
 			if(!getWorldGuard().canBuild(p, b)){
 				//Can't build.
@@ -533,9 +530,7 @@ public class QuickShop extends JavaPlugin{
 			if(!getLWC().canAccessProtection(p, b)){
 				return false;
 			}
-		}
-		
-		return true;
+		}*/
 	}
 	
 	/**
