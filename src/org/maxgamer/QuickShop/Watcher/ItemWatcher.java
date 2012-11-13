@@ -32,6 +32,7 @@ public class ItemWatcher implements Runnable{
 		for(Entry<String, HashMap<ShopChunk, HashMap<Location, Shop>>> inWorld : plugin.getShopManager().getShops().entrySet()){
 			//This world
 			World world = Bukkit.getWorld(inWorld.getKey());
+			if(world == null) continue; //world not loaded.
 			
 			for(Entry<ShopChunk, HashMap<Location, Shop>> inChunk : inWorld.getValue().entrySet()){
 				if(!world.isChunkLoaded(inChunk.getKey().getX(), inChunk.getKey().getZ())){
@@ -42,16 +43,6 @@ public class ItemWatcher implements Runnable{
 				for(Shop shop : inChunk.getValue().values()){
 					Location loc = shop.getLocation();
 					DisplayItem disItem = shop.getDisplayItem();
-					/* This should no longer be needed
-					if(loc.getWorld() == null){
-						//Unloaded world.
-						break;
-					}
-					else if(!loc.getChunk().isLoaded()){
-						System.out.println("Chunk isnt loaded.");
-						//Unloaded chunk
-						break;
-					}*/
 					if(loc.getBlock() != null && loc.getBlock().getType() != Material.CHEST){
 						//The block is nolonger a chest (Maybe WorldEdit or something?)
 						shop.delete(false);
