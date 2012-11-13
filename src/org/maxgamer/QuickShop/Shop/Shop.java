@@ -16,6 +16,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.maxgamer.QuickShop.QuickShop;
@@ -127,6 +128,52 @@ public class Shop{
 	 */
 	public boolean matches(ItemStack item){
 		return (item != null && item.getType() == getMaterial() && item.getDurability() == getDurability() && item.getEnchantments().equals(getEnchants()));
+	}
+	
+	/**
+	 * Returns true if this shop is a double chest, and the other half is selling/buying the same as this is buying/selling.
+	 * @return true if this shop is a double chest, and the other half is selling/buying the same as this is buying/selling.
+	 */
+	
+	public boolean isDoubleShop(){
+		if(this.getLocation().getBlock().getType() != Material.CHEST){
+			return false; // Oh, fuck.
+		}
+		
+		if(!(this.getChest().getInventory() instanceof DoubleChestInventory)){
+			return false; //Not a double inventory. Not a double chest.
+		}
+		
+		Location loc = this.loc.clone().add(1, 0, 0);
+		Shop nextTo = plugin.getShopManager().getShop(loc);
+		if(nextTo == null){
+			loc = this.loc.clone().add(-1, 0, 0);
+			nextTo = plugin.getShopManager().getShop(loc);
+		}
+		if(nextTo == null){
+			loc = this.loc.clone().add(0, 0, 1);
+			nextTo = plugin.getShopManager().getShop(loc);
+		}
+		if(nextTo == null){
+			loc = this.loc.clone().add(-1, 0, -1);
+			nextTo = plugin.getShopManager().getShop(loc);
+		}
+		if(nextTo == null) return false;
+		
+		if(nextTo.matches(this.getItem())){
+			//They're both trading the same item
+			if(this.getShopType() == nextTo.getShopType()){
+				//They're both buying or both selling => Not a double shop, just two shops.
+				return false;
+			}
+			else{
+				//One is buying, one is selling.
+				return true;
+			}
+		}
+		else{
+			return false;
+		}
 	}
 	
 	/**
