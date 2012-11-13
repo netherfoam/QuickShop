@@ -57,6 +57,7 @@ public class ClickListener implements Listener{
 	 */
 	public void onClick(PlayerInteractEvent e){
 		if(e.isCancelled()) return;
+		if(e.getClickedBlock() == null) return; //What the fuck man.
 		if(e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.WALL_SIGN) return;
 		
 		if(e.getAction() == Action.RIGHT_CLICK_BLOCK && plugin.lock){
