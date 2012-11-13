@@ -222,7 +222,8 @@ public class QS implements CommandExecutor{
 						if(Bukkit.getWorld(worlds.getKey()) == null) continue;
 						for(HashMap<Location, Shop> inChunk : worlds.getValue().values()){
 							for(Shop shop : inChunk.values()){
-								if(shop.getLocation().getWorld() != null && shop.getLocation().getChunk().isLoaded() && shop.isSelling() && shop.getRemainingStock() == 0){
+								if(shop.getLocation().getWorld() != null && shop.isSelling() && shop.getRemainingStock() == 0){
+									if(shop.isDoubleShop()) continue; //Dont delete double shops
 									shop.delete(false);
 									toRemove.add(shop);
 									i++;
@@ -251,17 +252,39 @@ public class QS implements CommandExecutor{
 			
 			else if(subArg.equals("info")){
 				if(sender.hasPermission("quickshop.info")){
-					Player p = (Player) sender;
-					Chunk c = p.getLocation().getChunk();
+					int buying, selling, doubles, chunks, worlds;
+					buying = selling = doubles = chunks = worlds = 0;
 					
-					for(Shop shop : plugin.getShopManager().getShops(c).values()){
-						String reply = "";
-						
-						Location loc = shop.getLocation();
-						reply += ChatColor.GREEN + shop.getDataName() + " at " + loc.getX() + "," + loc.getY() + "," + loc.getZ();
-						
-						p.sendMessage(reply);
+					int nostock = 0;
+					
+					for(HashMap<ShopChunk, HashMap<Location, Shop>> inWorld : plugin.getShopManager().getShops().values()){
+						worlds++;
+						for(HashMap<Location, Shop> inChunk : inWorld.values()){
+							chunks++;
+							for(Shop shop : inChunk.values()){
+								if(shop.isBuying()){
+									buying++;
+								}
+								else if(shop.isSelling()){
+									selling++;
+								}
+								
+								if(shop.isDoubleShop()){
+									doubles++;
+								}
+								
+								if(shop.isSelling() && !shop.isDoubleShop()){
+									nostock++;
+								}
+							}
+						}
 					}
+					
+					sender.sendMessage(ChatColor.RED + "QuickShop Statistics...");
+					sender.sendMessage(ChatColor.GREEN + "" + (buying + selling) + " shops in " + chunks + " chunks spread over " + worlds + " worlds.");
+					sender.sendMessage(ChatColor.GREEN + "" + doubles + " double shops. ");
+					sender.sendMessage(ChatColor.GREEN + "" + nostock + " selling shops (excluding doubles) which will be removed by /qs clean.");
+					
 					
 					return true;
 				}
