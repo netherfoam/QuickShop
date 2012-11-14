@@ -86,7 +86,11 @@ public class QS implements CommandExecutor{
 						sender.sendMessage(plugin.getMessage("command.no-type-given"));
 						return true;
 					}
-					String lookFor = args[1].toUpperCase();
+					String lookFor = "";
+					for(int i = 1; i < args.length; i++){
+						lookFor += args[i];
+					}
+					lookFor = lookFor.toUpperCase();
 					Player p = (Player) sender;
 					Location loc = p.getLocation().clone().add(0, 1.62, 0);
 					
@@ -273,7 +277,7 @@ public class QS implements CommandExecutor{
 									doubles++;
 								}
 								
-								if(shop.isSelling() && !shop.isDoubleShop()){
+								if(shop.isSelling() && !shop.isDoubleShop() && shop.getRemainingStock() == 0){
 									nostock++;
 								}
 							}
