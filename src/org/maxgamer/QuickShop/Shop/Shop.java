@@ -131,17 +131,17 @@ public class Shop{
 	}
 	
 	/**
-	 * Returns true if this shop is a double chest, and the other half is selling/buying the same as this is buying/selling.
-	 * @return true if this shop is a double chest, and the other half is selling/buying the same as this is buying/selling.
+	 * Returns the shop that shares it's inventory with this one.
+	 * @return the shop that shares it's inventory with this one.
+	 * Will return null if thsi shop is not attached to another.
 	 */
-	
-	public boolean isDoubleShop(){
+	public Shop getAttachedShop(){
 		if(this.getLocation().getBlock().getType() != Material.CHEST){
-			return false; // Oh, fuck.
+			return null; // Oh, fuck.
 		}
 		
 		if(!(this.getChest().getInventory() instanceof DoubleChestInventory)){
-			return false; //Not a double inventory. Not a double chest.
+			return null; //Not a double inventory. Not a double chest.
 		}
 		
 		Location loc = this.loc.clone().add(1, 0, 0);
@@ -158,6 +158,15 @@ public class Shop{
 			loc = this.loc.clone().add(-1, 0, -1);
 			nextTo = plugin.getShopManager().getShop(loc);
 		}
+		return nextTo;
+	}
+	
+	/**
+	 * Returns true if this shop is a double chest, and the other half is selling/buying the same as this is buying/selling.
+	 * @return true if this shop is a double chest, and the other half is selling/buying the same as this is buying/selling.
+	 */
+	public boolean isDoubleShop(){
+		Shop nextTo = this.getAttachedShop();
 		if(nextTo == null) return false;
 		
 		if(nextTo.matches(this.getItem())){
