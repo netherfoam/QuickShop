@@ -32,6 +32,7 @@ average-price-nearby: "&aAverage Price Nearby: &e{0}"
 shop-has-changed: "&cThe shop you tried to use has changed since you clicked it!"
 nearby-shop-this-way: "&aShop is {0} blocks away from you."
 no-nearby-shop: "&cNo shops matching {0} nearby."
+buying-more-than-selling: "&cWARNING: You are buying items for more than you are selling them!"
 
 menu:
     successful-purchase: "&aSuccessfully Purchased:"

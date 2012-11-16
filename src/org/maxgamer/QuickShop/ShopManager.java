@@ -242,6 +242,14 @@ public class ShopManager{
 							
 							shop.setSignText();
 						}
+						if(shop.isDoubleShop()){
+							Shop nextTo = shop.getAttachedShop();
+							
+							if(nextTo.getPrice() > shop.getPrice()){
+								//The one next to it must always be a buying shop.
+								p.sendMessage(plugin.getMessage("buying-more-than-selling"));
+							}
+						}
 					}
 					/* They didn't enter a number. */
 					catch(NumberFormatException ex){

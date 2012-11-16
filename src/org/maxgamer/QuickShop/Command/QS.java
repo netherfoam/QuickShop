@@ -207,6 +207,26 @@ public class QS implements CommandExecutor{
 							shop.setSignText();
 							shop.update();
 							sender.sendMessage(plugin.getMessage("price-is-now", plugin.getEcon().format(shop.getPrice())));
+							
+							if(shop.isDoubleShop()){
+								Shop nextTo = shop.getAttachedShop();
+								
+								if(shop.isSelling()){
+									if(shop.getPrice() < nextTo.getPrice()){
+										sender.sendMessage(plugin.getMessage("buying-more-than-selling"));
+									}
+								}
+								else{
+									//Buying
+									if(shop.getPrice() > nextTo.getPrice()){
+										sender.sendMessage(plugin.getMessage("buying-more-than-selling"));
+									}
+								}
+							}
+							else{
+								sender.sendMessage("Not a double shop");//DEBUG
+							}
+							
 							return true;
 						}
 					}
