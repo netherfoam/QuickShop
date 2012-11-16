@@ -20,6 +20,8 @@ import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.ShopAction;
 import org.maxgamer.QuickShop.Shop.ShopChunk;
+import org.maxgamer.QuickShop.Shop.ShopCreateEvent;
+import org.maxgamer.QuickShop.Shop.ShopPurchaseEvent;
 
 public class ShopManager{
 	private QuickShop plugin;
@@ -196,6 +198,11 @@ public class ShopManager{
 						
 						//Add the shop to the list.
 						Shop shop = new Shop(info.getLocation(), price, info.getItem(), p.getName());
+						
+						ShopCreateEvent e = new ShopCreateEvent(shop);
+						Bukkit.getPluginManager().callEvent(e);
+						
+						if(e.isCancelled()) return;
 
 						plugin.getShopManager().addShop(shop.getLocation().getWorld().getName(), shop);
 						
@@ -299,6 +306,10 @@ public class ShopManager{
 							p.sendMessage(plugin.getMessage("negative-amount"));
 							return;
 						}
+						
+						ShopPurchaseEvent e = new ShopPurchaseEvent(shop, p, amount);
+						Bukkit.getPluginManager().callEvent(e);
+						if(e.isCancelled()) return; //Cancelled
 						
 						//Money handling
 						if(!p.getName().equalsIgnoreCase(shop.getOwner())){
