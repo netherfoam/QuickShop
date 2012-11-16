@@ -168,7 +168,6 @@ public class Shop{
 	public boolean isDoubleShop(){
 		Shop nextTo = this.getAttachedShop();
 		if(nextTo == null){
-			System.out.println("No shop next to me!");
 			return false;
 		}
 		
@@ -176,17 +175,14 @@ public class Shop{
 			//They're both trading the same item
 			if(this.getShopType() == nextTo.getShopType()){
 				//They're both buying or both selling => Not a double shop, just two shops.
-				System.out.println("Both selling or both buying!");
 				return false;
 			}
 			else{
 				//One is buying, one is selling.
-				System.out.println("A OK!");
 				return true;
 			}
 		}
 		else{
-			System.out.println("Diff items!");
 			return false;
 		}
 	}

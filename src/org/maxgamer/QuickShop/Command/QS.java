@@ -223,9 +223,6 @@ public class QS implements CommandExecutor{
 									}
 								}
 							}
-							else{
-								sender.sendMessage("Not a double shop");//DEBUG
-							}
 							
 							return true;
 						}
