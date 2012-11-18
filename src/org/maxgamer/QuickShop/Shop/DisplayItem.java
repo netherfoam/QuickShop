@@ -26,8 +26,7 @@ public class DisplayItem{
 	 * @param shop The shop (See Shop)
 	 * @param iStack The item stack to clone properties of the display item from.
 	 */
-	public DisplayItem(/*QuickShop plugin,*/ Shop shop, ItemStack iStack){
-		//this.plugin = plugin;
+	public DisplayItem(Shop shop, ItemStack iStack){
 		this.shop = shop;
 		this.iStack = iStack.clone();
 		this.displayLoc = shop.getLocation().clone().add(0.5, 1.2, 0.5);
@@ -46,8 +45,8 @@ public class DisplayItem{
 		
 		Location dispLoc = this.getDisplayLocation();
 		this.item = shop.getLocation().getWorld().dropItem(dispLoc, this.iStack);
-		this.item.setVelocity(new Vector(0, 0.1, 0));
-		this.item.teleport(dispLoc);
+		this.item.setVelocity(new Vector(0, 0, 0));
+		//this.item.teleport(dispLoc);
 		this.item.setPickupDelay(Integer.MAX_VALUE);  
 	}
 	
@@ -76,8 +75,6 @@ public class DisplayItem{
 			if(this.item != null && e.getEntityId() == this.item.getEntityId()) continue;
 			Location eLoc = e.getLocation().getBlock().getLocation();
 			
-			//if(eLoc.equals(displayLoc) || eLoc.equals(obj)) {
-			//if(eLoc.distanceSquared(displayLoc))
 			if(eLoc.equals(displayLoc) || eLoc.equals(shop.getLocation())){
 				ItemStack near = ((Item) e).getItemStack();
 				//if its the same its a dupe

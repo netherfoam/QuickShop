@@ -199,7 +199,7 @@ public class ShopManager{
 						//Add the shop to the list.
 						Shop shop = new Shop(info.getLocation(), price, info.getItem(), p.getName());
 						
-						ShopCreateEvent e = new ShopCreateEvent(shop);
+						ShopCreateEvent e = new ShopCreateEvent(shop, p);
 						Bukkit.getPluginManager().callEvent(e);
 						
 						if(e.isCancelled()) return;
