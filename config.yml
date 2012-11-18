@@ -22,6 +22,8 @@ shop:
     pay-unlimited-shop-owners: false
     #Should we place display items on the chests?
     display-items: true
+    #Should we place item frames on chests?
+    frame-items: true
     #When someone uses /qs find <item>, how far should we search in blocks?
     #This command lets users shop quickly without wasting time searching
     #Settings > 100 WILL cause lag. Don't do it, or don't cry when your server lags.
