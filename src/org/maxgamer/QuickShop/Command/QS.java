@@ -88,7 +88,7 @@ public class QS implements CommandExecutor{
 					}
 					String lookFor = "";
 					for(int i = 1; i < args.length; i++){
-						lookFor += args[i];
+						lookFor += "_" + args[i];
 					}
 					lookFor = lookFor.toUpperCase();
 					Player p = (Player) sender;
