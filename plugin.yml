@@ -12,9 +12,7 @@ commands:
     qs:
         description: QuickShop command
         usage: /qs
-    shop:
-        description: QuickShop command
-        usage: /shop
+        aliases: [shop]
         
 permissions:
     quickshop.create.sell:
