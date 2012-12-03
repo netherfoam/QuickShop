@@ -27,6 +27,237 @@ public class QS implements CommandExecutor{
 	public QS(QuickShop plugin){
 		this.plugin = plugin;
 	}
+	
+	private void setUnlimited(CommandSender sender){
+		if(sender instanceof Player && sender.hasPermission("quickshop.unlimited")){
+			BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
+			while(bIt.hasNext()){
+				Block b = bIt.next();
+				Shop shop = plugin.getShopManager().getShop(b.getLocation());
+				if(shop != null){
+					shop.setUnlimited(true);
+					shop.update();
+					sender.sendMessage(plugin.getMessage("command.success-created-unlimited"));
+					return;
+				}
+			}
+			sender.sendMessage(plugin.getMessage("not-looking-at-shop"));
+			return;
+		}
+		else{
+			sender.sendMessage(plugin.getMessage("no-permission"));
+			return;
+		}
+	}
+	
+	private void setOwner(CommandSender sender, String[] args){
+		if(sender instanceof Player && sender.hasPermission("quickshop.setowner")){
+			if(args.length < 2){
+				sender.sendMessage(plugin.getMessage("command.no-owner-given"));
+				return;
+			}
+			BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
+			while(bIt.hasNext()){
+				Block b = bIt.next();
+				Shop shop = plugin.getShopManager().getShop(b.getLocation());
+				if(shop != null){
+					shop.setOwner(args[1]);
+					shop.update();
+					
+					sender.sendMessage(ChatColor.GREEN + "New Owner: " + shop.getOwner());
+					return;
+				}
+			}
+			sender.sendMessage(plugin.getMessage("not-looking-at-shop"));
+			return;
+		}
+		else{
+			sender.sendMessage(plugin.getMessage("no-permission"));
+			return;
+		}
+	}
+	
+	private void find(CommandSender sender, String[] args){
+		if(sender instanceof Player && sender.hasPermission("quickshop.find")){
+			if(args.length < 2){
+				sender.sendMessage(plugin.getMessage("command.no-type-given"));
+				return;
+			}
+			String lookFor = "";
+			for(int i = 1; i < args.length; i++){
+				lookFor += "_" + args[i];
+			}
+			lookFor = lookFor.toUpperCase();
+			Player p = (Player) sender;
+			Location loc = p.getLocation().clone().add(0, 1.62, 0);
+			
+			//double minDistanceSquared = plugin.getConfig().getInt("shop.find-distance") * plugin.getConfig().getInt("shop-find);
+			double minDistance = plugin.getConfig().getInt("shop.find-distance");
+			double minDistanceSquared = minDistance * minDistance;
+			int chunkRadius = (int) minDistance/16 + 1;
+			Shop closest = null;
+			
+			Chunk c = loc.getChunk();
+			
+			for(int x = -chunkRadius + c.getX(); x < chunkRadius + c.getX(); x++){
+				for(int z = -chunkRadius + c.getZ(); z < chunkRadius + c.getZ(); z++){
+					Chunk d = c.getWorld().getChunkAt(x, z);
+					HashMap<Location, Shop> inChunk = plugin.getShopManager().getShops(d);
+					if(inChunk == null) continue;
+					for(Shop shop : inChunk.values()){
+						if(shop.getDataName().contains(lookFor) && shop.getLocation().distanceSquared(loc) < minDistanceSquared){
+							closest = shop;
+							minDistanceSquared = shop.getLocation().distanceSquared(loc);
+						}
+					}
+				}
+			}
+			if(closest == null){
+				sender.sendMessage(plugin.getMessage("no-nearby-shop", args[1]));
+				return;
+			}
+			Location lookat = closest.getLocation().clone().add(0.5, 0.5, 0.5);
+			
+			p.teleport(this.lookAt(loc, lookat).add(0, -1.62, 0), TeleportCause.COMMAND);
+			p.sendMessage(plugin.getMessage("nearby-shop-this-way", ""+(int) Math.floor(Math.sqrt(minDistanceSquared))));
+			
+			return;
+		}
+		else{
+			sender.sendMessage(plugin.getMessage("no-permission"));
+			return;
+		}
+	}
+	
+	private void setBuy(CommandSender sender){
+		if(sender instanceof Player && sender.hasPermission("quickshop.create.buy")){
+			BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
+			while(bIt.hasNext()){
+				Block b = bIt.next();
+				Shop shop = plugin.getShopManager().getShop(b.getLocation());
+				if(shop != null && shop.getOwner().equalsIgnoreCase(((Player) sender).getName())){
+					shop.setShopType(ShopType.BUYING);
+					shop.setSignText();
+					shop.update();
+					
+					sender.sendMessage(plugin.getMessage("command.now-buying", shop.getDataName()));
+					return;
+				}
+			}
+			sender.sendMessage(plugin.getMessage("not-looking-at-shop"));
+			return;
+		}
+		sender.sendMessage(plugin.getMessage("no-permission"));
+		return;
+	}
+	
+	private void setSell(CommandSender sender){
+		if(sender instanceof Player && sender.hasPermission("quickshop.create.sell")){
+			BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
+			while(bIt.hasNext()){
+				Block b = bIt.next();
+				Shop shop = plugin.getShopManager().getShop(b.getLocation());
+				if(shop != null && shop.getOwner().equalsIgnoreCase(((Player) sender).getName())){
+					shop.setShopType(ShopType.SELLING);
+					shop.setSignText();
+					shop.update();
+					sender.sendMessage(plugin.getMessage("command.now-selling", shop.getDataName()));
+					return;
+				}
+			}
+			sender.sendMessage(plugin.getMessage("not-looking-at-shop"));
+			return;
+		}
+		sender.sendMessage(plugin.getMessage("no-permission"));
+		return;
+	}
+	
+	private void setPrice(CommandSender sender, String[] args){
+		if(sender instanceof Player && sender.hasPermission("quickshop.create.changeprice")){
+			if(args.length < 2){
+				sender.sendMessage(plugin.getMessage("no-price-given"));
+				return;
+			}
+			double price;
+			try{
+				price = Double.parseDouble(args[1]);
+			}
+			catch(NumberFormatException e){
+				sender.sendMessage(plugin.getMessage("thats-not-a-number"));
+				return;
+			}
+			
+			if(price < 0.01){
+				sender.sendMessage(plugin.getMessage("price-too-cheap"));
+				return;
+			}
+			
+			BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
+			//Loop through every block they're looking at upto 10 blocks away
+			while(bIt.hasNext()){
+				Block b = bIt.next();
+				Shop shop = plugin.getShopManager().getShop(b.getLocation());
+				
+				if(shop != null && shop.getOwner().equalsIgnoreCase(((Player) sender).getName())){
+					//Update the shop
+					shop.setPrice(price);
+					shop.setSignText();
+					shop.update();
+					sender.sendMessage(plugin.getMessage("price-is-now", plugin.getEcon().format(shop.getPrice())));
+					
+					if(shop.isDoubleShop()){
+						Shop nextTo = shop.getAttachedShop();
+						
+						if(shop.isSelling()){
+							if(shop.getPrice() < nextTo.getPrice()){
+								sender.sendMessage(plugin.getMessage("buying-more-than-selling"));
+							}
+						}
+						else{
+							//Buying
+							if(shop.getPrice() > nextTo.getPrice()){
+								sender.sendMessage(plugin.getMessage("buying-more-than-selling"));
+							}
+						}
+					}
+					
+					return;
+				}
+			}
+			sender.sendMessage(plugin.getMessage("not-looking-at-shop"));
+			return;
+		}
+		sender.sendMessage(plugin.getMessage("no-permission"));
+		return;
+	}
+	
+	private void clean(CommandSender sender){
+		if(sender.hasPermission("quickshop.clean")){
+			sender.sendMessage(plugin.getMessage("command.cleaning"));
+			int i = 0;
+			List<Shop> toRemove = new ArrayList<Shop>(10);
+			for(Entry<String, HashMap<ShopChunk, HashMap<Location, Shop>>> worlds : plugin.getShopManager().getShops().entrySet()){
+				if(Bukkit.getWorld(worlds.getKey()) == null) continue;
+				for(HashMap<Location, Shop> inChunk : worlds.getValue().values()){
+					for(Shop shop : inChunk.values()){
+						if(shop.getLocation().getWorld() != null && shop.isSelling() && shop.getRemainingStock() == 0){
+							if(shop.isDoubleShop()) continue; //Dont delete double shops
+							shop.delete(false);
+							toRemove.add(shop);
+							i++;
+						}
+					}
+				}
+			}
+			for(Shop shop : toRemove){
+				plugin.getShopManager().removeShop(shop);
+			}
+			sender.sendMessage(plugin.getMessage("command.cleaned", ""+i));
+			return;
+		}
+		sender.sendMessage(plugin.getMessage("no-permission"));
+		return;
+	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
@@ -34,232 +265,28 @@ public class QS implements CommandExecutor{
 			String subArg = args[0].toLowerCase();
 			
 			if(subArg.equals("unlimited")){
-				if(sender instanceof Player && sender.hasPermission("quickshop.unlimited")){
-					BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
-					while(bIt.hasNext()){
-						Block b = bIt.next();
-						Shop shop = plugin.getShopManager().getShop(b.getLocation());
-						if(shop != null){
-							shop.setUnlimited(true);
-							shop.update();
-							sender.sendMessage(plugin.getMessage("command.success-created-unlimited"));
-							return true;
-						}
-					}
-					sender.sendMessage(plugin.getMessage("not-looking-at-shop"));
-					return true;
-				}
-				else{
-					sender.sendMessage(plugin.getMessage("no-permission"));
-					return true;
-				}
+				setUnlimited(sender);
+				return true;
 			}
 			else if(subArg.equals("setowner")){
-				if(sender instanceof Player && sender.hasPermission("quickshop.setowner")){
-					if(args.length < 2){
-						sender.sendMessage(plugin.getMessage("command.no-owner-given"));
-						return true;
-					}
-					BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
-					while(bIt.hasNext()){
-						Block b = bIt.next();
-						Shop shop = plugin.getShopManager().getShop(b.getLocation());
-						if(shop != null){
-							shop.setOwner(args[1]);
-							shop.update();
-							
-							sender.sendMessage(ChatColor.GREEN + "New Owner: " + shop.getOwner());
-							return true;
-						}
-					}
-					sender.sendMessage(plugin.getMessage("not-looking-at-shop"));
-					return true;
-				}
-				else{
-					sender.sendMessage(plugin.getMessage("no-permission"));
-					return true;
-				}
+				setOwner(sender, args);
 			}
 			else if(subArg.equals("find")){
-				if(sender instanceof Player && sender.hasPermission("quickshop.find")){
-					if(args.length < 2){
-						sender.sendMessage(plugin.getMessage("command.no-type-given"));
-						return true;
-					}
-					String lookFor = "";
-					for(int i = 1; i < args.length; i++){
-						lookFor += "_" + args[i];
-					}
-					lookFor = lookFor.toUpperCase();
-					Player p = (Player) sender;
-					Location loc = p.getLocation().clone().add(0, 1.62, 0);
-					
-					//double minDistanceSquared = plugin.getConfig().getInt("shop.find-distance") * plugin.getConfig().getInt("shop-find);
-					double minDistance = plugin.getConfig().getInt("shop.find-distance");
-					double minDistanceSquared = minDistance * minDistance;
-					int chunkRadius = (int) minDistance/16 + 1;
-					Shop closest = null;
-					
-					Chunk c = loc.getChunk();
-					
-					for(int x = -chunkRadius + c.getX(); x < chunkRadius + c.getX(); x++){
-						for(int z = -chunkRadius + c.getZ(); z < chunkRadius + c.getZ(); z++){
-							Chunk d = c.getWorld().getChunkAt(x, z);
-							HashMap<Location, Shop> inChunk = plugin.getShopManager().getShops(d);
-							if(inChunk == null) continue;
-							for(Shop shop : inChunk.values()){
-								if(shop.getDataName().contains(lookFor) && shop.getLocation().distanceSquared(loc) < minDistanceSquared){
-									closest = shop;
-									minDistanceSquared = shop.getLocation().distanceSquared(loc);
-								}
-							}
-						}
-					}
-					if(closest == null){
-						sender.sendMessage(plugin.getMessage("no-nearby-shop", args[1]));
-						return true;
-					}
-					Location lookat = closest.getLocation().clone().add(0.5, 0.5, 0.5);
-					
-					p.teleport(this.lookAt(loc, lookat).add(0, -1.62, 0), TeleportCause.COMMAND);
-					p.sendMessage(plugin.getMessage("nearby-shop-this-way", ""+(int) Math.floor(Math.sqrt(minDistanceSquared))));
-					
-					return true;
-				}
-				else{
-					sender.sendMessage(plugin.getMessage("no-permission"));
-					return true;
-				}
+				find(sender, args);
 			}
-			
 			else if(subArg.startsWith("buy")){
-				if(sender instanceof Player && sender.hasPermission("quickshop.create.buy")){
-					BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
-					while(bIt.hasNext()){
-						Block b = bIt.next();
-						Shop shop = plugin.getShopManager().getShop(b.getLocation());
-						if(shop != null && shop.getOwner().equalsIgnoreCase(((Player) sender).getName())){
-							shop.setShopType(ShopType.BUYING);
-							shop.setSignText();
-							shop.update();
-							
-							sender.sendMessage(plugin.getMessage("command.now-buying", shop.getDataName()));
-							return true;
-						}
-					}
-					sender.sendMessage(plugin.getMessage("not-looking-at-shop"));
-					return true;
-				}
-				sender.sendMessage(plugin.getMessage("no-permission"));
-				return true;
+				setBuy(sender);
 			}
-			
 			else if(subArg.startsWith("sell")){
-				if(sender instanceof Player && sender.hasPermission("quickshop.create.sell")){
-					BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
-					while(bIt.hasNext()){
-						Block b = bIt.next();
-						Shop shop = plugin.getShopManager().getShop(b.getLocation());
-						if(shop != null && shop.getOwner().equalsIgnoreCase(((Player) sender).getName())){
-							shop.setShopType(ShopType.SELLING);
-							shop.setSignText();
-							shop.update();
-							sender.sendMessage(plugin.getMessage("command.now-selling", shop.getDataName()));
-							return true;
-						}
-					}
-					sender.sendMessage(plugin.getMessage("not-looking-at-shop"));
-					return true;
-				}
-				sender.sendMessage(plugin.getMessage("no-permission"));
-				return true;
+				setSell(sender);
 			}
 			
 			else if(subArg.startsWith("price")){
-				if(sender instanceof Player && sender.hasPermission("quickshop.create.changeprice")){
-					if(args.length < 2){
-						sender.sendMessage(plugin.getMessage("no-price-given"));
-						return true;
-					}
-					double price;
-					try{
-						price = Double.parseDouble(args[1]);
-					}
-					catch(NumberFormatException e){
-						sender.sendMessage(plugin.getMessage("thats-not-a-number"));
-						return true;
-					}
-					
-					if(price < 0.01){
-						sender.sendMessage(plugin.getMessage("price-too-cheap"));
-						return true;
-					}
-					
-					BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
-					//Loop through every block they're looking at upto 10 blocks away
-					while(bIt.hasNext()){
-						Block b = bIt.next();
-						Shop shop = plugin.getShopManager().getShop(b.getLocation());
-						
-						if(shop != null && shop.getOwner().equalsIgnoreCase(((Player) sender).getName())){
-							//Update the shop
-							shop.setPrice(price);
-							shop.setSignText();
-							shop.update();
-							sender.sendMessage(plugin.getMessage("price-is-now", plugin.getEcon().format(shop.getPrice())));
-							
-							if(shop.isDoubleShop()){
-								Shop nextTo = shop.getAttachedShop();
-								
-								if(shop.isSelling()){
-									if(shop.getPrice() < nextTo.getPrice()){
-										sender.sendMessage(plugin.getMessage("buying-more-than-selling"));
-									}
-								}
-								else{
-									//Buying
-									if(shop.getPrice() > nextTo.getPrice()){
-										sender.sendMessage(plugin.getMessage("buying-more-than-selling"));
-									}
-								}
-							}
-							
-							return true;
-						}
-					}
-					sender.sendMessage(plugin.getMessage("not-looking-at-shop"));
-					return true;
-				}
-				sender.sendMessage(plugin.getMessage("no-permission"));
-				return true;
+				setPrice(sender, args);
 			}
 			
 			else if(subArg.equals("clean")){
-				if(sender.hasPermission("quickshop.clean")){
-					sender.sendMessage(plugin.getMessage("command.cleaning"));
-					int i = 0;
-					List<Shop> toRemove = new ArrayList<Shop>(10);
-					for(Entry<String, HashMap<ShopChunk, HashMap<Location, Shop>>> worlds : plugin.getShopManager().getShops().entrySet()){
-						if(Bukkit.getWorld(worlds.getKey()) == null) continue;
-						for(HashMap<Location, Shop> inChunk : worlds.getValue().values()){
-							for(Shop shop : inChunk.values()){
-								if(shop.getLocation().getWorld() != null && shop.isSelling() && shop.getRemainingStock() == 0){
-									if(shop.isDoubleShop()) continue; //Dont delete double shops
-									shop.delete(false);
-									toRemove.add(shop);
-									i++;
-								}
-							}
-						}
-					}
-					for(Shop shop : toRemove){
-						plugin.getShopManager().removeShop(shop);
-					}
-					sender.sendMessage(plugin.getMessage("command.cleaned", ""+i));
-					return true;
-				}
-				sender.sendMessage(plugin.getMessage("no-permission"));
-				return true;
+				clean(sender);
 			}
 			else if(subArg.equals("debug")){
 				if(sender.hasPermission("quickshop.debug")){
@@ -313,6 +340,12 @@ public class QS implements CommandExecutor{
 				return true;
 			}
 		}
+		else{
+			//Invalid arg given
+			sendHelp(sender);
+			return true;
+		}
+		//No args given
 		sendHelp(sender);
 		return true;
 	}
