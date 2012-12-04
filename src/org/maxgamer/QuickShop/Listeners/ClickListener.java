@@ -57,12 +57,21 @@ public class ClickListener implements Listener{
 	 */
 	public void onClick(PlayerInteractEvent e){
 		if(e.isCancelled()) return;
-		if(e.getClickedBlock() == null) return; //What the fuck man.
+		if(e.getClickedBlock() == null) return; //Interacted with air
 		if(e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.WALL_SIGN) return;
 		
 		if(e.getAction() == Action.RIGHT_CLICK_BLOCK && plugin.lock){
 			if(e.getClickedBlock().getType() == Material.CHEST){
 				Shop shop = plugin.getShopManager().getShop(e.getClickedBlock().getLocation());
+				
+				//Make sure they're not using the non-shop half of a double chest.
+				if(shop == null){
+					Block b = Util.getSecondHalf(e.getClickedBlock());
+					if(b != null){
+						shop = plugin.getShopManager().getShop(b.getLocation());
+					}
+				}
+				
 				if(shop != null && !shop.getOwner().equalsIgnoreCase(e.getPlayer().getName())){
 					if(e.getPlayer().hasPermission("quickshop.other.open")){
 						e.getPlayer().sendMessage(plugin.getMessage("bypassing-lock"));

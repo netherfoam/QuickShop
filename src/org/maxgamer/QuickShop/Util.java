@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -111,6 +112,27 @@ public class Util{
 		
 		DecimalFormat formatter = new DecimalFormat("0");
 		return formatter.format((1 - dura/max)* 100.0);
+	}
+	
+	/**
+	 * Returns the chest attached to the given chest. The given block must be a chest.
+	 * @param b The chest to check.
+	 * @return the block which is also a chest and connected to b.
+	 */
+	public static Block getSecondHalf(Block b){
+		Block[] blocks = new Block[4];
+		blocks[0] = b.getRelative(1, 0, 0);
+		blocks[1] = b.getRelative(-1, 0, 0);
+		blocks[2] = b.getRelative(0, 0, 1);
+		blocks[3] = b.getRelative(0, 0, -1);
+		
+		for(Block c : blocks){
+			if(c.getType() == Material.CHEST){
+				return c;
+			}
+		}
+
+		return null;
 	}
 
 	/**

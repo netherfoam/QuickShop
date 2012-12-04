@@ -2,6 +2,7 @@ package org.maxgamer.QuickShop.Shop;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
@@ -135,9 +136,25 @@ public class Shop{
 	/**
 	 * Returns the shop that shares it's inventory with this one.
 	 * @return the shop that shares it's inventory with this one.
-	 * Will return null if thsi shop is not attached to another.
+	 * Will return null if this shop is not attached to another.
 	 */
 	public Shop getAttachedShop(){
+		if(this.getLocation().getBlock().getType() != Material.CHEST){
+			return null; // Oh, fuck.
+		}
+		
+		Chest chest = getOtherHalf();
+		
+		if(chest == null) return null;
+		
+		return plugin.getShopManager().getShop(chest.getLocation());
+	}
+	
+	/**
+	 * Returns the other half of this shops double chest, or null if it is a single chest.
+	 * @return the other half of this shops double chest, or null if it is a single chest.
+	 */
+	public Chest getOtherHalf(){
 		if(this.getLocation().getBlock().getType() != Material.CHEST){
 			return null; // Oh, fuck.
 		}
@@ -146,21 +163,12 @@ public class Shop{
 			return null; //Not a double inventory. Not a double chest.
 		}
 		
-		Location loc = this.loc.clone().add(1, 0, 0);
-		Shop nextTo = plugin.getShopManager().getShop(loc);
-		if(nextTo == null){
-			loc = this.loc.clone().add(-1, 0, 0);
-			nextTo = plugin.getShopManager().getShop(loc);
+		Block b = Util.getSecondHalf(this.loc.getBlock());
+		if(b == null){
+			return null; //You're a double chest in a single block, you say? That's nice.
 		}
-		if(nextTo == null){
-			loc = this.loc.clone().add(0, 0, 1);
-			nextTo = plugin.getShopManager().getShop(loc);
-		}
-		if(nextTo == null){
-			loc = this.loc.clone().add(0, 0, -1);
-			nextTo = plugin.getShopManager().getShop(loc);
-		}
-		return nextTo;
+		
+		return (Chest) b.getState();
 	}
 	
 	/**
@@ -521,7 +529,7 @@ public class Shop{
 	 */
 	public void setSignText(String[] lines){
 		if(this.getLocation().getWorld() == null) return;
-		
+		/*
 		Block[] blocks = new Block[4];
 		blocks[0] = loc.getBlock().getRelative(1, 0, 0);
 		blocks[1] = loc.getBlock().getRelative(-1, 0, 0);
@@ -539,8 +547,55 @@ public class Shop{
 			}
 			
 			sign.update(true);
-		}
+		}*/
 		
+		for(Sign sign : this.getSigns()){
+			for(int i = 0; i < lines.length; i++){
+				sign.setLine(i,  lines[i]);
+			}
+			
+			sign.update();
+		}
+	}
+	
+	/**
+	 * Returns a list of signs that are attached to this shop (QuickShop and blank signs only)
+	 * @return a list of signs that are attached to this shop (QuickShop and blank signs only)
+	 */
+	public List<Sign> getSigns(){
+		ArrayList<Sign> signs = new ArrayList<Sign>(4);
+		
+		if(this.getLocation().getWorld() == null) return signs;
+		
+		Block[] blocks = new Block[4];
+		blocks[0] = loc.getBlock().getRelative(1, 0, 0);
+		blocks[1] = loc.getBlock().getRelative(-1, 0, 0);
+		blocks[2] = loc.getBlock().getRelative(0, 0, 1);
+		blocks[3] = loc.getBlock().getRelative(0, 0, -1);
+		
+		for(Block b : blocks){
+			if(b.getType() != Material.WALL_SIGN) continue;
+			if(!isAttached(b)) continue;
+			Sign sign = (Sign) b.getState();
+			
+			if(sign.getLine(0).contains("[QuickShop")){
+				signs.add(sign);
+			}
+			else{
+				boolean text = false;
+				for(String s : sign.getLines()){
+					if(!s.isEmpty()){
+						text = true;
+						break;
+					}
+				}
+				
+				if(!text){
+					signs.add(sign);
+				}
+			}
+		}
+		return signs;
 	}
 	
 	/**
