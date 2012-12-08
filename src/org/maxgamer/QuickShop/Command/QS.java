@@ -262,6 +262,17 @@ public class QS implements CommandExecutor{
 		sender.sendMessage(MsgUtil.getMessage("no-permission"));
 		return;
 	}
+	
+	private void reload(CommandSender sender){
+		if(sender.hasPermission("quickshop.reload")){
+			sender.sendMessage(MsgUtil.getMessage("command.reloading"));
+			QuickShop.instance.onDisable();
+			QuickShop.instance.onEnable();
+			return;
+		}
+		sender.sendMessage(MsgUtil.getMessage("no-permission"));
+		return;
+	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
@@ -296,6 +307,10 @@ public class QS implements CommandExecutor{
 			
 			else if(subArg.equals("clean")){
 				clean(sender);
+				return true;
+			}
+			else if(subArg.equals("reload")){
+				reload(sender);
 				return true;
 			}
 			else if(subArg.equals("debug")){

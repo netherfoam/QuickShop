@@ -69,6 +69,7 @@ command:
    now-buying: "&aNow &dBUYING&a &e{0}"
    now-selling: "&aNow &bSELLING &e{0}"
    cleaning: "&aCleaning up shops with 0 stock..."
+   reloading: "&aReloading..."
    cleaned: "&aCleaned &e{0}&a shops"
    no-type-given: "&cUsage: /qs find <item>"
    description:
@@ -80,6 +81,7 @@ command:
        clean: "&eRemoves all (loaded) shops with 0 stock"
        price: "&eChanges the buy/selling price of one of your shops"
        find: "&eLocates the nearest shop of a specific type."
+       reload: "&eReloads QuickShop from config.yml"
        
 signs:
     #Line 1 is used as an identifier at the moment, so I kind of need it to work, thats why I won't let you change it

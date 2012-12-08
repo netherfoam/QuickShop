@@ -237,7 +237,7 @@ public class QuickShop extends JavaPlugin{
 		super.reloadConfig();
 		
 		//Load quick variables
-		this.display = this.getConfig().getBoolean("shop.display-items");
+		this.display = this.getConfig().getBoolean("shop.display-items"); 
 		this.sneak = this.getConfig().getBoolean("shop.sneak-only");
 		this.lock = this.getConfig().getBoolean("shop.lock");
 		
