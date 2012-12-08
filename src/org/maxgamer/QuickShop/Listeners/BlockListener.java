@@ -11,7 +11,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.maxgamer.QuickShop.MsgUtil;
 import org.maxgamer.QuickShop.QuickShop;
+import org.maxgamer.QuickShop.Util;
 import org.maxgamer.QuickShop.Shop.DisplayItem;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
@@ -42,7 +44,7 @@ public class BlockListener implements Listener{
 					//If they owned it or have bypass perms, they can destroy it
 					if(!shop.getOwner().equalsIgnoreCase(p.getName()) && !p.hasPermission("quickshop.other.destroy")){
 						e.setCancelled(true);
-						p.sendMessage(plugin.getMessage("no-permission"));
+						p.sendMessage(MsgUtil.getMessage("no-permission"));
 						return;
 					}
 				}
@@ -50,7 +52,7 @@ public class BlockListener implements Listener{
 				//If they're either survival or the owner, they can break it
 				if(p.getGameMode() == GameMode.CREATIVE && !p.getName().equalsIgnoreCase(shop.getOwner())){
 					e.setCancelled(true);
-					p.sendMessage(plugin.getMessage("no-creative-break"));
+					p.sendMessage(MsgUtil.getMessage("no-creative-break"));
 					return;
 				}
 				
@@ -60,7 +62,7 @@ public class BlockListener implements Listener{
 					action.setAction(ShopAction.CANCELLED);
 				}
 				shop.delete();
-				p.sendMessage(plugin.getMessage("success-removed-shop"));
+				p.sendMessage(MsgUtil.getMessage("success-removed-shop"));
 			}
 		}
 		else if(b.getType() == Material.WALL_SIGN){
@@ -70,14 +72,14 @@ public class BlockListener implements Listener{
 					//If they're the shop owner or have bypass perms, they can destroy it.
 					if(!shop.getOwner().equalsIgnoreCase(p.getName()) && !e.getPlayer().hasPermission("quickshop.other.destroy")){
 						e.setCancelled(true);
-						p.sendMessage(plugin.getMessage("no-permission"));
+						p.sendMessage(MsgUtil.getMessage("no-permission"));
 						return;
 					}
 				}
 				//If they're in creative and not the owner, don't let them (accidents happen)
 				if(p.getGameMode() == GameMode.CREATIVE && !p.getName().equalsIgnoreCase(shop.getOwner())){
 					e.setCancelled(true);
-					p.sendMessage(plugin.getMessage("no-creative-break"));
+					p.sendMessage(MsgUtil.getMessage("no-creative-break"));
 					return;
 				}
 			}
@@ -91,10 +93,11 @@ public class BlockListener implements Listener{
 	public void onPlace(BlockPlaceEvent e){
 		if(e.isCancelled() || e.getBlock().getType() != Material.CHEST) return;
 		Block b = e.getBlock();
-		Block chest = plugin.getChestNextTo(b);
+		
+		Block chest = Util.getSecondHalf(b);
 		if(chest != null && plugin.getShopManager().getShop(chest.getLocation()) != null && !e.getPlayer().hasPermission("quickshop.create.double")){
 			e.setCancelled(true);
-			e.getPlayer().sendMessage(plugin.getMessage("no-double-chests"));
+			e.getPlayer().sendMessage(MsgUtil.getMessage("no-double-chests"));
 		}
 	}
 	/**

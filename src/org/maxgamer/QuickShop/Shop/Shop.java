@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.maxgamer.QuickShop.MsgUtil;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Util;
 
@@ -89,16 +90,8 @@ public class Shop{
 		if(this.unlimited) return 10000;
 		
 		Chest chest = (Chest) loc.getBlock().getState();
-		int stock = 0;
 		
-		ItemStack[] in = chest.getInventory().getContents();
-		for(ItemStack item : in){
-			if(this.matches(item)){
-				stock = stock + item.getAmount();
-			}
-		}
-		
-		return stock;
+		return Util.countItems(chest.getInventory(), this.getItem());
 	}
 	
 	/**
@@ -106,8 +99,10 @@ public class Shop{
 	 * @param stackSize
 	 * @return
 	 */
-	public int getRemainingSpace(int stackSize){
+	public int getRemainingSpace(){
 		if(this.unlimited) return 10000;
+		
+		int stackSize = this.getMaterial().getMaxStackSize();
 		
 		Chest chest = (Chest) loc.getBlock().getState();
 		int space = 0;
@@ -130,7 +125,7 @@ public class Shop{
 	 * @return True if the ItemStack is the same (Excludes amounts)
 	 */
 	public boolean matches(ItemStack item){
-		return (item != null && item.getType() == getMaterial() && item.getDurability() == getDurability() && item.getEnchantments().equals(getEnchants()));
+		return Util.matches(this.item, item);
 	}
 	
 	/**
@@ -513,13 +508,13 @@ public class Shop{
 		String[] lines = new String[4];
 		lines[0] = ChatColor.RED + "[QuickShop]";
 		if(this.isBuying()){
-			lines[1] = plugin.getMessage("signs.buying");
+			lines[1] = MsgUtil.getMessage("signs.buying");
 		}
 		if(this.isSelling()){
-			lines[1] = plugin.getMessage("signs.selling");
+			lines[1] = MsgUtil.getMessage("signs.selling");
 		}
 		lines[2] = Util.getDataName(this.getMaterial(), this.getDurability());
-		lines[3] = plugin.getMessage("signs.price", ""+this.getPrice());
+		lines[3] = MsgUtil.getMessage("signs.price", ""+this.getPrice());
 		this.setSignText(lines);
 	}
 	
@@ -529,25 +524,6 @@ public class Shop{
 	 */
 	public void setSignText(String[] lines){
 		if(this.getLocation().getWorld() == null) return;
-		/*
-		Block[] blocks = new Block[4];
-		blocks[0] = loc.getBlock().getRelative(1, 0, 0);
-		blocks[1] = loc.getBlock().getRelative(-1, 0, 0);
-		blocks[2] = loc.getBlock().getRelative(0, 0, 1);
-		blocks[3] = loc.getBlock().getRelative(0, 0, -1);
-		
-		for(Block b : blocks){
-			if(b.getType() != Material.WALL_SIGN) continue;
-			if(!isAttached(b)) continue;
-			Sign sign = (Sign) b.getState();
-			//Only if its a quickshop sign do we change it.
-			if(!sign.getLine(0).contains("[QuickShop]") && sign.getLine(0).length() > 0) continue;
-			for(int i = 0; i < lines.length; i++){
-				sign.setLine(i, lines[i]);
-			}
-			
-			sign.update(true);
-		}*/
 		
 		for(Sign sign : this.getSigns()){
 			for(int i = 0; i < lines.length; i++){
@@ -632,38 +608,11 @@ public class Shop{
 			iframe.teleport(this.loc);
 		}
 		
-		
-		
 		System.out.println("Unmodified loc?: " + (orig.equals(this.loc)));
 	}
 	
 	public boolean isAttached(Block b){
-		Sign sign = (Sign) b.getState();
-		BlockFace bf = b.getFace(this.getLocation().getBlock());
-		if(sign.getRawData() == 5){
-			if(bf == BlockFace.NORTH){
-				return true;
-			}
-			return false;
-		}
-		else if(sign.getRawData() == 4){
-			if(bf == BlockFace.SOUTH){
-				return true;
-			}
-			return false;
-		}
-		else if(sign.getRawData() == 2){
-			if(bf == BlockFace.WEST){
-				return true;
-			}
-			return false;
-		}
-		else{
-			if(bf == BlockFace.EAST){
-				return true;
-			}
-			return false;
-		}
+		return Util.getAttached(b).equals(this.getLocation().getBlock());
 	}
 	
 	public String getDataName(){
@@ -746,7 +695,7 @@ public class Shop{
 					//Has space if they're buying, or stock if they're selling
 					if(shop.getShopType() == this.getShopType() && shop.matches(this.getItem()) 
 							&& 	(shop.isSelling() && shop.getRemainingStock() > 0 
-								 || shop.isBuying() && shop.getRemainingSpace(shop.getMaterial().getMaxStackSize()) > 0)){
+								 || shop.isBuying() && shop.getRemainingSpace() > 0)){
 						
 						total += shop.getPrice();
 						count++;

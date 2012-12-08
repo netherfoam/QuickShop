@@ -8,12 +8,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -31,27 +29,19 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.maxgamer.QuickShop.Command.QS;
 import org.maxgamer.QuickShop.Database.Database;
-import org.maxgamer.QuickShop.Listeners.BlockListener;
-import org.maxgamer.QuickShop.Listeners.ChatListener;
-import org.maxgamer.QuickShop.Listeners.ChunkListener;
-import org.maxgamer.QuickShop.Listeners.ClickListener;
-import org.maxgamer.QuickShop.Listeners.HeroChatListener;
-import org.maxgamer.QuickShop.Listeners.JoinListener;
-import org.maxgamer.QuickShop.Listeners.MoveListener;
-import org.maxgamer.QuickShop.Listeners.QuitListener;
-import org.maxgamer.QuickShop.Listeners.WorldListener;
+import org.maxgamer.QuickShop.Listeners.*;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.Shop.ShopType;
-import org.maxgamer.QuickShop.Watcher.BufferWatcher;
-import org.maxgamer.QuickShop.Watcher.ItemWatcher;
-import org.maxgamer.QuickShop.Watcher.LogWatcher;
+import org.maxgamer.QuickShop.Watcher.*;
 
 import net.milkbowl.vault.economy.Economy;
 
 public class QuickShop extends JavaPlugin{
 	private Economy economy;
 	private ShopManager shopManager;
+	
+	public static QuickShop instance;
 	
 	private HashMap<String, Info> actions = new HashMap<String, Info>(30);
 	private HashSet<Material> tools = new HashSet<Material>(50);
@@ -64,32 +54,18 @@ public class QuickShop extends JavaPlugin{
 	
 	public YamlConfiguration messages;
 	
-	/* Hooking into plugins */
-	/*
-	//PreciousStones
-	private PreciousStones preciousStones;
-	//Towny
-	private Towny towny;
-	//Residence
-	private Residence residence;
-	//WorldGuard
-	private WorldGuardPlugin worldGuardPlugin;
-	//GriefPrevention
-	private GriefPrevention griefPrevention; 
-	//Lockette
-	private Lockette lockette;
-	//LWC
-	private LWC lwc;
-	*/
+	//Listeners (These need extra args)
 	private ChatListener chatListener;
 	private HeroChatListener heroChatListener;
-	private ClickListener clickListener;
+	
+	//Listeners (These don't)
+	private ClickListener clickListener = new ClickListener(this);
 	private BlockListener blockListener = new BlockListener(this);
 	private MoveListener moveListener = new MoveListener(this);
 	private ChunkListener chunkListener = new ChunkListener(this);
 	private QuitListener quitListener = new QuitListener(this);
 	private WorldListener worldListener = new WorldListener(this);
-	private JoinListener joinListener = new JoinListener(this);
+	private JoinListener joinListener = new JoinListener();
 	
 	private int itemWatcherID;
 	public boolean lock;
@@ -100,57 +76,20 @@ public class QuickShop extends JavaPlugin{
 	private LogWatcher logWatcher;
 	
 	public void onEnable(){
-		/* Create plugin folder */
-		if(!this.getDataFolder().exists()){
-			this.getDataFolder().mkdir();
-		}
-		/* Create config file */
-		File configFile = new File(this.getDataFolder(), "config.yml");
-		if(!configFile.exists()){
-			//Copy config with comments
-			getLogger().info("Generating config.yml");
-			this.saveDefaultConfig();
-		}
-		else{
-			//We've run before. Load ourself.
-			reloadConfig(); //Reload it just in case this plugin was manually reloaded
-			getConfig().options().copyDefaults(true);
-			saveConfig();
-		}
+		instance = this;
 		
-		//Load quick variables
-		this.display = this.getConfig().getBoolean("shop.display-items");
-		this.sneak = this.getConfig().getBoolean("shop.sneak-only");
-		this.lock = this.getConfig().getBoolean("shop.lock");
-		
-		//Load messages.yml
-		File messageFile = new File(this.getDataFolder(), "messages.yml");
-		if(!messageFile.exists()){
-			getLogger().info("Creating messages.yml");
-			this.saveResource("messages.yml", true);
-		}
-		
-		this.messages = YamlConfiguration.loadConfiguration(messageFile);
-		this.messages.options().copyDefaults(true);
-		
-		InputStream defMessageStream = this.getResource("messages.yml");
-		if(defMessageStream != null){
-			YamlConfiguration defMessages = YamlConfiguration.loadConfiguration(defMessageStream);
-			this.messages.setDefaults(defMessages);
-		}
-		else{
-			this.getLogger().severe("Messages.yml not found inside plugin! This will cause errors! Update!");
-		}
-		Util.parseColours(this.messages);
+		saveDefaultConfig(); //Creates the config folder and copies config.yml (If one doesn't exist) as required.
+		reloadConfig(); //Reloads messages.yml too, aswell as config.yml and others.
+		getConfig().options().copyDefaults(true); //Load defaults.
 		
 		/* Hook into other plugins */
-		
 		if(Bukkit.getPluginManager().getPlugin("Vault") == null){
 			getLogger().severe(ChatColor.RED + "You don't have Vault installed!");
 			getLogger().severe(ChatColor.RED + "Download it from: ");
 			getLogger().severe(ChatColor.RED + "http://dev.bukkit.org/server-mods/vault");
 			getLogger().severe(ChatColor.RED + "And place it in your plugins folder!");
 			getLogger().severe(ChatColor.RED + "This plugin will not function (at all) until you install vault.");
+			return;
 		}
 		else{
 			getLogger().info("Hooking Vault");
@@ -160,81 +99,25 @@ public class QuickShop extends JavaPlugin{
 				getLogger().severe(ChatColor.YELLOW + "BOSEconomy, EssentialsEcon, 3Co, MultiCurrency, MineConomy, CraftConomy");
 				getLogger().severe(ChatColor.YELLOW + "from http://dev.bukkit.org!");
 				getLogger().severe(ChatColor.YELLOW + "This plugin will not function (at all) until you install an economy.");
+				return;
 			}
 			else{
 				getLogger().info(ChatColor.GREEN + "Vault hooked!");
 			}
 		}
 		
-		/*
-		Plugin plug;
-		
-		//PreciousStones
-		if(getConfig().getBoolean("plugins.preciousstones")){
-			plug = Bukkit.getPluginManager().getPlugin("PreciousStones");
-			if(plug != null){
-				this.preciousStones = (PreciousStones) plug;
-			}
-		}
-		//Towny
-		if(getConfig().getBoolean("plugins.towny")){
-			plug = Bukkit.getPluginManager().getPlugin("Towny");
-			if(plug != null){
-				this.towny = (Towny) plug;
-			}	
-		}
-		//Lockette
-		if(getConfig().getBoolean("plugins.lockette")){
-			plug = Bukkit.getPluginManager().getPlugin("Lockette");
-			if(plug != null){
-				this.lockette = (Lockette) plug;
-			}
-		}
-		//WorldGuard
-		if(getConfig().getBoolean("plugins.worldguard")){
-			plug = Bukkit.getPluginManager().getPlugin("WorldGuard");
-			if(plug != null){
-				this.worldGuardPlugin = (WorldGuardPlugin) plug;
-			}
-		}
-		//GriefPrevention
-		if(getConfig().getBoolean("plugins.griefprevention")){
-			plug = Bukkit.getPluginManager().getPlugin("GriefPrevention");
-			if(plug != null){
-				this.griefPrevention = (GriefPrevention) plug;
-			}
-		}
-		//Residence
-		if(getConfig().getBoolean("plugins.residence")){
-			plug = Bukkit.getPluginManager().getPlugin("Residence");
-			if(plug != null){
-				this.residence = (Residence) plug;
-			}
-		}
-		//LWC
-		if(getConfig().getBoolean("plugins.lwc")){
-			plug = Bukkit.getPluginManager().getPlugin("LWC");
-			if(plug != null){
-				this.lwc = (LWC) lwc;
-			}
-		}
-		*/
 		//Create the shop manager.
 		this.shopManager = new ShopManager(this);
 		
 		if(this.display){
-			/**
-			 * Display item handler thread
-			 */
+			// Display item handler thread
 			getLogger().info("Starting item scheduler");
 			ItemWatcher itemWatcher = new ItemWatcher(this);
 			itemWatcherID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, itemWatcher, 600, 600);
 		}
 		
 		if(this.getConfig().getBoolean("log-actions")){
-			/**
-			 * Logging handler
-			 */
+			//Logger Handler
 			this.logWatcher = new LogWatcher(this, new File(this.getDataFolder(), "qs.log"));
 			logWatcher.taskId = Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, this.logWatcher, 150, 150);
 		}
@@ -308,8 +191,18 @@ public class QuickShop extends JavaPlugin{
 		
 		//Register events
 		getLogger().info("Registering Listeners");
-		//Safe to initialize now - It accesses config!
-		this.clickListener = new ClickListener(this);
+		Bukkit.getServer().getPluginManager().registerEvents(clickListener, this);
+		Bukkit.getServer().getPluginManager().registerEvents(blockListener, this);
+		Bukkit.getServer().getPluginManager().registerEvents(moveListener, this);
+		
+		if(this.display){
+			Bukkit.getServer().getPluginManager().registerEvents(chunkListener, this);
+		}
+		
+		Bukkit.getServer().getPluginManager().registerEvents(quitListener, this);
+		Bukkit.getServer().getPluginManager().registerEvents(worldListener, this);
+		Bukkit.getServer().getPluginManager().registerEvents(joinListener, this);
+		
 		if(Bukkit.getPluginManager().getPlugin("Herochat") != null){
 			this.getLogger().info("Found Herochat... Hooking!");
 			this.heroChatListener = new HeroChatListener(this);
@@ -319,16 +212,6 @@ public class QuickShop extends JavaPlugin{
 			this.chatListener = new ChatListener(this);
 			Bukkit.getServer().getPluginManager().registerEvents(chatListener, this);
 		}
-		Bukkit.getServer().getPluginManager().registerEvents(clickListener, this);
-		Bukkit.getServer().getPluginManager().registerEvents(blockListener, this);
-		Bukkit.getServer().getPluginManager().registerEvents(moveListener, this);
-		
-		if(this.display){
-			Bukkit.getServer().getPluginManager().registerEvents(chunkListener, this);
-		}
-		Bukkit.getServer().getPluginManager().registerEvents(quitListener, this);
-		Bukkit.getServer().getPluginManager().registerEvents(worldListener, this);
-		Bukkit.getServer().getPluginManager().registerEvents(joinListener, this);
 		
 		//Command handlers
 		QS commandExecutor = new QS(this);
@@ -348,6 +231,37 @@ public class QuickShop extends JavaPlugin{
 			getLogger().info("Could not start metrics.");
 		}
 	}
+	/** Reloads QuickShops config */
+	@Override
+	public void reloadConfig(){
+		super.reloadConfig();
+		
+		//Load quick variables
+		this.display = this.getConfig().getBoolean("shop.display-items");
+		this.sneak = this.getConfig().getBoolean("shop.sneak-only");
+		this.lock = this.getConfig().getBoolean("shop.lock");
+		
+		//Load messages.yml
+		File messageFile = new File(this.getDataFolder(), "messages.yml");
+		if(!messageFile.exists()){
+			getLogger().info("Creating messages.yml");
+			this.saveResource("messages.yml", true);
+		}
+		
+		this.messages = YamlConfiguration.loadConfiguration(messageFile);
+		this.messages.options().copyDefaults(true);
+		
+		InputStream defMessageStream = this.getResource("messages.yml");
+		if(defMessageStream != null){
+			YamlConfiguration defMessages = YamlConfiguration.loadConfiguration(defMessageStream);
+			this.messages.setDefaults(defMessages);
+		}
+		else{
+			this.getLogger().severe("Messages.yml not found inside plugin! This will cause errors! Update!");
+		}
+		Util.parseColours(this.messages);
+	}
+	
 	public void onDisable(){
 		if(this.display){
 			Bukkit.getScheduler().cancelTask(itemWatcherID);
@@ -386,22 +300,6 @@ public class QuickShop extends JavaPlugin{
 		this.logWatcher.add("["+time.toString()+"] "+ s);
 	}
 	
-	public String getMessage(String loc, String... args){
-		String raw = this.messages.getString(loc);
-		
-		if(raw == null || raw.isEmpty()){
-			return "Invalid message: " + loc;
-		}
-		if(args == null){
-			return raw;
-		}
-		
-		for(int i = 0; i < args.length; i++){
-			raw = raw.replace("{"+i+"}", args[i]);
-		}
-		return raw;
-	}
-	
 	/**
 	 * @return Returns the HashMap<Player name, shopInfo>. Info contains what their last question etc was.
 	 */
@@ -433,50 +331,7 @@ public class QuickShop extends JavaPlugin{
 		if(!debug) return;
 		this.getLogger().info(ChatColor.YELLOW + "[Debug] " + s);
 	}
-	
-	/**
-	 * Gets the chest (or null) directly next to a block. Does not check vertical or diagonal.
-	 * @param b The block to check next to.
-	 * @return The chest.
-	 */
-	public Block getChestNextTo(Block b){
-		Block[] c = new Block[4];
-		c[0] = (b.getLocation().add(1, 0, 0).getBlock());
-		c[1] = (b.getLocation().add(-1, 0, 0).getBlock());
-		c[2] = (b.getLocation().add(0, 0, 1).getBlock());
-		c[3] = (b.getLocation().add(0, 0, -1).getBlock());
 
-		for(Block d : c){
-			if(d.getType() == Material.CHEST){
-				return d;
-			}
-		}
-		return null;
-	}
-	
-	
-	/*
-	public WorldGuardPlugin getWorldGuard(){
-		return this.worldGuardPlugin;
-	}
-	public Lockette getLockette(){
-		return this.lockette;
-	}
-	public PreciousStones getPreciousStones(){
-		return this.preciousStones;
-	}
-	public Towny getTowny(){
-		return this.towny;
-	}
-	public GriefPrevention getGriefPrevention(){
-		return this.griefPrevention;
-	}
-	public Residence getResidence(){
-        return this.residence;
-	}
-	public LWC getLWC(){
-		return this.lwc;
-	}*/
 	/**
 	 * Checks other plugins to make sure they can use the chest they're making a shop.
 	 * @param p The player to check
@@ -492,64 +347,6 @@ public class QuickShop extends JavaPlugin{
 		else{
 			return true;
 		}
-		/*
-		if(getWorldGuard() != null){
-			if(!getWorldGuard().canBuild(p, b)){
-				//Can't build.
-				return false;
-			}
-		}
-		
-		if(getLockette() != null){
-			if(!Lockette.isUser(b, p.getName(), true)){
-				//Can't use
-				return false;
-			}
-		}
-		
-		if(getPreciousStones() != null){
-			List<Field> fields = getPreciousStones().getForceFieldManager().getSourceFields(b.getLocation(), FieldFlag.PREVENT_USE);
-				for(Field field : fields){
-					if(!field.isAllowed(p.getName()) && !field.isOwner(p.getName())){
-						//Not ps-allowed
-						return false;
-					}
-				}
-		}
-		if(getTowny() != null){
-			TownBlock tb = TownyUniverse.getTownBlock(b.getLocation());
-			if(tb != null){
-				try {
-					if(!tb.getTown().getResidents().contains(TownyUniverse.getDataSource().getResident(p.getName()))){
-						//Not a resident of the town. (Maybe I should check individual plots? How?)
-						return false;
-					}
-				} catch (Exception e) {
-				} 
-			}
-		}
-		if(getGriefPrevention() != null){
-			Claim claim = getGriefPrevention().dataStore.getClaimAt(b.getLocation(), false, null);
-			if(claim != null && claim.allowContainers(p) != null){
-				//Not trusted with containers.
-				return false;
-			}
-			
-		}
-		if(getResidence() != null){
-			ClaimedResidence res = Residence.getResidenceManager().getByLoc(b.getLocation());
-			if(res!=null){
-				if(!res.getPermissions().playerHas(p.getName(), "container", false)&&!Residence.getPermissionManager().isResidenceAdmin(p)){
-					return false;
-				}
-			}
-		}
-		
-		if(getLWC() != null){
-			if(!getLWC().canAccessProtection(p, b)){
-				return false;
-			}
-		}*/
 	}
 	
 	/**
@@ -558,8 +355,6 @@ public class QuickShop extends JavaPlugin{
 	 * If you want to use the shop, use QuickShop.getShopManager().getShop(Location) instead.
 	 * @param loc The location to check
 	 * @return true is it's a shop, false if it's not.
-	 * 
-	 * 
 	 */
 	public boolean isShop(Location loc){
 		return this.getShopManager().getShop(loc.getBlock().getLocation()) != null;
@@ -572,7 +367,7 @@ public class QuickShop extends JavaPlugin{
 	public ShopManager getShopManager(){
 		return this.shopManager;
 	}
-	
+	/*
 	public List<String> getMessages(String player){
 		player = player.toLowerCase();
 		
@@ -593,21 +388,17 @@ public class QuickShop extends JavaPlugin{
 			this.getLogger().info("Could not load messages for " + player);
 		}
 		return messages;
-	}
-	
+	}*/
+	/*
 	public void addMessage(String player, String msg){
 		player = player.toLowerCase();
 		
 		String q = "INSERT INTO messages (owner, message, time) VALUES ('"+player+"','"+msg+"','"+System.currentTimeMillis()+"')";
 		
 		getDB().writeToBuffer(q);
-	}
-	
+	}*/
+	/*
 	public void deleteMessages(String player){
 		getDB().writeToBuffer("DELETE FROM messages WHERE owner = '"+player.toLowerCase()+"'");
-	}
-	
-	public String format(double n){
-		return this.economy.format(n);
-	}
+	}*/
 }

@@ -6,6 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.maxgamer.QuickShop.MsgUtil;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.ShopAction;
@@ -31,10 +32,10 @@ public class MoveListener implements Listener{
 			
 			if(loc1.getWorld() != loc2.getWorld() || loc1.distanceSquared(loc2) > 25){
 				if(info.getAction() == ShopAction.CREATE){
-					p.sendMessage(plugin.getMessage("shop-creation-cancelled"));
+					p.sendMessage(MsgUtil.getMessage("shop-creation-cancelled"));
 				}
 				else if(info.getAction() == ShopAction.BUY){
-					p.sendMessage(plugin.getMessage("shop-purchase-cancelled"));
+					p.sendMessage(MsgUtil.getMessage("shop-purchase-cancelled"));
 				}
 				plugin.getActions().remove(p.getName());
 				return;

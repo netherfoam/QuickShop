@@ -2,34 +2,22 @@ package org.maxgamer.QuickShop;
 
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class Messenger implements Runnable{
-	private QuickShop plugin;
-	private String player;
+	private Player player;
 	
-	public Messenger(QuickShop plugin, String player){
-		this.plugin = plugin;
+	public Messenger(Player player){
 		this.player = player;
 	}
 
 	@Override
 	public void run() {
-		List<String> messages = plugin.getMessages(player);
-		
-		if(messages == null){
-			return;
-		}
-		Player p = Bukkit.getPlayerExact(player);
-		if(p == null){
-			//Gets thrown when a player joins for the first time, believe it or not.
-			return;
-		}
+		List<String> messages = MsgUtil.getMessages(player.getName());
 		
 		for(String s : messages){
-			p.sendMessage(s);
+			player.sendMessage(s);
 		}
-		plugin.deleteMessages(player);
+		MsgUtil.deleteMessages(player.getName());
 	}
 }

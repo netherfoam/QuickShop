@@ -16,6 +16,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Sign;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.ShopAction;
@@ -162,37 +163,36 @@ public class ShopManager{
 			public void run() {
 				HashMap<String, Info> actions = plugin.getActions();
 				//They wanted to do something.
-				Info info = actions.get(p.getName());
-				plugin.getActions().remove(p.getName());
+				Info info = actions.remove(p.getName());
 				if(info == null) return;
 				/* Creation handling */
 				if(info.getAction() == ShopAction.CREATE){
 					try{
 						if(plugin.getShopManager().getShop(info.getLocation()) != null){
-							p.sendMessage(plugin.getMessage("shop-already-owned"));
+							p.sendMessage(MsgUtil.getMessage("shop-already-owned"));
 							return;
 						}
 						
-						if(plugin.getChestNextTo(info.getLocation().getBlock()) != null && !p.hasPermission("quickshop.create.double")){
-							p.sendMessage(plugin.getMessage("no-double-chests"));
+						if(Util.getSecondHalf(info.getLocation().getBlock()) != null && !p.hasPermission("quickshop.create.double")){
+							p.sendMessage(MsgUtil.getMessage("no-double-chests"));
 							return;
 						}
 						
 						if(info.getLocation().getBlock().getType() != Material.CHEST){
-							p.sendMessage(plugin.getMessage("chest-was-removed"));
+							p.sendMessage(MsgUtil.getMessage("chest-was-removed"));
 							return;
 						}
 						
 						//Price per item
 						double price = Double.parseDouble(message);
 						if(price < 0.01){
-							p.sendMessage(plugin.getMessage("price-too-cheap"));
+							p.sendMessage(MsgUtil.getMessage("price-too-cheap"));
 							return;
 						}
 						double tax = plugin.getConfig().getDouble("shop.cost"); 
 						
 						if(tax != 0 && plugin.getEcon().getBalance(p.getName()) <= tax){
-							p.sendMessage(plugin.getMessage("you-cant-afford-a-new-shop", plugin.format(tax)));
+							p.sendMessage(MsgUtil.getMessage("you-cant-afford-a-new-shop", Util.format(tax)));
 							return;
 						}
 						
@@ -206,9 +206,14 @@ public class ShopManager{
 
 						plugin.getShopManager().addShop(shop.getLocation().getWorld().getName(), shop);
 						
-						if(tax == 0) p.sendMessage(plugin.getMessage("success-created-shop"));
-						else{
-							plugin.getEcon().withdrawPlayer(p.getName(), tax);
+						if(tax != 0){
+							EconomyResponse r = plugin.getEcon().withdrawPlayer(p.getName(), tax);
+							
+							if(!r.transactionSuccess()){
+								p.sendMessage(MsgUtil.getMessage("you-cant-afford-a-new-shop", Util.format(tax)));
+								return;
+							}
+							
 							plugin.getEcon().depositPlayer(plugin.getConfig().getString("tax-account"), tax);
 						}
 						
@@ -221,7 +226,7 @@ public class ShopManager{
 						if(!plugin.getConfig().getBoolean("shop.lock")){
 							//Warn them if they haven't been warned since reboot
 							if(!plugin.warnings.contains(p.getName())){
-								p.sendMessage(plugin.getMessage("shops-arent-locked"));
+								p.sendMessage(MsgUtil.getMessage("shops-arent-locked"));
 								plugin.warnings.add(p.getName());
 							}
 						}
@@ -232,18 +237,8 @@ public class ShopManager{
 							BlockFace bf = info.getLocation().getBlock().getFace(info.getSignBlock());
 							bs.setType(Material.WALL_SIGN);
 							
-							if(bf == BlockFace.NORTH){
-								bs.setRawData((byte)4);
-							}
-							else if(bf == BlockFace.SOUTH){
-								bs.setRawData((byte) 5);
-							}
-							else if(bf == BlockFace.EAST){
-								bs.setRawData((byte) 2);
-							}
-							else if(bf == BlockFace.WEST){
-								bs.setRawData((byte) 3);
-							}
+							Sign sign = (Sign) bs.getData();
+							sign.setFacingDirection(bf);
 							
 							bs.update(true);
 							
@@ -254,13 +249,13 @@ public class ShopManager{
 							
 							if(nextTo.getPrice() > shop.getPrice()){
 								//The one next to it must always be a buying shop.
-								p.sendMessage(plugin.getMessage("buying-more-than-selling"));
+								p.sendMessage(MsgUtil.getMessage("buying-more-than-selling"));
 							}
 						}
 					}
 					/* They didn't enter a number. */
 					catch(NumberFormatException ex){
-						p.sendMessage(plugin.getMessage("shop-creation-cancelled"));
+						p.sendMessage(MsgUtil.getMessage("shop-creation-cancelled"));
 						return;
 					}
 				}
@@ -271,7 +266,7 @@ public class ShopManager{
 						amount = Integer.parseInt(message);
 					}
 					catch(NumberFormatException e){
-						p.sendMessage(plugin.getMessage("shop-purchase-cancelled"));
+						p.sendMessage(MsgUtil.getMessage("shop-purchase-cancelled"));
 						return;
 					}
 					
@@ -280,12 +275,12 @@ public class ShopManager{
 					
 					//It's not valid anymore
 					if(shop == null || info.getLocation().getBlock().getType() != Material.CHEST){
-						p.sendMessage(plugin.getMessage("chest-was-removed"));
+						p.sendMessage(MsgUtil.getMessage("chest-was-removed"));
 						return;
 					}
 					
 					if(info.hasChanged(shop)){
-						p.sendMessage(plugin.getMessage("shop-has-changed"));
+						p.sendMessage(MsgUtil.getMessage("shop-has-changed"));
 						return;
 					}
 					
@@ -293,7 +288,7 @@ public class ShopManager{
 						int stock = shop.getRemainingStock();
 						
 						if(stock <  amount){
-							p.sendMessage(plugin.getMessage("shop-stock-too-low", ""+shop.getRemainingStock(), shop.getDataName()));
+							p.sendMessage(MsgUtil.getMessage("shop-stock-too-low", ""+shop.getRemainingStock(), shop.getDataName()));
 							return;
 						}
 						if(amount == 0){
@@ -303,7 +298,7 @@ public class ShopManager{
 						}
 						else if(amount < 0){
 							// & Dumber
-							p.sendMessage(plugin.getMessage("negative-amount"));
+							p.sendMessage(MsgUtil.getMessage("negative-amount"));
 							return;
 						}
 						
@@ -315,7 +310,7 @@ public class ShopManager{
 						if(!p.getName().equalsIgnoreCase(shop.getOwner())){
 							//Check their balance.  Works with *most* economy plugins*
 							if(!plugin.getEcon().has(p.getName(), amount * shop.getPrice())){
-								p.sendMessage(plugin.getMessage("you-cant-afford-to-buy", ""+amount * shop.getPrice(), ""+plugin.getEcon().getBalance(p.getName())));
+								p.sendMessage(MsgUtil.getMessage("you-cant-afford-to-buy", ""+amount * shop.getPrice(), ""+plugin.getEcon().getBalance(p.getName())));
 								return;
 							}
 							
@@ -326,7 +321,7 @@ public class ShopManager{
 							
 							EconomyResponse r = plugin.getEcon().withdrawPlayer(p.getName(), total);
 							if(!r.transactionSuccess()){
-								p.sendMessage(plugin.getMessage("you-cant-afford-to-buy", ""+amount * shop.getPrice(), ""+plugin.getEcon().getBalance(p.getName())));
+								p.sendMessage(MsgUtil.getMessage("you-cant-afford-to-buy", ""+amount * shop.getPrice(), ""+plugin.getEcon().getBalance(p.getName())));
 								return;
 							}
 							
@@ -339,18 +334,10 @@ public class ShopManager{
 							}
 							
 							//Notify the shop owner
-							Player owner = Bukkit.getPlayerExact(shop.getOwner());
+							String msg = MsgUtil.getMessage("player-bought-from-your-store", p.getName(), ""+amount, shop.getDataName());
+							if(stock == amount) msg += "\n" + MsgUtil.getMessage("shop-out-of-stock", ""+shop.getLocation().getBlockX(), ""+shop.getLocation().getBlockY(), ""+shop.getLocation().getBlockZ(), shop.getDataName());
 							
-							String msg = plugin.getMessage("player-bought-from-your-store", p.getName(), ""+amount, shop.getDataName());
-							
-							if(stock == amount) msg += "\n" + plugin.getMessage("shop-out-of-stock", ""+shop.getLocation().getBlockX(), ""+shop.getLocation().getBlockY(), ""+shop.getLocation().getBlockZ(), shop.getDataName());
-							
-							if(owner != null && owner.isOnline()){
-								owner.sendMessage(msg);
-							}
-							else{
-								plugin.addMessage(shop.getOwner(), msg);
-							}
+							MsgUtil.send(shop.getOwner(), msg);
 						}
 						//Transfers the item from A to B
 						shop.sell(p, amount);
@@ -359,10 +346,10 @@ public class ShopManager{
 						plugin.log(p.getName() + " bought " + amount + " " +shop.getDataName()+" from shop at ("+loc.getWorld().getName()+" - "+loc.getX()+","+loc.getY()+","+loc.getZ()+") for " + (shop.getPrice() * amount));
 					}
 					else if(shop.isBuying()){
-						int space = shop.getRemainingSpace(shop.getMaterial().getMaxStackSize());
+						int space = shop.getRemainingSpace();
 						
 						if(space <  amount){
-							p.sendMessage(plugin.getMessage("shop-has-no-space", ""+space, shop.getDataName()));
+							p.sendMessage(MsgUtil.getMessage("shop-has-no-space", ""+space, shop.getDataName()));
 							return;
 						}
 						
@@ -375,7 +362,7 @@ public class ShopManager{
 						
 						//Broke
 						if(amount > count){
-							p.sendMessage(plugin.getMessage("you-dont-have-that-many-items", ""+count, shop.getDataName()));
+							p.sendMessage(MsgUtil.getMessage("you-dont-have-that-many-items", ""+count, shop.getDataName()));
 							return;
 						}
 						
@@ -386,7 +373,7 @@ public class ShopManager{
 						}
 						else if(amount < 0){
 							// & Dumber
-							p.sendMessage(plugin.getMessage("negative-amount"));
+							p.sendMessage(MsgUtil.getMessage("negative-amount"));
 							return;
 						}
 						
@@ -400,7 +387,7 @@ public class ShopManager{
 							if(!shop.isUnlimited() || plugin.getConfig().getBoolean("shop.pay-unlimited-shop-owners")){
 								//Tries to check their balance nicely to see if they can afford it.
 								if(!plugin.getEcon().has(shop.getOwner(), amount * shop.getPrice())){
-									p.sendMessage(plugin.getMessage("the-owner-cant-afford-to-buy-from-you", plugin.format(amount * shop.getPrice()), plugin.format(plugin.getEcon().getBalance(shop.getOwner()))));
+									p.sendMessage(MsgUtil.getMessage("the-owner-cant-afford-to-buy-from-you", Util.format(amount * shop.getPrice()), Util.format(plugin.getEcon().getBalance(shop.getOwner()))));
 									return;
 								}
 								
@@ -408,7 +395,7 @@ public class ShopManager{
 								
 								//Check for plugins faking econ.has(amount)
 								if(!r.transactionSuccess()){
-									p.sendMessage(plugin.getMessage("the-owner-cant-afford-to-buy-from-you", plugin.format(amount * shop.getPrice()), plugin.format(plugin.getEcon().getBalance(shop.getOwner()))));
+									p.sendMessage(MsgUtil.getMessage("the-owner-cant-afford-to-buy-from-you", Util.format(amount * shop.getPrice()), Util.format(plugin.getEcon().getBalance(shop.getOwner()))));
 									return;
 								}
 								
@@ -420,17 +407,10 @@ public class ShopManager{
 							plugin.getEcon().depositPlayer(p.getName(), total * (1 - tax));
 							
 							//Notify the owner of the purchase.
-							Player owner = Bukkit.getPlayerExact(shop.getOwner());
-							String msg = plugin.getMessage("player-sold-to-your-store", p.getName(), ""+amount, shop.getDataName());
+							String msg = MsgUtil.getMessage("player-sold-to-your-store", p.getName(), ""+amount, shop.getDataName());
+							if(space == amount) msg += "\n" + MsgUtil.getMessage("shop-out-of-space", ""+shop.getLocation().getBlockX(), ""+shop.getLocation().getBlockY(), ""+shop.getLocation().getBlockZ());
 							
-							if(space == amount) msg += "\n" + plugin.getMessage("shop-out-of-space", ""+shop.getLocation().getBlockX(), ""+shop.getLocation().getBlockY(), ""+shop.getLocation().getBlockZ());
-							
-							if(owner != null && owner.isOnline()){
-								owner.sendMessage(msg);
-							}
-							else{
-								plugin.addMessage(shop.getOwner(), msg);
-							}
+							MsgUtil.send(shop.getOwner(), msg);
 						}
 						
 						shop.buy(p, amount);
@@ -449,14 +429,14 @@ public class ShopManager{
 	}
 	private void sendPurchaseSuccess(Player p, Shop shop, int amount){
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.successful-purchase"));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.successful-purchase"));
 		
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), plugin.format((amount * shop.getPrice()))));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), Util.format((amount * shop.getPrice()))));
 		
 
 		Map<Enchantment, Integer> enchs = shop.getEnchants();
 		if(enchs != null && enchs.size() > 0){
-			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+plugin.getMessage("menu.enchants")+"-----------------------+");
+			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+MsgUtil.getMessage("menu.enchants")+"-----------------------+");
 			for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
 				p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
 			}
@@ -466,12 +446,12 @@ public class ShopManager{
 	
 	private void sendSellSuccess(Player p, Shop shop, int amount){
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.successfully-sold"));
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + plugin.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), plugin.format((amount * shop.getPrice()))));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.successfully-sold"));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), Util.format((amount * shop.getPrice()))));
 
 		Map<Enchantment, Integer> enchs = shop.getEnchants();
 		if(enchs != null && enchs.size() > 0){
-			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+plugin.getMessage("menu.enchants")+"-----------------------+");
+			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+MsgUtil.getMessage("menu.enchants")+"-----------------------+");
 			for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
 				p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
 			}

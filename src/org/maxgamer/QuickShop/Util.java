@@ -2,14 +2,18 @@ package org.maxgamer.QuickShop;
 
 import java.text.DecimalFormat;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.material.Sign;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.bukkit.potion.Potion;
@@ -17,8 +21,12 @@ import org.bukkit.potion.PotionType;
 
 public class Util{
 	private static HashSet<Material> tools = new HashSet<Material>();
+	private static HashSet<Material> blacklist = new HashSet<Material>();
+	private static QuickShop plugin;
 	
 	static{
+		plugin = QuickShop.instance;
+	
 		tools.add(Material.BOW);
 		tools.add(Material.SHEARS);
 		tools.add(Material.FISHING_ROD);
@@ -76,6 +84,20 @@ public class Util{
 		tools.add(Material.IRON_CHESTPLATE);
 		tools.add(Material.IRON_HELMET);
 		tools.add(Material.IRON_LEGGINGS);
+		
+		List<String> configBlacklist = plugin.getConfig().getStringList("blacklist");
+		
+		for(String s : configBlacklist){
+			Material mat = Material.getMaterial(s.toUpperCase());
+			if(mat == null){
+				mat = Material.getMaterial(Integer.parseInt(s));
+				if(mat == null){
+					plugin.getLogger().info(s + " is not a valid material.  Check your spelling or ID");
+					continue;
+				}
+			}
+			blacklist.add(mat);
+		}
 	}
 	
 	public static void parseColours(YamlConfiguration config){
@@ -86,6 +108,7 @@ public class Util{
 			if(filtered.startsWith("MemorySection")){
 				continue;
 			}
+			/*
 			char[] chars = filtered.toCharArray();
 			
 			for(int i = 0; i < chars.length - 1; i++){
@@ -97,6 +120,8 @@ public class Util{
 			}
 			
 			filtered = new String(chars);
+			*/
+			filtered = ChatColor.translateAlternateColorCodes('&', filtered);
 			config.set(key, filtered);
 		}
 	}
@@ -396,5 +421,68 @@ public class Util{
 	 */
 	public static boolean isTool(Material mat){
 		return tools.contains(mat);
+	}
+	
+	/**
+	 * Compares two items to each other. Returns true if they match.
+	 * @param stack1 The first item stack
+	 * @param stack2 The second item stack
+	 * @return true if the itemstacks match. (Material, durability, enchants)
+	 */
+	public static boolean matches(ItemStack stack1, ItemStack stack2){
+		if(stack1 == stack2) return true; //Referring to the same thing, or both are null.
+		if(stack1 == null || stack2 == null) return false; //One of them is null (Can't be both, see above)
+		
+		if(stack1.getType() != stack2.getType()) return false; //Not the same material
+		if(stack1.getDurability() != stack2.getDurability()) return false; //Not the same durability
+		if(!stack1.getEnchantments().equals(stack2.getEnchantments())) return false; //They have the same enchants
+		
+		return true;
+	}
+	
+	/**
+	 * Formats the given number according to how vault would like it.
+	 * E.g. $50 or 5 dollars.
+	 * @return The formatted string.
+	*/
+	public static String format(double n){
+		return plugin.getEcon().format(n);
+	}
+	
+	/**
+	 * @param m The material to check if it is blacklisted
+	 * @return true if the material is black listed. False if not.
+	 */
+	public static boolean isBlacklisted(Material m){
+		return blacklist.contains(m);
+	}
+	
+	/**
+	 * Fetches the block which the given sign is attached to
+	 * @param sign The sign which is attached
+	 * @return The block the sign is attached to
+	 */
+	public static Block getAttached(Block b){
+		Sign sign = (Sign) b.getState().getData();
+		BlockFace attached = sign.getAttachedFace();
+		
+		return b.getRelative(attached);
+	}
+	
+	/**
+	 * Counts the number of items in the given inventory where Util.matches(inventory item, item) is true.
+	 * @param inv The inventory to search
+	 * @param item The ItemStack to search for
+	 * @return The number of items that match in this inventory.
+	 */
+	public static int countItems(Inventory inv, ItemStack item){
+		int items = 0;
+		for(ItemStack iStack : inv.getContents()){
+			if(iStack == null) continue;
+			if(Util.matches(item, iStack)){
+				items += iStack.getAmount();
+			}
+		}
+		return items;
 	}
 }
