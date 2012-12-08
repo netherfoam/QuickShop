@@ -505,6 +505,8 @@ public class Shop{
 	 * Updates signs attached to the shop
 	 */
 	public void setSignText(){
+		if(this.getLocation().getWorld() == null) return;
+		
 		String[] lines = new String[4];
 		lines[0] = ChatColor.RED + "[QuickShop]";
 		if(this.isBuying()){
@@ -612,7 +614,7 @@ public class Shop{
 	}
 	
 	public boolean isAttached(Block b){
-		return Util.getAttached(b).equals(this.getLocation().getBlock());
+		return this.getLocation().getBlock().equals(Util.getAttached(b));
 	}
 	
 	public String getDataName(){
