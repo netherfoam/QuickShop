@@ -466,6 +466,7 @@ public class Util{
 		Sign sign = (Sign) b.getState().getData();
 		BlockFace attached = sign.getAttachedFace();
 		
+		if(attached == null) return null;
 		return b.getRelative(attached);
 	}
 	
