@@ -36,7 +36,7 @@ public class BufferWatcher implements Runnable{
 			}
 			plugin.getDB().queries.clear();
 			
-			db.bufferWatcherID = 0;
+			db.task = null;
 			
 			plugin.getDB().queriesInUse = false;
 			
@@ -46,7 +46,7 @@ public class BufferWatcher implements Runnable{
 		} catch (SQLException e) {
 			e.printStackTrace();
 			plugin.getLogger().severe("Could not execute query");
-			db.bufferWatcherID = 0;
+			db.task = null;
 		}
 	}
 }

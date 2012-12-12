@@ -50,7 +50,7 @@ public class MsgUtil{
 	 */
 	public static boolean flush(Player p, int delay){
 		if(p != null && p.isOnline()){
-			Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, new Messenger(p), delay);
+			Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, new Messenger(p), delay);
 			
 			return true;
 		}
@@ -129,6 +129,38 @@ public class MsgUtil{
 		}
 			
 		Map<Enchantment, Integer> enchs = items.getEnchantments();
+		if(enchs != null && enchs.size() > 0){
+			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+MsgUtil.getMessage("menu.enchants")+"-----------------------+");
+			for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
+				p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
+			}
+		}
+		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
+	}
+	
+	public static void sendPurchaseSuccess(Player p, Shop shop, int amount){
+		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.successful-purchase"));
+		
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), Util.format((amount * shop.getPrice()))));
+		
+
+		Map<Enchantment, Integer> enchs = shop.getEnchants();
+		if(enchs != null && enchs.size() > 0){
+			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+MsgUtil.getMessage("menu.enchants")+"-----------------------+");
+			for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
+				p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
+			}
+		}
+		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
+	}
+	
+	public static void sendSellSuccess(Player p, Shop shop, int amount){
+		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.successfully-sold"));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), Util.format((amount * shop.getPrice()))));
+
+		Map<Enchantment, Integer> enchs = shop.getEnchants();
 		if(enchs != null && enchs.size() > 0){
 			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+MsgUtil.getMessage("menu.enchants")+"-----------------------+");
 			for(Entry<Enchantment, Integer> entries : enchs.entrySet()){

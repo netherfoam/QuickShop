@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitTask;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Watcher.BufferWatcher;
 
@@ -20,8 +21,8 @@ public class Database{
 	File file;
 	public List<String> queries = new ArrayList<String>(5);
 	public boolean queriesInUse = false;
-	public int bufferWatcherID;
 	private Connection connection;
+	public BukkitTask task;
 	
 	/**
 	 * Creates a new database handler.
@@ -39,7 +40,7 @@ public class Database{
 	}
 	
 	public void startBufferWatcher(){
-		this.bufferWatcherID = Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, new BufferWatcher(this.plugin), 300);
+		this.task = Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, new BufferWatcher(this.plugin), 300);
 	}
 	/**
 	 * Returns a new connection to execute SQL statements on.
@@ -119,7 +120,7 @@ public class Database{
 	 */
 	public void writeToBuffer(final String s){
 		final Database db = this;
-		Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable(){
+		Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable(){
 			@Override
 			public void run() {
 				while(db.queriesInUse){
@@ -131,12 +132,12 @@ public class Database{
 				db.queriesInUse = false;
 
 				//If the buffer isn't running yet, start it.
-				if(db.bufferWatcherID == 0){
+				if(db.task == null){
 					db.startBufferWatcher();
 				}
 			}
 			
-		}, 0);
+		});
 	}
 	
 	/**
@@ -191,6 +192,6 @@ public class Database{
 	}
 	
 	public void stopBuffer(){
-		Bukkit.getScheduler().cancelTask(bufferWatcherID);
+		if(task != null) task.cancel();
 	}
 }

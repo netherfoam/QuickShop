@@ -3,6 +3,7 @@ package org.maxgamer.QuickShop.Shop;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
@@ -30,11 +31,6 @@ public class DisplayItem{
 		this.shop = shop;
 		this.iStack = iStack.clone();
 		this.displayLoc = shop.getLocation().clone().add(0.5, 1.2, 0.5);
-		
-		if(displayLoc.getWorld() != null){
-			this.removeDupe();
-			this.spawn();
-		}
 	}
 	
 	/**
@@ -44,9 +40,21 @@ public class DisplayItem{
 		if(shop.getLocation().getWorld() == null) return;
 		
 		Location dispLoc = this.getDisplayLocation();
+		
 		this.item = shop.getLocation().getWorld().dropItem(dispLoc, this.iStack);
 		this.item.setVelocity(new Vector(0, 0.1, 0));
-		this.item.setPickupDelay(Integer.MAX_VALUE);  
+		this.item.setPickupDelay(Integer.MAX_VALUE);
+		
+		//TODO: When bukkit releases a build with an EntityPickupItemEvent or makes entities obey item.getPickupDelay() this can be removed.
+		
+		//Fetch the NMS item
+		net.minecraft.server.v1_4_5.ItemStack nmsI = CraftItemStack.createNMSItemStack(iStack);
+		//Force the count to 0, don't notify anything though.
+		nmsI.count = 0;
+		//Get the itemstack back as a bukkit stack
+		iStack = CraftItemStack.asBukkitStack(nmsI);
+		//Set the display item to the stack.
+		this.item.setItemStack(iStack);
 	}
 	
 	/**

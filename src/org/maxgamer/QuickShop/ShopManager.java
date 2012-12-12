@@ -1,8 +1,6 @@
 package org.maxgamer.QuickShop;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import net.milkbowl.vault.economy.EconomyResponse;
 
@@ -13,7 +11,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Sign;
@@ -293,7 +290,7 @@ public class ShopManager{
 						}
 						if(amount == 0){
 							//Dumb.
-							sendPurchaseSuccess(p, shop, amount);
+							MsgUtil.sendPurchaseSuccess(p, shop, amount);
 							return; 
 						}
 						else if(amount < 0){
@@ -341,7 +338,7 @@ public class ShopManager{
 						}
 						//Transfers the item from A to B
 						shop.sell(p, amount);
-						sendPurchaseSuccess(p, shop, amount);
+						MsgUtil.sendPurchaseSuccess(p, shop, amount);
 						Location loc = shop.getLocation();
 						plugin.log(p.getName() + " bought " + amount + " " +shop.getDataName()+" from shop at ("+loc.getWorld().getName()+" - "+loc.getX()+","+loc.getY()+","+loc.getZ()+") for " + (shop.getPrice() * amount));
 					}
@@ -368,7 +365,7 @@ public class ShopManager{
 						
 						if(amount == 0){
 							//Dumb.
-							sendPurchaseSuccess(p, shop, amount);
+							MsgUtil.sendPurchaseSuccess(p, shop, amount);
 							return; 
 						}
 						else if(amount < 0){
@@ -414,7 +411,7 @@ public class ShopManager{
 						}
 						
 						shop.buy(p, amount);
-						sendSellSuccess(p, shop, amount);
+						MsgUtil.sendSellSuccess(p, shop, amount);
 						
 						Location loc = shop.getLocation();
 						plugin.log(p.getName() + " sold " + amount + " " +shop.getDataName()+" to shop at ("+loc.getWorld().getName()+" - "+loc.getX()+","+loc.getY()+","+loc.getZ()+") for " + (shop.getPrice() * amount));
@@ -426,36 +423,5 @@ public class ShopManager{
 				}
 			}
 		});
-	}
-	private void sendPurchaseSuccess(Player p, Shop shop, int amount){
-		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.successful-purchase"));
-		
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), Util.format((amount * shop.getPrice()))));
-		
-
-		Map<Enchantment, Integer> enchs = shop.getEnchants();
-		if(enchs != null && enchs.size() > 0){
-			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+MsgUtil.getMessage("menu.enchants")+"-----------------------+");
-			for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
-				p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
-			}
-		}
-		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
-	}
-	
-	private void sendSellSuccess(Player p, Shop shop, int amount){
-		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.successfully-sold"));
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), Util.format((amount * shop.getPrice()))));
-
-		Map<Enchantment, Integer> enchs = shop.getEnchants();
-		if(enchs != null && enchs.size() > 0){
-			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+MsgUtil.getMessage("menu.enchants")+"-----------------------+");
-			for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
-				p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
-			}
-		}
-		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 	}
 }

@@ -8,6 +8,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.scheduler.BukkitTask;
 import org.maxgamer.QuickShop.QuickShop;
 
 public class LogWatcher implements Runnable{
@@ -16,6 +17,7 @@ public class LogWatcher implements Runnable{
 	
 	private List<String> logs = new ArrayList<String>(5);
 	private boolean lock = false;
+	public BukkitTask task;
 	
 	public LogWatcher(QuickShop plugin, File log){
 		try {

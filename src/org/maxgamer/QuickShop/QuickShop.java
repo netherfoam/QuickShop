@@ -92,7 +92,7 @@ public class QuickShop extends JavaPlugin{
 			return;
 		}
 		else{
-			getLogger().info("Hooking Vault");
+			getLogger().info("Hooking Economy");
 			if(!setupEconomy()){
 				getLogger().severe(ChatColor.YELLOW + "Vault was found, but does not have an economy to hook into!");
 				getLogger().severe(ChatColor.YELLOW + "Download an economy plugin such as:");
@@ -102,7 +102,7 @@ public class QuickShop extends JavaPlugin{
 				return;
 			}
 			else{
-				getLogger().info(ChatColor.GREEN + "Vault hooked!");
+				getLogger().info(ChatColor.GREEN + "Economy hooked!");
 			}
 		}
 		
@@ -119,7 +119,7 @@ public class QuickShop extends JavaPlugin{
 		if(this.getConfig().getBoolean("log-actions")){
 			//Logger Handler
 			this.logWatcher = new LogWatcher(this, new File(this.getDataFolder(), "qs.log"));
-			logWatcher.taskId = Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, this.logWatcher, 150, 150);
+			logWatcher.task = Bukkit.getScheduler().runTaskTimerAsynchronously(this, this.logWatcher, 150, 150);
 		}
 		
 		/* Start database - Also creates DB file. */

@@ -16,7 +16,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.DoubleChestInventory;
@@ -78,6 +77,8 @@ public class Shop{
 		
 		if(plugin.display){
 			this.displayItem = new DisplayItem(this, this.item);
+			this.displayItem.removeDupe();
+			this.displayItem.respawn();
 		}
 		
 		this.shopType = ShopType.SELLING;
@@ -584,30 +585,27 @@ public class Shop{
 		Location orig = this.loc.clone();
 		Location[] locs = new Location[4];
 		locs[0] = this.loc.clone().add(0, 0, 1);
-		locs[1] = this.loc.clone().add(1, 0, 0);
-		locs[2] = this.loc.clone().add(0, 0, -1);
-		locs[3] = this.loc.clone().add(-1, 0, 0);
+		//locs[2] = this.loc.clone().add(0, 0, -1);
+		//locs[1] = this.loc.clone().add(1, 0, 0);		
+		//locs[3] = this.loc.clone().add(-1, 0, 0);
 		
-		ItemFrame[] frames = new ItemFrame[3];
+		ItemFrame[] frames = new ItemFrame[4]; //TODO: increase size incase missing sign
 		int i = 0;
 		for(Location loc : locs){
+			if(loc == null) continue;
 			if(loc.getBlock().getType() != Material.AIR) continue; //Don't override existing blocks.
 			
-			ItemFrame iframe = (ItemFrame) this.getLocation().getWorld().spawnEntity(this.loc.clone(), EntityType.ITEM_FRAME);
-			BlockFace bf = loc.getBlock().getFace(this.getLocation().getBlock());
-			//BlockFace bf = this.getLocation().getBlock().getFace(loc.getBlock());
-			System.out.println("BF: " + bf);
-			//iframe.setFacingDirection(bf, false);
-			iframe.setFacingDirection(bf, true); //True = force?
+			ItemFrame iframe = getLocation().getWorld().spawn(this.loc, ItemFrame.class);//(ItemFrame) this.getLocation().getWorld().spawnEntity(this.loc, EntityType.ITEM_FRAME);
+			//BlockFace bf = loc.getBlock().getFace(this.getLocation().getBlock());
+			BlockFace bf = getLocation().getBlock().getFace(loc.getBlock());
 			
-			iframe.setItem(this.item.clone());
+			System.out.println("BF: " + bf);
+			//iframe.setFacingDirection(bf, true); //Force it
+
+			//iframe.setItem(this.item.clone());
 			
 			frames[i] = iframe;
 			i++;
-		}
-		
-		for(ItemFrame iframe : frames){
-			iframe.teleport(this.loc);
 		}
 		
 		System.out.println("Unmodified loc?: " + (orig.equals(this.loc)));

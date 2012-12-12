@@ -20,6 +20,7 @@ public class ChunkListener implements Listener{
 	public ChunkListener(QuickShop plugin){
 		this.plugin = plugin;
 	}
+	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onChunkLoad(ChunkLoadEvent e){
 		Chunk c = e.getChunk();
