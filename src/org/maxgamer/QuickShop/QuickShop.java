@@ -312,12 +312,12 @@ public class QuickShop extends JavaPlugin{
 	 * @return True is success
 	 */
 	private boolean setupEconomy(){
-	        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-	        if (economyProvider != null) {
-	            economy = economyProvider.getProvider();
-	        }
+        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+        if (economyProvider != null) {
+            economy = economyProvider.getProvider();
+        }
 
-	        return (economy != null);
+        return (economy != null);
     }
 
 	/**
