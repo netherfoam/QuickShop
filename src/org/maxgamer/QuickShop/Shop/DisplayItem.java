@@ -46,15 +46,27 @@ public class DisplayItem{
 		this.item.setPickupDelay(Integer.MAX_VALUE);
 		
 		//TODO: When bukkit releases a build with an EntityPickupItemEvent or makes entities obey item.getPickupDelay() this can be removed.
-		
-		//Fetch the NMS item
-		net.minecraft.server.v1_4_5.ItemStack nmsI = CraftItemStack.createNMSItemStack(iStack);
-		//Force the count to 0, don't notify anything though.
-		nmsI.count = 0;
-		//Get the itemstack back as a bukkit stack
-		iStack = CraftItemStack.asBukkitStack(nmsI);
-		//Set the display item to the stack.
-		this.item.setItemStack(iStack);
+		try{
+			Class.forName("net.minecraft.server.v1_4_5.ItemStack");
+			//Fetch the NMS item
+			net.minecraft.server.v1_4_5.ItemStack nmsI = CraftItemStack.createNMSItemStack(iStack);
+			//Force the count to 0, don't notify anything though.
+			nmsI.count = 0;
+			//Get the itemstack back as a bukkit stack
+			iStack = CraftItemStack.asBukkitStack(nmsI);
+			//Set the display item to the stack.
+			this.item.setItemStack(iStack);
+		}
+		catch(Exception e){
+			//Fetch the NMS item
+			net.minecraft.server.ItemStack nmsI = org.bukkit.craftbukkit.inventory.CraftItemStack.createNMSItemStack(iStack);
+			//Force the count to 0, don't notify anything though.
+			nmsI.count = 0;
+			//Get the itemstack back as a bukkit stack
+			iStack = org.bukkit.craftbukkit.inventory.CraftItemStack.asBukkitStack(nmsI);
+			//Set the display item to the stack.
+			this.item.setItemStack(iStack);
+		}
 	}
 	
 	/**
