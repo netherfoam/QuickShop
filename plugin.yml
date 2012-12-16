@@ -16,10 +16,16 @@ commands:
 permissions:
     quickshop.create.sell:
         description: Allows a player to sell from a shop
+        default: true
     quickshop.create.buy:
         description: Allows a player to buy from a shop
+        default: true
+    quickshop.create.double:
+        description: Allows a player to create a double shop
+        default: true
     quickshop.use:
         description: Allows a player to buy/sell using other players shops
+        default: true
     quickshop.unlimited:
         description: Allows a Staff Member to use /qs unlimited and make a shop infinite
     quickshop.bypass.<itemID>:
@@ -32,3 +38,4 @@ permissions:
         description: Allows a Staff Member to change the owner of any shop
     quickshop.find:
         description: Allows a player to locate the nearest shop of a specific item type. Works in a 3 chunk radius.
+        default: true
