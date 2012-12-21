@@ -34,7 +34,7 @@ public class MsgUtil{
 			player = player.toLowerCase();		
 			String q = "INSERT INTO messages (owner, message, time) VALUES ('"+player+"','"+message+"','"+System.currentTimeMillis()+"')";
 			
-			plugin.getDB().writeToBuffer(q);
+			plugin.getDB().execute(q);
 		}
 		else{
 			p.sendMessage(message);
@@ -62,7 +62,7 @@ public class MsgUtil{
 	 * Deletes all messages for a player in the database.
 	*/
 	public static void deleteMessages(String player){
-		plugin.getDB().writeToBuffer("DELETE FROM messages WHERE owner = '"+player.toLowerCase()+"'");
+		plugin.getDB().execute("DELETE FROM messages WHERE owner = '"+player.toLowerCase()+"'");
 	}
 	
 	/**

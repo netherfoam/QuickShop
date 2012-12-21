@@ -236,13 +236,13 @@ public class Shop{
 
 		String q = "";
 		if(isNew){
-			q = "INSERT INTO shops VALUES ('"+this.getOwner()+"', '"+this.getPrice()+"', '"+Util.escape(Util.getNBTString(this.getItem()))+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"', '"+unlimited+"', '"+ShopType.toID(this.shopType)+"')";
+			q = "INSERT INTO shops VALUES ('"+this.getOwner()+"', '"+this.getPrice()+"', '"+plugin.getDB().escape(Util.getNBTString(this.getItem()))+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"', '"+unlimited+"', '"+ShopType.toID(this.shopType)+"')";
 		}
 		else{
-			q = "UPDATE shops SET owner = '"+this.getOwner()+"', item = '"+Util.escape(Util.getNBTString(this.getItem()))+"', unlimited = '"+unlimited+"', type = '"+ShopType.toID(this.shopType)+"', price = '"+this.price+"' WHERE x = '"+x+"' AND y = '"+y+"' AND z = '"+z+"' AND world = '"+world+"'";  
+			q = "UPDATE shops SET owner = '"+this.getOwner()+"', item = '"+plugin.getDB().escape(Util.getNBTString(this.getItem()))+"', unlimited = '"+unlimited+"', type = '"+ShopType.toID(this.shopType)+"', price = '"+this.price+"' WHERE x = '"+x+"' AND y = '"+y+"' AND z = '"+z+"' AND world = '"+world+"'";  
 		}
 		
-		plugin.getDB().writeToBuffer(q);
+		plugin.getDB().execute(q);
 	}
 	
 	/**
@@ -658,7 +658,7 @@ public class Shop{
 		int y = this.getLocation().getBlockY();
 		int z = this.getLocation().getBlockZ();
 		String world = this.getLocation().getWorld().getName();
-		plugin.getDB().writeToBuffer("DELETE FROM shops WHERE x = '"+x+"' AND y = '"+y+"' AND z = '"+z+"' AND world = '"+world+"'");
+		plugin.getDB().execute("DELETE FROM shops WHERE x = '"+x+"' AND y = '"+y+"' AND z = '"+z+"' AND world = '"+world+"'");
 		
 		//Refund if necessary
 		if(plugin.getConfig().getBoolean("shop.refund")){

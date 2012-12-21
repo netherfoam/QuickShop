@@ -215,7 +215,7 @@ public class Util{
 			
 			//Convert the NBT tag to a byte[]
 			byte[] bytes = net.minecraft.server.v1_4_5.NBTCompressedStreamTools.a(itemCompound);
-			//Convert & escape the byte[] to a string
+			//Convert the byte[] to a string
 			return new String(bytes, "ISO-8859-1");
 		}
 		catch(UnsupportedEncodingException e){
@@ -518,14 +518,5 @@ public class Util{
 			}
 		}
 		return items;
-	}
-	
-	/**
-	 * Prepares a query for the database by fixing 's (Only works for SQLite)
-	 * @param s The string to escape E.g. can't do that :\
-	 * @return The escaped string. E.g. can''t do that :\
-	 */
-	public static String escape(String s) {
-		return s.replace("'", "''");
 	}
 }

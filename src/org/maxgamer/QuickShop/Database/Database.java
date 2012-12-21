@@ -1,48 +1,67 @@
 package org.maxgamer.QuickShop.Database;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 import org.maxgamer.QuickShop.QuickShop;
-import org.maxgamer.QuickShop.Watcher.BufferWatcher;
 
-public class Database{
-	QuickShop plugin;
-	File file;
-	public List<String> queries = new ArrayList<String>(5);
-	public boolean queriesInUse = false;
-	private Connection connection;
-	public BukkitTask task;
+public class Database {
+	private DatabaseCore dbCore;
+	private Buffer buffer;
+	
+	private DatabaseWatcher dbw;
+	private BukkitTask task;
+	
+	public Database(File file){
+		this.dbCore = new SQLite(file);
+		this.buffer = new Buffer(this);
+		this.dbw = new DatabaseWatcher(this);
+	}
 	
 	/**
-	 * Creates a new database handler.
-	 * @param plugin The plugin creating the database.
-	 * @param file The name of the DB file, including path.
+	 * Reschedules the db watcher
 	 */
-	public Database(QuickShop plugin, String file){
-		this.plugin = plugin;
-		this.file = new File(file);
-		
-		/**
-		 * Database query handler thread
-		 */
-		startBufferWatcher();
+	public void scheduleWatcher(){
+		this.task = Bukkit.getScheduler().runTaskLater(QuickShop.instance, this.dbw, 300);
 	}
 	
-	public void startBufferWatcher(){
-		this.task = Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, new BufferWatcher(this.plugin), 300);
+	public BukkitTask getTask(){
+		return task;
+	}
+	public void setTask(BukkitTask task){
+		this.task = task; 
 	}
 	
+	public DatabaseWatcher getDatabaseWatcher(){
+		return this.dbw;
+	}
+	
+	public Buffer getBuffer(){
+		return this.buffer;
+	}
+	
+	/**
+	 * Returns true if the table exists
+	 * @param table The table to check for
+	 * @return True if the table is found
+	 */
+	public boolean hasTable(String table){
+		String query = "SELECT * FROM " + table + " LIMIT 0,1";
+		try {
+			PreparedStatement ps = this.getConnection().prepareStatement(query);
+			ps.executeQuery();
+			
+			return true;
+		} catch (SQLException e) {
+			return false;
+		}
+	}
+	/** Returns true if the given table has the given column. Case sensitive */
 	public boolean hasColumn(String table, String column){
 		String query = "SELECT * FROM " + table + " LIMIT 0,1";
 		try{
@@ -56,156 +75,23 @@ public class Database{
 			return false;
 		}
 	}
+	
+	/** Queues the given query in the buffer to be executed in the near future. */
+	public void execute(String q){
+		this.getBuffer().addString(q);
+	}
+
 	/**
-	 * Returns a new connection to execute SQL statements on.
-	 * @return A new connection to execute SQL statements on.
+	 * Gets the database connection for
+	 * executing queries on.
+	 * @return The database connection
 	 */
 	public Connection getConnection(){
-		try{
-			//If we have a current connection, fetch it
-			if(this.connection != null && !this.connection.isClosed()){
-				return this.connection;
-			}
-		}
-		catch(SQLException e){
-			e.printStackTrace();
-			plugin.getLogger().severe("Could not retrieve SQLite connection!");
-		}
-		
-		if(this.getFile().exists()){
-			//So we need a new connection
-			try{
-				Class.forName("org.sqlite.JDBC");
-				this.connection = DriverManager.getConnection("jdbc:sqlite:" + this.getFile());
-				return this.connection;
-			}
-			catch (ClassNotFoundException e) {
-				e.printStackTrace();
-				return null;
-			} catch (SQLException e) {
-				e.printStackTrace();
-				return null;
-			}
-		}
-		else{
-			//So we need a new file too.
-			try {
-				//Create the file
-				this.getFile().createNewFile();
-				//Now we won't need a new file, just a connection.
-				//This will return that new connection.
-				return this.getConnection();
-			} catch (IOException e) {
-				e.printStackTrace();
-				plugin.getLogger().severe("Could not create database file!");
-				return null;
-			}
-		}
-	}
-	/**
-	 * @return Returns the database file
-	 */
-	public File getFile(){
-		return this.file;
+		return this.dbCore.getConnection();
 	}
 	
-	/**
-	 * @return Returns true if the shops table exists 
-	 */
-	public boolean hasTable(String t){
-		try {
-			PreparedStatement ps = this.getConnection().prepareStatement("SELECT name FROM sqlite_master WHERE type='table' AND name='"+t+"';");
-			ResultSet rs = ps.executeQuery();
-			while(rs.next()){
-				ps.close();
-				return true;
-			}
-			ps.close();
-			return false;
-			
-		} catch (SQLException e) {
-			return false;
-		}
+	public String escape(String s){
+		return this.dbCore.escape(s);
 	}
 	
-	/**
-	 * Writes a query to the buffer safely.
-	 * @param s The String to write to the buffer (In SQL syntax... E.g. UPDATE table SET x = 'y', owner = 'bob'
-	 */
-	public void writeToBuffer(final String s){
-		final Database db = this;
-		Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable(){
-			@Override
-			public void run() {
-				while(db.queriesInUse){
-					//Wait
-				}
-				
-				db.queriesInUse = true;
-				db.queries.add(s);
-				db.queriesInUse = false;
-
-				//If the buffer isn't running yet, start it.
-				if(db.task == null){
-					db.startBufferWatcher();
-				}
-			}
-			
-		});
-	}
-	
-	/**
-	 * Creates the database table 'shops'.
-	 * @throws SQLException If the connection is invalid.
-	 */
-	public void createShopsTable() throws SQLException{
-		Statement st = getConnection().createStatement();
-		String createTable = 
-		"CREATE TABLE \"shops\" (" + 
-				"\"owner\"  TEXT(20) NOT NULL, " +
-				"\"price\"  INTEGER(32) NOT NULL, " +
-				"\"item\"  TEXT(2000) NOT NULL, " +
-				"\"x\"  INTEGER(32) NOT NULL, " +
-				"\"y\"  INTEGER(32) NOT NULL, " +
-				"\"z\"  INTEGER(32) NOT NULL, " +
-				"\"world\"  TEXT(30) NOT NULL, " +
-				"\"unlimited\"  boolean, " +
-				"\"type\"  boolean, " +
-				"PRIMARY KEY ('x', 'y','z','world') " +
-				");";
-		st.execute(createTable);
-	}
-	
-	public void createMessagesTable() throws SQLException{
-		Statement st = getConnection().createStatement();
-		String createTable = 
-		"CREATE TABLE \"messages\" (" + 
-				"\"owner\"  TEXT(20) NOT NULL, " +
-				"\"message\"  TEXT(200) NOT NULL, " +
-				"\"time\"  INTEGER(32) NOT NULL " +
-				");";
-		st.execute(createTable);
-	}
-	
-	public void checkColumns(){
-		PreparedStatement ps = null;
-		try {
-			ps = this.getConnection().prepareStatement(" ALTER TABLE shops ADD unlimited boolean");
-			ps.execute();
-			ps.close();
-		} catch (SQLException e) {
-			plugin.getLogger().info("Found unlimited");
-		}
-		try {
-			ps = this.getConnection().prepareStatement(" ALTER TABLE shops ADD type int");
-			ps.execute();
-			ps.close();
-		} catch (SQLException e) {
-			plugin.getLogger().info("Found type column");
-		}
-	}
-	
-	public void stopBuffer(){
-		if(task != null) task.cancel();
-	}
 }

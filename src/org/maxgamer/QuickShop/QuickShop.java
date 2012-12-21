@@ -59,18 +59,15 @@ public class QuickShop extends JavaPlugin{
 	
 	public YamlConfiguration messages;
 	
-	//Listeners (These need extra args)
+	//Listeners - We decide which one to use at runtime
 	private ChatListener chatListener;
 	private HeroChatListener heroChatListener;
 	
 	//Listeners (These don't)
-	private ClickListener clickListener = new ClickListener(this);
 	private BlockListener blockListener = new BlockListener(this);
-	private MoveListener moveListener = new MoveListener(this);
+	private PlayerListener playerListener = new PlayerListener(this);
 	private ChunkListener chunkListener = new ChunkListener(this);
-	private QuitListener quitListener = new QuitListener(this);
 	private WorldListener worldListener = new WorldListener(this);
-	private JoinListener joinListener = new JoinListener();
 	
 	private int itemWatcherID;
 	public boolean lock;
@@ -128,12 +125,12 @@ public class QuickShop extends JavaPlugin{
 		}
 		
 		/* Start database - Also creates DB file. */
-		this.database = new Database(this, this.getDataFolder() + File.separator + "shops.db");
+		this.database = new Database(new File(this.getDataFolder(), "shops.db"));
 		
 		/* Creates DB table 'shops' */
 		if(!getDB().hasTable("shops")){
 			try {
-				getDB().createShopsTable();
+				shopManager.createShopsTable();
 			} catch (SQLException e) {
 				e.printStackTrace();
 				getLogger().severe("Could not create shops table");
@@ -141,7 +138,7 @@ public class QuickShop extends JavaPlugin{
 		}
 		if(!getDB().hasTable("messages")){
 			try{
-				getDB().createMessagesTable();
+				shopManager.createMessagesTable();
 			}
 			catch (SQLException e) {
 				e.printStackTrace();
@@ -150,7 +147,7 @@ public class QuickShop extends JavaPlugin{
 		}
 		
 		//Make the database up to date
-		getDB().checkColumns();
+		shopManager.checkColumns();
 		
 		/* Load shops from database to memory */
 		int count = 0; //Shops count
@@ -188,7 +185,7 @@ public class QuickShop extends JavaPlugin{
 				/* Delete invalid shops, if we know of any */
 				if(world != null && loc.getBlock().getType() != Material.CHEST){
 					getLogger().info("Shop is not a chest in " +rs.getString("world") + " at: " + x + ", " + y + ", " + z + ".  Removing from DB.");
-					getDB().writeToBuffer("DELETE FROM shops WHERE x = "+x+" AND y = "+y+" AND z = "+z+" AND world = '"+rs.getString("world")+"'");
+					getDB().execute("DELETE FROM shops WHERE x = "+x+" AND y = "+y+" AND z = "+z+" AND world = '"+rs.getString("world")+"'");
 				}
 				
 				int type = rs.getInt("type");
@@ -210,17 +207,14 @@ public class QuickShop extends JavaPlugin{
 		
 		//Register events
 		getLogger().info("Registering Listeners");
-		Bukkit.getServer().getPluginManager().registerEvents(clickListener, this);
 		Bukkit.getServer().getPluginManager().registerEvents(blockListener, this);
-		Bukkit.getServer().getPluginManager().registerEvents(moveListener, this);
+		Bukkit.getServer().getPluginManager().registerEvents(playerListener, this);
 		
 		if(this.display){
 			Bukkit.getServer().getPluginManager().registerEvents(chunkListener, this);
 		}
 		
-		Bukkit.getServer().getPluginManager().registerEvents(quitListener, this);
 		Bukkit.getServer().getPluginManager().registerEvents(worldListener, this);
-		Bukkit.getServer().getPluginManager().registerEvents(joinListener, this);
 		
 		if(Bukkit.getPluginManager().getPlugin("Herochat") != null){
 			this.getLogger().info("Found Herochat... Hooking!");
@@ -294,8 +288,7 @@ public class QuickShop extends JavaPlugin{
 		shopManager.clear();
 		
 		/* Empty the buffer */
-		new BufferWatcher(this).run();
-		this.database.stopBuffer();
+		this.database.getDatabaseWatcher().run();
 		
 		this.actions.clear();
 		
@@ -412,7 +405,7 @@ public class QuickShop extends JavaPlugin{
 			/* Delete invalid shops, if we know of any */
 			if(world != null && loc.getBlock().getType() != Material.CHEST){
 				getLogger().info("Shop is not a chest in " +rs.getString("world") + " at: " + x + ", " + y + ", " + z + ".  Removing from DB.");
-				getDB().writeToBuffer("DELETE FROM shops WHERE x = "+x+" AND y = "+y+" AND z = "+z+" AND world = '"+rs.getString("world")+"'");
+				getDB().execute("DELETE FROM shops WHERE x = "+x+" AND y = "+y+" AND z = "+z+" AND world = '"+rs.getString("world")+"'");
 			}
 			
 			int type = rs.getInt("type");
@@ -428,8 +421,8 @@ public class QuickShop extends JavaPlugin{
 		
 		System.out.println("Loading complete. Backing up and deleting shops table...");
 		//Step 2: Delete shops table.
-		File existing = database.getFile();
-		File backup = new File(database.getFile().getAbsolutePath() + ".bak");
+		File existing = new File(this.getDataFolder(), "shops.db");
+		File backup = new File(existing.getAbsolutePath() + ".bak");
 		
 		InputStream in = new FileInputStream(existing);
 		OutputStream out = new FileOutputStream(backup);
@@ -453,7 +446,7 @@ public class QuickShop extends JavaPlugin{
 		ps.close();
 		
 		//Step 3: Create shops table.
-		database.createShopsTable();
+		shopManager.createShopsTable();
 		
 		//Step 4: Export the new data into the table
 		for(Entry<String, HashMap<ShopChunk, HashMap<Location, Shop>>> worlds : shopManager.getShops().entrySet()){

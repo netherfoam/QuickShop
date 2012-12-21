@@ -7,9 +7,13 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockIterator;
 import org.maxgamer.QuickShop.MsgUtil;
@@ -20,13 +24,9 @@ import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.ShopAction;
 
 
-/**
- * @author Netherfoam
- */
-public class ClickListener implements Listener{
+public class PlayerListener implements Listener{
 	QuickShop plugin;
-	
-	public ClickListener(QuickShop plugin){
+	public PlayerListener(QuickShop plugin){
 		this.plugin = plugin;
 	}
 	
@@ -138,5 +138,43 @@ public class ClickListener implements Listener{
 			plugin.getActions().put(p.getName(), info);
 			p.sendMessage(MsgUtil.getMessage("how-much-to-trade-for", Util.getDataName(info.getItem().getType(), info.getItem().getDurability())));
 		}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGH)
+	/**
+	 * Waits for a player to move too far from a shop, then cancels the menu.
+	 */
+	public void onMove(PlayerMoveEvent e){
+		if(e.isCancelled()) return;
+		Info info = plugin.getActions().get(e.getPlayer().getName());
+		if(info != null){
+			Player p = e.getPlayer();
+			Location loc1 = info.getLocation();
+			Location loc2 = p.getLocation();
+			
+			
+			if(loc1.getWorld() != loc2.getWorld() || loc1.distanceSquared(loc2) > 25){
+				if(info.getAction() == ShopAction.CREATE){
+					p.sendMessage(MsgUtil.getMessage("shop-creation-cancelled"));
+				}
+				else if(info.getAction() == ShopAction.BUY){
+					p.sendMessage(MsgUtil.getMessage("shop-purchase-cancelled"));
+				}
+				plugin.getActions().remove(p.getName());
+				return;
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onJoin(PlayerJoinEvent e){
+		//Notify the player any messages they were sent
+		MsgUtil.flush(e.getPlayer(), 60);
+	}
+	
+	@EventHandler
+	public void onPlayerQuit(PlayerQuitEvent e){
+		//Remove them from the menu
+		plugin.getActions().remove(e.getPlayer().getName());
 	}
 }

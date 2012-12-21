@@ -1,5 +1,8 @@
 package org.maxgamer.QuickShop;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -14,6 +17,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Sign;
+import org.maxgamer.QuickShop.Database.Database;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.ShopAction;
@@ -28,6 +32,61 @@ public class ShopManager{
 	
 	public ShopManager(QuickShop plugin){
 		this.plugin = plugin;
+	}
+	
+	public Database getDatabase(){
+		return plugin.getDB();
+	}
+	
+	/**
+	 * Creates the database table 'shops'.
+	 * @throws SQLException If the connection is invalid.
+	 */
+	public void createShopsTable() throws SQLException{
+		Statement st = getDatabase().getConnection().createStatement();
+		String createTable = 
+		"CREATE TABLE \"shops\" (" + 
+				"\"owner\"  TEXT(20) NOT NULL, " +
+				"\"price\"  INTEGER(32) NOT NULL, " +
+				"\"item\"  TEXT(2000) NOT NULL, " +
+				"\"x\"  INTEGER(32) NOT NULL, " +
+				"\"y\"  INTEGER(32) NOT NULL, " +
+				"\"z\"  INTEGER(32) NOT NULL, " +
+				"\"world\"  TEXT(30) NOT NULL, " +
+				"\"unlimited\"  boolean, " +
+				"\"type\"  boolean, " +
+				"PRIMARY KEY ('x', 'y','z','world') " +
+				");";
+		st.execute(createTable);
+	}
+	
+	public void createMessagesTable() throws SQLException{
+		Statement st = getDatabase().getConnection().createStatement();
+		String createTable = 
+		"CREATE TABLE \"messages\" (" + 
+				"\"owner\"  TEXT(20) NOT NULL, " +
+				"\"message\"  TEXT(200) NOT NULL, " +
+				"\"time\"  INTEGER(32) NOT NULL " +
+				");";
+		st.execute(createTable);
+	}
+	
+	public void checkColumns(){
+		PreparedStatement ps = null;
+		try {
+			ps = getDatabase().getConnection().prepareStatement(" ALTER TABLE shops ADD unlimited boolean");
+			ps.execute();
+			ps.close();
+		} catch (SQLException e) {
+			plugin.getLogger().info("Found unlimited");
+		}
+		try {
+			ps = getDatabase().getConnection().prepareStatement(" ALTER TABLE shops ADD type int");
+			ps.execute();
+			ps.close();
+		} catch (SQLException e) {
+			plugin.getLogger().info("Found type column");
+		}
 	}
 	
 	/**
