@@ -239,7 +239,7 @@ public class Shop{
 			q = "INSERT INTO shops VALUES ('"+this.getOwner()+"', '"+this.getPrice()+"', '"+Util.getNBTString(this.getItem())+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"', '"+unlimited+"', '"+ShopType.toID(this.shopType)+"')";
 		}
 		else{
-			q = "UPDATE shops SET owner = '"+this.getOwner()+"', itemString = '"+Util.getNBTString(this.getItem())+"', unlimited = '"+unlimited+"', type = '"+ShopType.toID(this.shopType)+"', price = '"+this.price+"' WHERE x = '"+x+"' AND y = '"+y+"' AND z = '"+z+"' AND world = '"+world+"'";  
+			q = "UPDATE shops SET owner = '"+this.getOwner()+"', item = '"+Util.getNBTString(this.getItem())+"', unlimited = '"+unlimited+"', type = '"+ShopType.toID(this.shopType)+"', price = '"+this.price+"' WHERE x = '"+x+"' AND y = '"+y+"' AND z = '"+z+"' AND world = '"+world+"'";  
 		}
 		
 		plugin.getDB().writeToBuffer(q);
