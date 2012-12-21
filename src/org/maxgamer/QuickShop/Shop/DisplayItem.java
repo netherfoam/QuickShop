@@ -3,7 +3,6 @@ package org.maxgamer.QuickShop.Shop;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
@@ -47,25 +46,20 @@ public class DisplayItem{
 		
 		//TODO: When bukkit releases a build with an EntityPickupItemEvent or makes entities obey item.getPickupDelay() this can be removed.
 		try{
-			Class.forName("net.minecraft.server.v1_4_5.ItemStack");
+			//Throws NoClassDefFoundException if out of date.
+			Class.forName("net.minecraft.server.v1_4_6.ItemStack");
+			
 			//Fetch the NMS item
-			net.minecraft.server.v1_4_5.ItemStack nmsI = CraftItemStack.createNMSItemStack(iStack);
+			net.minecraft.server.v1_4_6.ItemStack nmsI = org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asNMSCopy(iStack);
 			//Force the count to 0, don't notify anything though.
 			nmsI.count = 0;
 			//Get the itemstack back as a bukkit stack
-			iStack = CraftItemStack.asBukkitStack(nmsI);
+			iStack = org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asBukkitCopy(nmsI);
 			//Set the display item to the stack.
 			this.item.setItemStack(iStack);
 		}
 		catch(Exception e){
-			//Fetch the NMS item
-			net.minecraft.server.ItemStack nmsI = org.bukkit.craftbukkit.inventory.CraftItemStack.createNMSItemStack(iStack);
-			//Force the count to 0, don't notify anything though.
-			nmsI.count = 0;
-			//Get the itemstack back as a bukkit stack
-			iStack = org.bukkit.craftbukkit.inventory.CraftItemStack.asBukkitStack(nmsI);
-			//Set the display item to the stack.
-			this.item.setItemStack(iStack);
+			System.out.println("QuickShop version mismatch! This version of QuickShop is incompatible with this version of bukkit! Try update?");
 		}
 	}
 	
