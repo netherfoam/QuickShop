@@ -1,8 +1,11 @@
 package org.maxgamer.QuickShop;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,6 +15,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -33,6 +37,7 @@ import org.maxgamer.QuickShop.Listeners.*;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.Shop.ShopType;
+import org.maxgamer.QuickShop.Shop.ShopChunk;
 import org.maxgamer.QuickShop.Watcher.*;
 
 import net.milkbowl.vault.economy.Economy;
@@ -149,10 +154,23 @@ public class QuickShop extends JavaPlugin{
 		
 		/* Load shops from database to memory */
 		int count = 0; //Shops count
-		Connection con = database.getConnection();
+		Connection con;
 		try {
 			getLogger().info("Loading shops from database...");
 			
+			if(database.hasColumn("shops", "itemString")){
+				//Convert.
+				try{
+					this.convertDatabase_2_9();
+				}
+				catch(Exception e){
+					e.printStackTrace();
+					System.out.println("Could not convert shops. Exitting");
+					return;
+				}
+			}
+			
+			con = database.getConnection();
 			PreparedStatement ps = con.prepareStatement("SELECT * FROM shops");
 			ResultSet rs = ps.executeQuery();
 			while(rs.next()){
@@ -161,7 +179,8 @@ public class QuickShop extends JavaPlugin{
 				int z = rs.getInt("z");
 				World world = Bukkit.getWorld(rs.getString("world"));
 
-				ItemStack item = Util.makeItem(rs.getString("itemString"));				
+				//ItemStack item = Util.makeItem(rs.getString("itemString"));
+				ItemStack item = Util.getItemStack(rs.getString("item"));
 				
 				String owner = rs.getString("owner");
 				double price = rs.getDouble("price");
@@ -369,38 +388,102 @@ public class QuickShop extends JavaPlugin{
 	public ShopManager getShopManager(){
 		return this.shopManager;
 	}
-	/*
-	public List<String> getMessages(String player){
-		player = player.toLowerCase();
-		
-		List<String> messages = new ArrayList<String>(5);
-		
-		String q = "SELECT * FROM messages WHERE owner = '"+player+"' ORDER BY time ASC";
-		
-		try{
-			PreparedStatement ps = getDB().getConnection().prepareStatement(q);
-			ResultSet rs = ps.executeQuery();
+	/** Converts the database to v 2.9 format. 
+	 * @throws SQLException */
+	public void convertDatabase_2_9() throws Exception{
+		Connection con = database.getConnection();
+		System.out.println("Converting shops...");
+		//Step 1: Load existing shops.
+		PreparedStatement ps = con.prepareStatement("SELECT * FROM shops");
+		ResultSet rs = ps.executeQuery();
+		int shops = 0;
+		System.out.println("Loading shops...");
+		while(rs.next()){
+			int x = rs.getInt("x");
+			int y = rs.getInt("y");
+			int z = rs.getInt("z");
+			World world = Bukkit.getWorld(rs.getString("world"));
+
+			ItemStack item = Util.makeItem(rs.getString("itemString"));				
 			
-			while(rs.next()){
-				messages.add(rs.getString("message"));
+			String owner = rs.getString("owner");
+			double price = rs.getDouble("price");
+			Location loc = new Location(world, x, y, z);
+			/* Delete invalid shops, if we know of any */
+			if(world != null && loc.getBlock().getType() != Material.CHEST){
+				getLogger().info("Shop is not a chest in " +rs.getString("world") + " at: " + x + ", " + y + ", " + z + ".  Removing from DB.");
+				getDB().writeToBuffer("DELETE FROM shops WHERE x = "+x+" AND y = "+y+" AND z = "+z+" AND world = '"+rs.getString("world")+"'");
+			}
+			
+			int type = rs.getInt("type");
+			Shop shop = new Shop(loc, price, item, owner);
+			shop.setUnlimited(rs.getBoolean("unlimited"));
+			shop.setShopType(ShopType.fromID(type));
+			
+			shopManager.addShop(rs.getString("world"), shop);
+			shops++;
+		}
+		ps.close();
+		rs.close();
+		
+		System.out.println("Loading complete. Backing up and deleting shops table...");
+		//Step 2: Delete shops table.
+		File existing = database.getFile();
+		File backup = new File(database.getFile().getAbsolutePath() + ".bak");
+		
+		InputStream in = new FileInputStream(existing);
+		OutputStream out = new FileOutputStream(backup);
+		
+		byte[] buf = new byte[1024];
+		int len;
+		while((len = in.read(buf)) > 0){
+			out.write(buf, 0, len);
+		}
+		in.close();
+		out.close();
+		
+		ps = con.prepareStatement("DELETE FROM shops");
+		ps.execute();
+		ps.close();
+		con.close();
+		
+		con = database.getConnection();
+		ps = con.prepareStatement("DROP TABLE shops");
+		ps.execute();
+		ps.close();
+		
+		//Step 3: Create shops table.
+		database.createShopsTable();
+		
+		//Step 4: Export the new data into the table
+		for(Entry<String, HashMap<ShopChunk, HashMap<Location, Shop>>> worlds : shopManager.getShops().entrySet()){
+			String world = worlds.getKey();
+			for(Entry<ShopChunk, HashMap<Location, Shop>> chunks : worlds.getValue().entrySet()){
+				for(Shop shop : chunks.getValue().values()){
+					ps = con.prepareStatement("INSERT INTO shops (owner, price, item, x, y, z, world, unlimited, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+					ps.setString(1, shop.getOwner());
+					ps.setDouble(2, shop.getPrice());
+					
+					ps.setString(3, Util.getNBTString(shop.getItem()));
+					
+					ps.setInt(4, shop.getLocation().getBlockX());
+					ps.setInt(5, shop.getLocation().getBlockY());
+					ps.setInt(6, shop.getLocation().getBlockZ());
+					ps.setString(7, world); 
+					ps.setInt(8, (shop.isUnlimited() ? 1 : 0));
+					ps.setInt(9, ShopType.toID(shop.getShopType()));
+					
+					ps.execute();
+					ps.close();
+					
+					shops--;
+					if(shops % 10 == 0){
+						System.out.println("Remaining: " + shops + " shops.");
+					}
+				}
 			}
 		}
-		catch(SQLException e){
-			e.printStackTrace();
-			this.getLogger().info("Could not load messages for " + player);
-		}
-		return messages;
-	}*/
-	/*
-	public void addMessage(String player, String msg){
-		player = player.toLowerCase();
 		
-		String q = "INSERT INTO messages (owner, message, time) VALUES ('"+player+"','"+msg+"','"+System.currentTimeMillis()+"')";
-		
-		getDB().writeToBuffer(q);
-	}*/
-	/*
-	public void deleteMessages(String player){
-		getDB().writeToBuffer("DELETE FROM messages WHERE owner = '"+player.toLowerCase()+"'");
-	}*/
+		System.out.println("Conversion complete.");
+	}
 }
