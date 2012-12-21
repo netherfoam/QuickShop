@@ -42,6 +42,20 @@ public class Database{
 	public void startBufferWatcher(){
 		this.task = Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, new BufferWatcher(this.plugin), 300);
 	}
+	
+	public boolean hasColumn(String table, String column){
+		String query = "SELECT * FROM " + table + " LIMIT 0,1";
+		try{
+			PreparedStatement ps = this.getConnection().prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
+			rs.findColumn(column); //Throws an exception if the column isnt found...
+			
+			return true; //Column was found.. hasColumn.
+		} 
+		catch(SQLException e){
+			return false;
+		}
+	}
 	/**
 	 * Returns a new connection to execute SQL statements on.
 	 * @return A new connection to execute SQL statements on.
@@ -150,7 +164,7 @@ public class Database{
 		"CREATE TABLE \"shops\" (" + 
 				"\"owner\"  TEXT(20) NOT NULL, " +
 				"\"price\"  INTEGER(32) NOT NULL, " +
-				"\"itemString\"  TEXT(200) NOT NULL, " +
+				"\"item\"  TEXT(2000) NOT NULL, " +
 				"\"x\"  INTEGER(32) NOT NULL, " +
 				"\"y\"  INTEGER(32) NOT NULL, " +
 				"\"z\"  INTEGER(32) NOT NULL, " +
