@@ -479,7 +479,12 @@ public class Util{
 	 * @return The formatted string.
 	*/
 	public static String format(double n){
-		return plugin.getEcon().format(n);
+		try{
+			return plugin.getEcon().format(n);
+		}
+		catch(NumberFormatException e){
+			return "$"+n;
+		}
 	}
 	
 	/**
