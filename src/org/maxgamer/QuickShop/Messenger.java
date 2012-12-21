@@ -18,6 +18,8 @@ public class Messenger implements Runnable{
 		for(String s : messages){
 			player.sendMessage(s);
 		}
-		MsgUtil.deleteMessages(player.getName());
+		if(!messages.isEmpty()){
+			MsgUtil.deleteMessages(player.getName());
+		}
 	}
 }
