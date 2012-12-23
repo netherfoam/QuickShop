@@ -38,15 +38,16 @@ public class PlayerListener implements Listener{
 	@EventHandler
 	public void onClick(PlayerInteractEvent e){
 		if(e.isCancelled()) return;
-		if(e.getClickedBlock() == null) return; //Interacted with air
-		if(e.getClickedBlock().getType() != Material.CHEST && e.getClickedBlock().getType() != Material.WALL_SIGN) return;
+		Block b = e.getClickedBlock();
+		if(b == null) return; //Interacted with air
+		if(b.getType() != Material.CHEST && b.getType() != Material.WALL_SIGN) return;
 		
 		if(plugin.lock && e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getClickedBlock().getType() == Material.CHEST){
 			Shop shop = plugin.getShopManager().getShop(e.getClickedBlock().getLocation());
 			
 			//Make sure they're not using the non-shop half of a double chest.
 			if(shop == null){
-				Block b = Util.getSecondHalf(e.getClickedBlock());
+				b = Util.getSecondHalf(b);
 				if(b != null){
 					shop = plugin.getShopManager().getShop(b.getLocation());
 				}
@@ -73,7 +74,6 @@ public class PlayerListener implements Listener{
 			return;
 		}
 		
-		Block b = e.getClickedBlock();
 		Location loc = b.getLocation();
 		ItemStack item = e.getItem();
 		
