@@ -415,14 +415,9 @@ public class ShopManager{
 							return;
 						}
 						
-						int count = 0;
-						for(ItemStack item : p.getInventory().getContents()){
-							if(shop.matches(item)){
-								count += item.getAmount();
-							}
-						}
+						int count = Util.countItems(p.getInventory(), shop.getItem());
 						
-						//Broke
+						//Not enough items
 						if(amount > count){
 							p.sendMessage(MsgUtil.getMessage("you-dont-have-that-many-items", ""+count, shop.getDataName()));
 							return;

@@ -89,10 +89,7 @@ public class Shop{
 	 */
 	public int getRemainingStock(){
 		if(this.unlimited) return 10000;
-		
-		Chest chest = (Chest) loc.getBlock().getState();
-		
-		return Util.countItems(chest.getInventory(), this.getItem());
+		return Util.countItems(this.getChest().getInventory(), this.getItem());
 	}
 	
 	/**
@@ -102,23 +99,7 @@ public class Shop{
 	 */
 	public int getRemainingSpace(){
 		if(this.unlimited) return 10000;
-		
-		int stackSize = this.getMaterial().getMaxStackSize();
-		
-		Chest chest = (Chest) loc.getBlock().getState();
-		int space = 0;
-		
-		ItemStack[] inv = chest.getInventory().getContents();
-		for(ItemStack item : inv){
-			if(item == null || item.getType() == Material.AIR || item.getAmount() == 0){
-				space += stackSize;
-			}
-			else if(this.matches(item)){
-				space += stackSize - item.getAmount();
-			}
-		}
-		
-		return space;
+		return Util.countItems(this.getChest().getInventory(), item);
 	}
 	/**
 	 * Returns true if the ItemStack matches what this shop is selling/buying

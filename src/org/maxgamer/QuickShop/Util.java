@@ -521,7 +521,7 @@ public class Util{
 	public static int countSpace(Inventory inv, ItemStack item){
 		int space = 0;
 		for(ItemStack iStack : inv.getContents()){
-			if(iStack == null){
+			if(iStack == null || iStack.getType() == Material.AIR){
 				space += item.getMaxStackSize();
 			}
 			else if(matches(item, iStack)){

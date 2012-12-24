@@ -2,6 +2,7 @@ package org.maxgamer.QuickShop.Database;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.LinkedList;
 
 import org.maxgamer.QuickShop.QuickShop;
 
@@ -25,25 +26,27 @@ public class DatabaseWatcher implements Runnable{
 			}
 		}
 		
-		//Lock it to see the size of it
+		//Lock it for use
 		db.getBuffer().locked = true;
 		
-		if(db.getBuffer().queries.size() > 0){
-			try{
-				Statement st = db.getConnection().createStatement();
-				
-				while(db.getBuffer().queries.size() > 0){
-					st.addBatch(db.getBuffer().queries.remove(0));
-				}
-				//We can release this now
-				db.getBuffer().locked = false;
-				
-				st.executeBatch();
+		LinkedList<String> history = new LinkedList<String>();
+		try{
+			Statement st = db.getConnection().createStatement();
+			
+			while(db.getBuffer().queries.size() > 0){
+				String q = db.getBuffer().queries.remove(0);
+				st.addBatch(q);
+				history.add(q);
 			}
-			catch(SQLException e){
-				e.printStackTrace();
-				QuickShop.instance.getLogger().severe("Could not update database!");
-			}
+			//We can release this now
+			db.getBuffer().locked = false;
+			
+			st.executeBatch();
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+			QuickShop.instance.getLogger().severe("Could not update database!");
+			QuickShop.instance.getLogger().severe("It was one of the following queries: " + history.toString());
 		}
 		//Ensure it's released
 		db.getBuffer().locked = false;
