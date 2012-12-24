@@ -109,19 +109,6 @@ public class Util{
 			if(filtered.startsWith("MemorySection")){
 				continue;
 			}
-			/*
-			char[] chars = filtered.toCharArray();
-			
-			for(int i = 0; i < chars.length - 1; i++){
-				if(chars[i] == '&' 
-					&& ((chars[i+1] >= '0' && chars[i+1] <= '9')
-						|| (chars[i+1] >= 'a' && chars[i+1] <= 'f'))){
-					chars[i] = ChatColor.COLOR_CHAR;
-				}
-			}
-			
-			filtered = new String(chars);
-			*/
 			filtered = ChatColor.translateAlternateColorCodes('&', filtered);
 			config.set(key, filtered);
 		}
@@ -208,13 +195,13 @@ public class Util{
 	
 	public static String getNBTString(ItemStack i){
 		try{
-			net.minecraft.server.v1_4_5.ItemStack is = org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack.asNMSCopy(i);
+			net.minecraft.server.v1_4_6.ItemStack is = org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asNMSCopy(i);
 			//Save the NMS itemstack to a new NBT tag
-			net.minecraft.server.v1_4_5.NBTTagCompound itemCompound = new net.minecraft.server.v1_4_5.NBTTagCompound();
+			net.minecraft.server.v1_4_6.NBTTagCompound itemCompound = new net.minecraft.server.v1_4_6.NBTTagCompound();
 			itemCompound = is.save(itemCompound);
 			
 			//Convert the NBT tag to a byte[]
-			byte[] bytes = net.minecraft.server.v1_4_5.NBTCompressedStreamTools.a(itemCompound);
+			byte[] bytes = net.minecraft.server.v1_4_6.NBTCompressedStreamTools.a(itemCompound);
 			//Convert the byte[] to a string
 			return new String(bytes, "ISO-8859-1");
 		}
@@ -227,9 +214,9 @@ public class Util{
 	public static ItemStack getItemStack(String nbt){
 		try{
 			byte[] bytes = nbt.getBytes("ISO-8859-1");
-			net.minecraft.server.v1_4_5.NBTTagCompound c = net.minecraft.server.v1_4_5.NBTCompressedStreamTools.a(bytes);
-			net.minecraft.server.v1_4_5.ItemStack is = net.minecraft.server.v1_4_5.ItemStack.a(c);
-			return org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack.asBukkitCopy(is);
+			net.minecraft.server.v1_4_6.NBTTagCompound c = net.minecraft.server.v1_4_6.NBTCompressedStreamTools.a(bytes);
+			net.minecraft.server.v1_4_6.ItemStack is = net.minecraft.server.v1_4_6.ItemStack.a(c);
+			return org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asBukkitCopy(is);
 		}
 		catch(UnsupportedEncodingException e){
 			e.printStackTrace();
@@ -523,5 +510,24 @@ public class Util{
 			}
 		}
 		return items;
+	}
+	
+	/**
+	 * Returns the number of items that can be given to the inventory safely.
+	 * @param inv The inventory to count
+	 * @param item The item prototype.  Material, durabiltiy and enchants must match for 'stackability' to occur.
+	 * @return The number of items that can be given to the inventory safely.
+	 */
+	public static int countSpace(Inventory inv, ItemStack item){
+		int space = 0;
+		for(ItemStack iStack : inv.getContents()){
+			if(iStack == null){
+				space += item.getMaxStackSize();
+			}
+			else if(matches(item, iStack)){
+				space += item.getMaxStackSize() - iStack.getAmount();
+			}
+		}
+		return space;
 	}
 }

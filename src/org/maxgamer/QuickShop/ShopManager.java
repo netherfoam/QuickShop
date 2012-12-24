@@ -358,6 +358,12 @@ public class ShopManager{
 							return;
 						}
 						
+						int pSpace = Util.countSpace(p.getInventory(), shop.getItem());
+						if(amount > pSpace){
+							p.sendMessage(MsgUtil.getMessage("not-enough-space", ""+pSpace));
+							return;
+						}
+						
 						ShopPurchaseEvent e = new ShopPurchaseEvent(shop, p, amount);
 						Bukkit.getPluginManager().callEvent(e);
 						if(e.isCancelled()) return; //Cancelled
