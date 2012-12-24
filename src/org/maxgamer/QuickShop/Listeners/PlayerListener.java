@@ -37,6 +37,7 @@ public class PlayerListener implements Listener{
 	 */
 	@EventHandler
 	public void onClick(PlayerInteractEvent e){
+		System.out.println("Clicked");
 		if(e.isCancelled()) return;
 		Block b = e.getClickedBlock();
 		if(b == null) return; //Interacted with air
@@ -109,6 +110,7 @@ public class PlayerListener implements Listener{
 			if(!plugin.canBuildShop(p, b, e.getBlockFace())){
 				//As of the new checking system, most plugins will tell the player why they can't create a shop there.
 				//So telling them a message would cause spam etc.
+				System.out.println("Cant build there.");
 				return;
 			}
 			if(Util.getSecondHalf(b) != null  && !p.hasPermission("quickshop.create.double")){

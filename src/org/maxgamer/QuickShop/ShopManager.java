@@ -15,7 +15,6 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Sign;
 import org.maxgamer.QuickShop.Database.Database;
 import org.maxgamer.QuickShop.Shop.Info;
