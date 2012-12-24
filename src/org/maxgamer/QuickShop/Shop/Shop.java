@@ -99,7 +99,7 @@ public class Shop{
 	 */
 	public int getRemainingSpace(){
 		if(this.unlimited) return 10000;
-		return Util.countItems(this.getChest().getInventory(), item);
+		return Util.countSpace(this.getChest().getInventory(), item);
 	}
 	/**
 	 * Returns true if the ItemStack matches what this shop is selling/buying
