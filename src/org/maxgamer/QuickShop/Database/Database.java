@@ -67,9 +67,13 @@ public class Database {
 		try{
 			PreparedStatement ps = this.getConnection().prepareStatement(query);
 			ResultSet rs = ps.executeQuery();
-			rs.findColumn(column); //Throws an exception if the column isnt found...
-			
-			return true; //Column was found.. hasColumn.
+			for(int i = 1; i < rs.getMetaData().getColumnCount(); i++){
+				String name = rs.getMetaData().getColumnName(i);
+				if(name.equals(column)){
+					return true;
+				}
+			}
+			return false; //Column was not found...
 		} 
 		catch(SQLException e){
 			return false;
