@@ -84,30 +84,6 @@ public class QuickShop extends JavaPlugin{
 		reloadConfig(); //Reloads messages.yml too, aswell as config.yml and others.
 		getConfig().options().copyDefaults(true); //Load defaults.
 		
-		/* Hook into other plugins */
-		if(Bukkit.getPluginManager().getPlugin("Vault") == null){
-			getLogger().severe(ChatColor.RED + "You don't have Vault installed!");
-			getLogger().severe(ChatColor.RED + "Download it from: ");
-			getLogger().severe(ChatColor.RED + "http://dev.bukkit.org/server-mods/vault");
-			getLogger().severe(ChatColor.RED + "And place it in your plugins folder!");
-			getLogger().severe(ChatColor.RED + "This plugin will not function (at all) until you install vault.");
-			return;
-		}
-		else{
-			getLogger().info("Hooking Economy");
-			if(!setupEconomy()){
-				getLogger().severe(ChatColor.YELLOW + "Vault was found, but does not have an economy to hook into!");
-				getLogger().severe(ChatColor.YELLOW + "Download an economy plugin such as:");
-				getLogger().severe(ChatColor.YELLOW + "BOSEconomy, EssentialsEcon, 3Co, MultiCurrency, MineConomy, CraftConomy");
-				getLogger().severe(ChatColor.YELLOW + "from http://dev.bukkit.org!");
-				getLogger().severe(ChatColor.YELLOW + "This plugin will not function (at all) until you install an economy.");
-				return;
-			}
-			else{
-				getLogger().info(ChatColor.GREEN + "Economy hooked!");
-			}
-		}
-		
 		//Create the shop manager.
 		this.shopManager = new ShopManager(this);
 		
@@ -318,19 +294,6 @@ public class QuickShop extends JavaPlugin{
 	public HashMap<String, Info> getActions(){
 		return this.actions;
 	}
-	
-	/**
-	 * Sets up the vault economy for hooking into & purchases.
-	 * @return True is success
-	 */
-	private boolean setupEconomy(){
-        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-        if (economyProvider != null) {
-            economy = economyProvider.getProvider();
-        }
-
-        return (economy != null);
-    }
 
 	/**
 	 * @return Returns the database handler for queries etc.
