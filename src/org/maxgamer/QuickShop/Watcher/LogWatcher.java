@@ -13,7 +13,6 @@ import org.maxgamer.QuickShop.QuickShop;
 
 public class LogWatcher implements Runnable{
 	private PrintStream ps;
-	//public int taskId = 0;
 	
 	private List<String> logs = new ArrayList<String>(5);
 	private boolean lock = false;
