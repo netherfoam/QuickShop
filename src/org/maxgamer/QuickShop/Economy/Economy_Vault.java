@@ -3,9 +3,9 @@ package org.maxgamer.QuickShop.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
-public class VaultEcon implements Economy{
+public class Economy_Vault implements Economy{
 	private net.milkbowl.vault.economy.Economy vault;
-	public VaultEcon(){
+	public Economy_Vault(){
 		
 		/* Hook into other plugins */
 		if(Bukkit.getPluginManager().getPlugin("Vault") == null){
