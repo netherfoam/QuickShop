@@ -294,14 +294,8 @@ public class Util{
 			return mat.toString();
 		case 373:
 			//Special case,.. Why?
-			if(damage == 64 || damage == 8192) return "MUNDANE_POTION";
-			Potion pot;
-			try{
-				pot = Potion.fromDamage(damage);
-			}
-			catch(IllegalArgumentException ex){
-				pot = new Potion(PotionType.WATER);
-			}
+			if(damage == 0) return "WATER_BOTTLE";
+			Potion pot = Potion.fromDamage(damage);
 			
 			String prefix = "";
 			String suffix = "";
@@ -312,7 +306,7 @@ public class Util{
 			
 			if(pot.getEffects().isEmpty()){
 				switch((int) pot.getNameId()){
-				case 0: return prefix + "WATER_BOTTLE" + suffix;
+				case 0: return prefix + "MUNDANE_POTION" + suffix;
 				case 7: return prefix + "CLEAR_POTION" + suffix;
 				case 11: return prefix + "DIFFUSE_POTION" + suffix;
 				case 13: return prefix + "ARTLESS_POTION" + suffix;
