@@ -6,6 +6,11 @@ package org.maxgamer.QuickShop.Economy;
  */
 public interface Economy{
 	/**
+	 * Checks that this economy is valid. Returns false if it is not valid.
+	 * @return True if this economy will work, false if it will not.
+	 */
+	public boolean isValid();
+	/**
 	 * Deposits a given amount of money from thin air to the given username.
 	 * @param name The exact (case insensitive) username to give money to
 	 * @param amount The amount to give them
