@@ -57,7 +57,7 @@ public class BlockListener implements Listener{
 				}
 				
 				//Cancel their current menu... Doesnt cancel other's menu's.
-				Info action = plugin.getActions().get(p.getName());
+				Info action = plugin.getShopManager().getActions().get(p.getName());
 				if(action != null){
 					action.setAction(ShopAction.CANCELLED);
 				}

@@ -643,7 +643,8 @@ public class Shop{
 		
 		//Refund if necessary
 		if(plugin.getConfig().getBoolean("shop.refund")){
-			plugin.getEcon().depositPlayer(this.getOwner(), plugin.getConfig().getDouble("shop.cost"));
+			//plugin.getEcon().depositPlayer(this.getOwner(), plugin.getConfig().getDouble("shop.cost"));
+			plugin.getEcon().deposit(this.getOwner(), plugin.getConfig().getDouble("shop.cost"));
 		}
 		
 		if(fromMemory){

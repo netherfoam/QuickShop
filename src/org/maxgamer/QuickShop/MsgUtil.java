@@ -1,5 +1,7 @@
 package org.maxgamer.QuickShop;
 
+import java.io.File;
+import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,6 +12,7 @@ import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -17,9 +20,31 @@ import org.maxgamer.QuickShop.Shop.Shop;
 
 public class MsgUtil{
 	private static QuickShop plugin;
+	private static YamlConfiguration messages;
 	
 	static{
 		plugin = QuickShop.instance;
+	}
+	
+	public static void loadMessages(){
+		//Load messages.yml
+		File messageFile = new File(plugin.getDataFolder(), "messages.yml");
+		if(!messageFile.exists()){
+			plugin.getLogger().info("Creating messages.yml");
+			plugin.saveResource("messages.yml", true);
+		}
+		
+		//Store it
+		messages = YamlConfiguration.loadConfiguration(messageFile);
+		messages.options().copyDefaults(true);
+		
+		//Load default messages
+		InputStream defMessageStream = plugin.getResource("messages.yml");
+		YamlConfiguration defMessages = YamlConfiguration.loadConfiguration(defMessageStream);
+		messages.setDefaults(defMessages);
+		
+		//Parse colour codes
+		Util.parseColours(messages);
 	}
 
 	/**
@@ -171,7 +196,7 @@ public class MsgUtil{
 	}
 	
 	public static String getMessage(String loc, String... args){
-		String raw = plugin.messages.getString(loc);
+		String raw = messages.getString(loc);
 		
 		if(raw == null || raw.isEmpty()){
 			return "Invalid message: " + loc;

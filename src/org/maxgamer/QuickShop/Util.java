@@ -195,13 +195,13 @@ public class Util{
 	
 	public static String getNBTString(ItemStack i){
 		try{
-			net.minecraft.server.v1_4_6.ItemStack is = org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asNMSCopy(i);
+			net.minecraft.server.v1_4_5.ItemStack is = org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack.asNMSCopy(i);
 			//Save the NMS itemstack to a new NBT tag
-			net.minecraft.server.v1_4_6.NBTTagCompound itemCompound = new net.minecraft.server.v1_4_6.NBTTagCompound();
+			net.minecraft.server.v1_4_5.NBTTagCompound itemCompound = new net.minecraft.server.v1_4_5.NBTTagCompound();
 			itemCompound = is.save(itemCompound);
 			
 			//Convert the NBT tag to a byte[]
-			byte[] bytes = net.minecraft.server.v1_4_6.NBTCompressedStreamTools.a(itemCompound);
+			byte[] bytes = net.minecraft.server.v1_4_5.NBTCompressedStreamTools.a(itemCompound);
 			//Convert the byte[] to a string
 			return new String(bytes, "ISO-8859-1");
 		}
@@ -210,17 +210,25 @@ public class Util{
 			System.out.println("Error: Your system does not support the encoding: ISO-8859-1.  Try install it? Shops won't save to the database because of this.");
 			return "";
 		}
+		catch(Error e){
+			System.out.println("This version of QuickShop is incompatible with your build of bukkit!");
+			return null;
+		}
 	}
 	public static ItemStack getItemStack(String nbt){
 		try{
 			byte[] bytes = nbt.getBytes("ISO-8859-1");
-			net.minecraft.server.v1_4_6.NBTTagCompound c = net.minecraft.server.v1_4_6.NBTCompressedStreamTools.a(bytes);
-			net.minecraft.server.v1_4_6.ItemStack is = net.minecraft.server.v1_4_6.ItemStack.a(c);
-			return org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asBukkitCopy(is);
+			net.minecraft.server.v1_4_5.NBTTagCompound c = net.minecraft.server.v1_4_5.NBTCompressedStreamTools.a(bytes);
+			net.minecraft.server.v1_4_5.ItemStack is = net.minecraft.server.v1_4_5.ItemStack.a(c);
+			return org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack.asBukkitCopy(is);
 		}
 		catch(UnsupportedEncodingException e){
 			e.printStackTrace();
 			System.out.println("Error: Your system does not support the encoding: ISO-8859-1.  Try install it? Shops won't save to the database because of this.");
+			return null;
+		}
+		catch(Error e){
+			System.out.println("This version of QuickShop is incompatible with your build of bukkit!");
 			return null;
 		}
 	}

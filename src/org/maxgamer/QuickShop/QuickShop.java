@@ -22,42 +22,31 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.maxgamer.QuickShop.Command.QS;
 import org.maxgamer.QuickShop.Database.Database;
+import org.maxgamer.QuickShop.Economy.Economy;
+import org.maxgamer.QuickShop.Economy.Economy_Core;
+import org.maxgamer.QuickShop.Economy.Economy_Vault;
 import org.maxgamer.QuickShop.Listeners.*;
-import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.Shop.ShopType;
 import org.maxgamer.QuickShop.Shop.ShopChunk;
 import org.maxgamer.QuickShop.Watcher.*;
 
-import net.milkbowl.vault.economy.Economy;
-
 public class QuickShop extends JavaPlugin{
+	public static QuickShop instance;
 	private Economy economy;
 	private ShopManager shopManager;
 	
-	public static QuickShop instance;
-	
-	private HashMap<String, Info> actions = new HashMap<String, Info>(30);
-	private HashSet<Material> tools = new HashSet<Material>(50);
 	public boolean debug = false;
 	public HashSet<String> warnings = new HashSet<String>(10);
 	
 	public boolean display = true;
 	
 	private Database database;
-	
-	public YamlConfiguration messages;
 	
 	//Listeners - We decide which one to use at runtime
 	private ChatListener chatListener;
@@ -69,7 +58,8 @@ public class QuickShop extends JavaPlugin{
 	private ChunkListener chunkListener = new ChunkListener(this);
 	private WorldListener worldListener = new WorldListener(this);
 	
-	private int itemWatcherID;
+	//private int itemWatcherID;
+	private BukkitTask itemWatcherTask;
 	public boolean lock;
 	public boolean sneak;
 	
@@ -84,6 +74,9 @@ public class QuickShop extends JavaPlugin{
 		reloadConfig(); //Reloads messages.yml too, aswell as config.yml and others.
 		getConfig().options().copyDefaults(true); //Load defaults.
 		
+
+		if(loadEcon() == false) return;
+		
 		//Create the shop manager.
 		this.shopManager = new ShopManager(this);
 		
@@ -91,7 +84,7 @@ public class QuickShop extends JavaPlugin{
 			// Display item handler thread
 			getLogger().info("Starting item scheduler");
 			ItemWatcher itemWatcher = new ItemWatcher(this);
-			itemWatcherID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, itemWatcher, 600, 600);
+			itemWatcherTask = Bukkit.getScheduler().runTaskTimer(this, itemWatcher, 600, 600);
 		}
 		
 		if(this.getConfig().getBoolean("log-actions")){
@@ -152,7 +145,6 @@ public class QuickShop extends JavaPlugin{
 				int z = rs.getInt("z");
 				World world = Bukkit.getWorld(rs.getString("world"));
 
-				//ItemStack item = Util.makeItem(rs.getString("itemString"));
 				ItemStack item = Util.getItemStack(rs.getString("item"));
 				
 				String owner = rs.getString("owner");
@@ -230,33 +222,54 @@ public class QuickShop extends JavaPlugin{
 		this.sneak = this.getConfig().getBoolean("shop.sneak-only");
 		this.lock = this.getConfig().getBoolean("shop.lock");
 		
-		//Load messages.yml
-		File messageFile = new File(this.getDataFolder(), "messages.yml");
-		if(!messageFile.exists()){
-			getLogger().info("Creating messages.yml");
-			this.saveResource("messages.yml", true);
+		MsgUtil.loadMessages();
+	}
+	
+	public boolean loadEcon(){
+		String econ = getConfig().getString("economy");
+		if(econ == null || econ.isEmpty()) econ = "Vault";
+		econ = econ.substring(0, 1).toUpperCase() + econ.substring(1).toLowerCase();
+		Economy_Core core = null;
+		try{
+			getLogger().info("Hooking " + econ);
+			Class<? extends Economy_Core> ecoClass = Class.forName("org.maxgamer.QuickShop.Economy.Economy_"+econ).asSubclass(Economy_Core.class);
+			core = ecoClass.newInstance();
+		}
+		catch(NoClassDefFoundError e){
+			e.printStackTrace();
+			System.out.println("No such economy hook found: " + econ + ", using vault!");
+			core = new Economy_Vault();
+		}
+		catch(ClassNotFoundException e){
+			e.printStackTrace();
+			System.out.println("No such economy hook found: " + econ + ", using vault!");
+			core = new Economy_Vault();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
 		}
 		
-		this.messages = YamlConfiguration.loadConfiguration(messageFile);
-		this.messages.options().copyDefaults(true);
-		
-		InputStream defMessageStream = this.getResource("messages.yml");
-		if(defMessageStream != null){
-			YamlConfiguration defMessages = YamlConfiguration.loadConfiguration(defMessageStream);
-			this.messages.setDefaults(defMessages);
+		if(core == null || !core.isValid()){
+			getLogger().severe("Economy is not valid!");
+			getLogger().severe("QuickShop could not hook an economy!");
+			getLogger().severe("QuickShop CANNOT start!");
+			if(econ.equals("Vault")) getLogger().severe("(Does Vault have an Economy to hook into?!");
+			return false;
 		}
 		else{
-			this.getLogger().severe("Messages.yml not found inside plugin! This will cause errors! Update!");
+			this.economy = new Economy(core);
+			return true;
 		}
-		Util.parseColours(this.messages);
 	}
 	
 	public void onDisable(){
-		if(this.display){
-			Bukkit.getScheduler().cancelTask(itemWatcherID);
+		if(itemWatcherTask != null){
+			itemWatcherTask.cancel();
 		}
 		if(logWatcher != null){
-			Bukkit.getScheduler().cancelTask(logWatcher.taskId);
+			//Bukkit.getScheduler().cancelTask(logWatcher.taskId);
+			logWatcher.task.cancel();
 			logWatcher.close(); //Closes the file
 		}
 		
@@ -265,34 +278,27 @@ public class QuickShop extends JavaPlugin{
 		
 		/* Empty the buffer */
 		this.database.getDatabaseWatcher().run();
-		
-		this.actions.clear();
-		
-		this.tools.clear();
 		this.warnings.clear();
 		
 		this.reloadConfig();
 	}
 	/**
-	 * Returns the vault economy
-	 * @return The vault economy
+	 * Returns the economy for moving currency around
+	 * @return The economy for moving currency around
 	 */
-	public Economy getEcon(){
+	public Economy_Core getEcon(){
 		return economy;
 	}
 	
+	/**
+	 * Logs the given string to qs.log, if QuickShop is configured to do so.
+	 * @param s The string to log. It will be prefixed with the date and time.
+	 */
 	public void log(String s){
 		if(this.logWatcher == null) return;
 		Date date = Calendar.getInstance().getTime();
 		Timestamp time = new Timestamp(date.getTime());
 		this.logWatcher.add("["+time.toString()+"] "+ s);
-	}
-	
-	/**
-	 * @return Returns the HashMap<Player name, shopInfo>. Info contains what their last question etc was.
-	 */
-	public HashMap<String, Info> getActions(){
-		return this.actions;
 	}
 
 	/**
@@ -302,39 +308,13 @@ public class QuickShop extends JavaPlugin{
 		return this.database;
 	}
 	
+	/**
+	 * Prints debug information if QuickShop is configured to do so.
+	 * @param s The string to print.
+	 */
 	public void debug(String s){
 		if(!debug) return;
 		this.getLogger().info(ChatColor.YELLOW + "[Debug] " + s);
-	}
-
-	/**
-	 * Checks other plugins to make sure they can use the chest they're making a shop.
-	 * @param p The player to check
-	 * @param b The block to check
-	 * @return True if they're allowed to place a shop there.
-	 */
-	public boolean canBuildShop(Player p, Block b, BlockFace bf){
-		PlayerInteractEvent event = new PlayerInteractEvent(p, Action.RIGHT_CLICK_BLOCK, new ItemStack(Material.AIR), b, bf);
-		Bukkit.getPluginManager().callEvent(event);
-		event.getPlayer().closeInventory(); //TODO: Verify, does this fix plugins (OpenInv?) opening inventories?
-		
-		if(event.isCancelled()){
-			return false;
-		}
-		else{
-			return true;
-		}
-	}
-	
-	/**
-	 * External API Component.
-	 * Returns true if the location is a shop block.
-	 * If you want to use the shop, use QuickShop.getShopManager().getShop(Location) instead.
-	 * @param loc The location to check
-	 * @return true is it's a shop, false if it's not.
-	 */
-	public boolean isShop(Location loc){
-		return this.getShopManager().getShop(loc.getBlock().getLocation()) != null;
 	}
 	
 	/**

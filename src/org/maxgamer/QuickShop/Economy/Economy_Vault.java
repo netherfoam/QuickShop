@@ -1,16 +1,11 @@
 package org.maxgamer.QuickShop.Economy;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 
-public class Economy_Vault implements Economy{
+public class Economy_Vault implements Economy_Core{
 	private net.milkbowl.vault.economy.Economy vault;
 	public Economy_Vault(){
 		setupEconomy();
-	}
-	
-	public boolean isValid(){
-		return vault != null;
 	}
 	
 	/**
@@ -25,6 +20,11 @@ public class Economy_Vault implements Economy{
 
         return (vault != null);
     }
+	
+	@Override
+	public boolean isValid(){
+		return vault != null;
+	}
 
 	@Override
 	public boolean deposit(String name, double amount) {

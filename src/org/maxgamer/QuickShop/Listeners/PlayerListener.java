@@ -98,7 +98,7 @@ public class PlayerListener implements Listener{
 			}
 			
 			//Add the new action
-			HashMap<String, Info> actions = plugin.getActions();
+			HashMap<String, Info> actions = plugin.getShopManager().getActions();
 			Info info = new Info(shop.getLocation(), ShopAction.BUY, null, null, shop);
 			actions.put(p.getName(), info);
 			
@@ -106,7 +106,7 @@ public class PlayerListener implements Listener{
 		}
 		//Handles creating shops
 		else if(shop == null && item != null && item.getType() != Material.AIR && p.hasPermission("quickshop.create.sell") && b.getType() == Material.CHEST){
-			if(!plugin.canBuildShop(p, b, e.getBlockFace())){
+			if(!plugin.getShopManager().canBuildShop(p, b, e.getBlockFace())){
 				//As of the new checking system, most plugins will tell the player why they can't create a shop there.
 				//So telling them a message would cause spam etc.
 				return;
@@ -135,7 +135,7 @@ public class PlayerListener implements Listener{
 			
 			//Send creation menu.
 			Info info = new Info(b.getLocation(), ShopAction.CREATE, e.getItem(), last);
-			plugin.getActions().put(p.getName(), info);
+			plugin.getShopManager().getActions().put(p.getName(), info);
 			p.sendMessage(MsgUtil.getMessage("how-much-to-trade-for", Util.getDataName(info.getItem().getType(), info.getItem().getDurability())));
 		}
 	}
@@ -146,7 +146,7 @@ public class PlayerListener implements Listener{
 	 */
 	public void onMove(PlayerMoveEvent e){
 		if(e.isCancelled()) return;
-		Info info = plugin.getActions().get(e.getPlayer().getName());
+		Info info = plugin.getShopManager().getActions().get(e.getPlayer().getName());
 		if(info != null){
 			Player p = e.getPlayer();
 			Location loc1 = info.getLocation();
@@ -160,7 +160,7 @@ public class PlayerListener implements Listener{
 				else if(info.getAction() == ShopAction.BUY){
 					p.sendMessage(MsgUtil.getMessage("shop-purchase-cancelled"));
 				}
-				plugin.getActions().remove(p.getName());
+				plugin.getShopManager().getActions().remove(p.getName());
 				return;
 			}
 		}
@@ -175,6 +175,6 @@ public class PlayerListener implements Listener{
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent e){
 		//Remove them from the menu
-		plugin.getActions().remove(e.getPlayer().getName());
+		plugin.getShopManager().getActions().remove(e.getPlayer().getName());
 	}
 }

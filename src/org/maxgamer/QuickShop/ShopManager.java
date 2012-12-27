@@ -5,16 +5,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 
-import net.milkbowl.vault.economy.EconomyResponse;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Sign;
 import org.maxgamer.QuickShop.Database.Database;
 import org.maxgamer.QuickShop.Shop.Info;
@@ -26,6 +28,7 @@ import org.maxgamer.QuickShop.Shop.ShopPurchaseEvent;
 
 public class ShopManager{
 	private QuickShop plugin;
+	private HashMap<String, Info> actions = new HashMap<String, Info>(30);
 	
 	private HashMap<String, HashMap<ShopChunk, HashMap<Location, Shop>>> shops = new HashMap<String, HashMap<ShopChunk, HashMap<Location, Shop>>>(3);
 	
@@ -35,6 +38,13 @@ public class ShopManager{
 	
 	public Database getDatabase(){
 		return plugin.getDB();
+	}
+	
+	/**
+	 * @return Returns the HashMap<Player name, shopInfo>. Info contains what their last question etc was.
+	 */
+	public HashMap<String, Info> getActions(){
+		return this.actions;
 	}
 	
 	/**
@@ -86,6 +96,17 @@ public class ShopManager{
 		} catch (SQLException e) {
 			plugin.getLogger().info("Found type column");
 		}
+	}
+	
+	/**
+	 * External API Component.
+	 * Returns true if the location is a shop block.
+	 * If you want to use the shop, use QuickShop.getShopManager().getShop(Location) instead.
+	 * @param loc The location to check
+	 * @return true is it's a shop, false if it's not.
+	 */
+	public boolean isShop(Location loc){
+		return getShop(loc.getBlock().getLocation()) != null;
 	}
 	
 	/**
@@ -205,8 +226,27 @@ public class ShopManager{
 				}
 			}
 		}
-		
+		this.actions.clear();
 		this.shops.clear();
+	}
+	
+	/**
+	 * Checks other plugins to make sure they can use the chest they're making a shop.
+	 * @param p The player to check
+	 * @param b The block to check
+	 * @return True if they're allowed to place a shop there.
+	 */
+	public boolean canBuildShop(Player p, Block b, BlockFace bf){
+		PlayerInteractEvent event = new PlayerInteractEvent(p, Action.RIGHT_CLICK_BLOCK, new ItemStack(Material.AIR), b, bf);
+		Bukkit.getPluginManager().callEvent(event);
+		event.getPlayer().closeInventory(); //TODO: Verify, does this fix plugins (OpenInv?) opening inventories?
+		
+		if(event.isCancelled()){
+			return false;
+		}
+		else{
+			return true;
+		}
 	}
 	
 	public void handleChat(final Player p, String msg){
@@ -216,10 +256,10 @@ public class ShopManager{
 		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
 			@Override
 			public void run() {
-				HashMap<String, Info> actions = plugin.getActions();
+				HashMap<String, Info> actions = getActions();
 				//They wanted to do something.
 				Info info = actions.remove(p.getName());
-				if(info == null) return;
+				if(info == null) return; //multithreaded means this can happen
 				/* Creation handling */
 				if(info.getAction() == ShopAction.CREATE){
 					try{
@@ -246,8 +286,9 @@ public class ShopManager{
 						}
 						double tax = plugin.getConfig().getDouble("shop.cost"); 
 						
-						if(tax != 0 && plugin.getEcon().getBalance(p.getName()) <= tax){
-							p.sendMessage(MsgUtil.getMessage("you-cant-afford-a-new-shop", Util.format(tax)));
+						//Tax refers to the cost to create a shop.  Not actual tax, that would be silly
+						if(tax != 0 && plugin.getEcon().getBalance(p.getName()) < tax){
+							p.sendMessage(MsgUtil.getMessage("you-cant-afford-a-new-shop", format(tax)));
 							return;
 						}
 						
@@ -262,14 +303,12 @@ public class ShopManager{
 						plugin.getShopManager().addShop(shop.getLocation().getWorld().getName(), shop);
 						
 						if(tax != 0){
-							EconomyResponse r = plugin.getEcon().withdrawPlayer(p.getName(), tax);
-							
-							if(!r.transactionSuccess()){
-								p.sendMessage(MsgUtil.getMessage("you-cant-afford-a-new-shop", Util.format(tax)));
+							if(!plugin.getEcon().withdraw(p.getName(), tax)){
+								p.sendMessage(MsgUtil.getMessage("you-cant-afford-a-new-shop", format(tax)));
 								return;
 							}
 							
-							plugin.getEcon().depositPlayer(plugin.getConfig().getString("tax-account"), tax);
+							plugin.getEcon().deposit(plugin.getConfig().getString("tax-account"), tax);
 						}
 						
 						Location loc = shop.getLocation();
@@ -370,8 +409,8 @@ public class ShopManager{
 						//Money handling
 						if(!p.getName().equalsIgnoreCase(shop.getOwner())){
 							//Check their balance.  Works with *most* economy plugins*
-							if(!plugin.getEcon().has(p.getName(), amount * shop.getPrice())){
-								p.sendMessage(MsgUtil.getMessage("you-cant-afford-to-buy", ""+amount * shop.getPrice(), ""+plugin.getEcon().getBalance(p.getName())));
+							if(plugin.getEcon().getBalance(p.getName()) < amount * shop.getPrice()){
+								p.sendMessage(MsgUtil.getMessage("you-cant-afford-to-buy", format(amount * shop.getPrice()), format(plugin.getEcon().getBalance(p.getName()))));
 								return;
 							}
 							
@@ -380,17 +419,16 @@ public class ShopManager{
 							double tax = plugin.getConfig().getDouble("tax");
 							double total = amount * shop.getPrice();
 							
-							EconomyResponse r = plugin.getEcon().withdrawPlayer(p.getName(), total);
-							if(!r.transactionSuccess()){
-								p.sendMessage(MsgUtil.getMessage("you-cant-afford-to-buy", ""+amount * shop.getPrice(), ""+plugin.getEcon().getBalance(p.getName())));
+							if(!plugin.getEcon().withdraw(p.getName(), total)){
+								p.sendMessage(MsgUtil.getMessage("you-cant-afford-to-buy", format(amount * shop.getPrice()), format(plugin.getEcon().getBalance(p.getName()))));
 								return;
 							}
 							
 							if(!shop.isUnlimited() || plugin.getConfig().getBoolean("shop.pay-unlimited-shop-owners")){
-								plugin.getEcon().depositPlayer(shop.getOwner(), total * (1 - tax));
+								plugin.getEcon().deposit(shop.getOwner(), total * (1 - tax));
 								
 								if(tax != 0){
-									plugin.getEcon().depositPlayer(plugin.getConfig().getString("tax-account"), total * tax);
+									plugin.getEcon().deposit(plugin.getConfig().getString("tax-account"), total * tax);
 								}
 							}
 							
@@ -442,25 +480,23 @@ public class ShopManager{
 							
 							if(!shop.isUnlimited() || plugin.getConfig().getBoolean("shop.pay-unlimited-shop-owners")){
 								//Tries to check their balance nicely to see if they can afford it.
-								if(!plugin.getEcon().has(shop.getOwner(), amount * shop.getPrice())){
-									p.sendMessage(MsgUtil.getMessage("the-owner-cant-afford-to-buy-from-you", Util.format(amount * shop.getPrice()), Util.format(plugin.getEcon().getBalance(shop.getOwner()))));
+								if(plugin.getEcon().getBalance(shop.getOwner()) < amount * shop.getPrice()){
+									p.sendMessage(MsgUtil.getMessage("the-owner-cant-afford-to-buy-from-you", format(amount * shop.getPrice()), format(plugin.getEcon().getBalance(shop.getOwner()))));
 									return;
 								}
 								
-								EconomyResponse r = plugin.getEcon().withdrawPlayer(shop.getOwner(), total);
-								
 								//Check for plugins faking econ.has(amount)
-								if(!r.transactionSuccess()){
-									p.sendMessage(MsgUtil.getMessage("the-owner-cant-afford-to-buy-from-you", Util.format(amount * shop.getPrice()), Util.format(plugin.getEcon().getBalance(shop.getOwner()))));
+								if(!plugin.getEcon().withdraw(shop.getOwner(), total)){
+									p.sendMessage(MsgUtil.getMessage("the-owner-cant-afford-to-buy-from-you", format(amount * shop.getPrice()), format(plugin.getEcon().getBalance(shop.getOwner()))));
 									return;
 								}
 								
 								if(tax != 0){
-									plugin.getEcon().depositPlayer(plugin.getConfig().getString("tax-account"), total * tax);
+									plugin.getEcon().deposit(plugin.getConfig().getString("tax-account"), total * tax);
 								}
 							}
 							//Give them the money after we know we succeeded
-							plugin.getEcon().depositPlayer(p.getName(), total * (1 - tax));
+							plugin.getEcon().deposit(p.getName(), total * (1 - tax));
 							
 							//Notify the owner of the purchase.
 							String msg = MsgUtil.getMessage("player-sold-to-your-store", p.getName(), ""+amount, shop.getDataName());
@@ -482,5 +518,9 @@ public class ShopManager{
 				}
 			}
 		});
+	}
+	
+	public String format(double d){
+		return plugin.getEcon().format(d);
 	}
 }

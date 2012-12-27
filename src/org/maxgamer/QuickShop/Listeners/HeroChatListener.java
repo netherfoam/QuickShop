@@ -22,7 +22,7 @@ public class HeroChatListener implements Listener{
 	
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onHeroChat(ChannelChatEvent e){
-		if(!plugin.getActions().containsKey(e.getSender().getName())) return;
+		if(!plugin.getShopManager().getActions().containsKey(e.getSender().getName())) return;
 		plugin.getShopManager().handleChat(e.getSender().getPlayer(), e.getMessage());
 		e.setResult(Result.BAD_PASSWORD);
 	}
