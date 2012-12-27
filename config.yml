@@ -6,7 +6,11 @@ tax-account: tax
 #Should we log transactions/creations to Bukkit\Plugins\QuickShop\qs.log?
 log-actions: true
 
-economy: vaulT
+#Advanced.  This chooses which economy to hook into.  If it fails, it will fall back to trying vault. Spelling must be exact. Case insensitive.
+# Vault - Will hook into anything vault can hook into (Vault is required for this to work)
+# Satoshis
+# Want yours added? Contact me (Netherfoam) on dev.bukkit.org
+economy: Vault
 
 shop:
     #Cost to make a stall

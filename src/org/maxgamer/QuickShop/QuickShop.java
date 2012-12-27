@@ -27,25 +27,26 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.maxgamer.QuickShop.Command.QS;
 import org.maxgamer.QuickShop.Database.Database;
-import org.maxgamer.QuickShop.Economy.Economy;
-import org.maxgamer.QuickShop.Economy.EconomyCore;
-import org.maxgamer.QuickShop.Economy.Economy_Vault;
+import org.maxgamer.QuickShop.Economy.*;
 import org.maxgamer.QuickShop.Listeners.*;
-import org.maxgamer.QuickShop.Shop.Shop;
+import org.maxgamer.QuickShop.Shop.*;
 import org.maxgamer.QuickShop.Shop.Shop.ShopType;
-import org.maxgamer.QuickShop.Shop.ShopChunk;
 import org.maxgamer.QuickShop.Watcher.*;
 
 public class QuickShop extends JavaPlugin{
+	/** The active instance of QuickShop */
 	public static QuickShop instance;
+	
+	/** The economy we hook into for transactions */
 	private Economy economy;
+	
+	/** The Shop Manager used to store shops */
 	private ShopManager shopManager;
 	
-	public boolean debug = false;
+	/** A set of players who have been warned ("Your shop isnt automatically locked") */
 	public HashSet<String> warnings = new HashSet<String>(10);
 	
-	public boolean display = true;
-	
+	/** The database for storing all our data for persistance */
 	private Database database;
 	
 	//Listeners - We decide which one to use at runtime
@@ -58,14 +59,20 @@ public class QuickShop extends JavaPlugin{
 	private ChunkListener chunkListener = new ChunkListener(this);
 	private WorldListener worldListener = new WorldListener(this);
 	
-	//private int itemWatcherID;
 	private BukkitTask itemWatcherTask;
+	private LogWatcher logWatcher;
+	
+	/** Whether shops should be locked from other players opening them */
 	public boolean lock;
+	/** Whether players are required to sneak to create a shop */
 	public boolean sneak;
+	/** Whether we should use display items or not */
+	public boolean display = true;
 	
 	private Metrics metrics;
 	
-	private LogWatcher logWatcher;
+	/** Whether debug info should be shown in the console */
+	public boolean debug = false;
 	
 	public void onEnable(){
 		instance = this;
@@ -74,7 +81,6 @@ public class QuickShop extends JavaPlugin{
 		reloadConfig(); //Reloads messages.yml too, aswell as config.yml and others.
 		getConfig().options().copyDefaults(true); //Load defaults.
 		
-
 		if(loadEcon() == false) return;
 		
 		//Create the shop manager.
@@ -225,36 +231,50 @@ public class QuickShop extends JavaPlugin{
 		MsgUtil.loadMessages();
 	}
 	
+	/**
+	 * Tries to load the economy and its core.  If this fails, it will try to use vault. If that fails, it will return false.
+	 * @return true if successful, false if the core is invalid or is not found, and vault cannot be used.
+	 */
 	public boolean loadEcon(){
 		String econ = getConfig().getString("economy");
+		//Fall back to vault if none specified
 		if(econ == null || econ.isEmpty()) econ = "Vault";
+		//Capitalize the first letter, lowercase the rest
 		econ = econ.substring(0, 1).toUpperCase() + econ.substring(1).toLowerCase();
+		
+		//The core to use
 		EconomyCore core = null;
 		try{
 			getLogger().info("Hooking " + econ);
+			//Throws ClassNotFoundException if they gave us the wrong economy
 			Class<? extends EconomyCore> ecoClass = Class.forName("org.maxgamer.QuickShop.Economy.Economy_"+econ).asSubclass(EconomyCore.class);
+			//Throws NoClassDefFoundError if the economy is not installed
 			core = ecoClass.newInstance();
 		}
 		catch(NoClassDefFoundError e){
 			e.printStackTrace();
-			System.out.println("No such economy hook found: " + econ + ", using vault!");
+			System.out.println("Could not find economy for " + econ + "... Is it installed? Using Vault instead!");
 			core = new Economy_Vault();
 		}
 		catch(ClassNotFoundException e){
 			e.printStackTrace();
-			System.out.println("No such economy hook found: " + econ + ", using vault!");
+			System.out.println("QuickShop does not know how to hook into " + econ + "! Using Vault instead!");
 			core = new Economy_Vault();
 		} catch (InstantiationException e) {
 			e.printStackTrace();
+			System.out.println("Invalid Economy Core! " + econ);
+			return false;
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
+			System.out.println("Invalid Economy Core! " + econ);
+			return false;
 		}
 		
 		if(core == null || !core.isValid()){
 			getLogger().severe("Economy is not valid!");
 			getLogger().severe("QuickShop could not hook an economy!");
 			getLogger().severe("QuickShop CANNOT start!");
-			if(econ.equals("Vault")) getLogger().severe("(Does Vault have an Economy to hook into?!");
+			if(econ.equals("Vault")) getLogger().severe("(Does Vault have an Economy to hook into?!)");
 			return false;
 		}
 		else{
