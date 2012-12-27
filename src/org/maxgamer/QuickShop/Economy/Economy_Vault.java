@@ -6,32 +6,11 @@ import org.bukkit.ChatColor;
 public class Economy_Vault implements Economy{
 	private net.milkbowl.vault.economy.Economy vault;
 	public Economy_Vault(){
-		
-		/* Hook into other plugins */
-		if(Bukkit.getPluginManager().getPlugin("Vault") == null){
-			Bukkit.getLogger().severe(ChatColor.RED + "You don't have Vault installed!");
-			Bukkit.getLogger().severe(ChatColor.RED + "Download it from: ");
-			Bukkit.getLogger().severe(ChatColor.RED + "http://dev.bukkit.org/server-mods/vault");
-			Bukkit.getLogger().severe(ChatColor.RED + "And place it in your plugins folder!");
-			Bukkit.getLogger().severe(ChatColor.RED + "This plugin will not function (at all) until you install vault.");
-			return;
-		}
-		else{
-			Bukkit.getLogger().info("Hooking Economy");
-			if(!setupEconomy()){
-				Bukkit.getLogger().severe(ChatColor.YELLOW + "Vault was found, but does not have an economy to hook into!");
-				Bukkit.getLogger().severe(ChatColor.YELLOW + "Download an economy plugin such as:");
-				Bukkit.getLogger().severe(ChatColor.YELLOW + "BOSEconomy, EssentialsEcon, 3Co, MultiCurrency, MineConomy, CraftConomy");
-				Bukkit.getLogger().severe(ChatColor.YELLOW + "from http://dev.bukkit.org!");
-				Bukkit.getLogger().severe(ChatColor.YELLOW + "This plugin will not function (at all) until you install an economy.");
-				return;
-			}
-			else{
-				Bukkit.getLogger().info(ChatColor.GREEN + "Economy hooked!");
-			}
-		}
-		
 		setupEconomy();
+	}
+	
+	public boolean isValid(){
+		return vault != null;
 	}
 	
 	/**
