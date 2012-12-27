@@ -254,7 +254,7 @@ public class QuickShop extends JavaPlugin{
 		catch(NoClassDefFoundError e){
 			//Thrown because the plugin backend is not installed
 			e.printStackTrace();
-			System.out.println("Could not find economy for " + econ + "... Is it installed? Using Vault instead!");
+			System.out.println("Could not find economy called " + econ + "... Is it installed? Using Vault instead!");
 			core = new Economy_Vault();
 		}
 		catch(ClassNotFoundException e){

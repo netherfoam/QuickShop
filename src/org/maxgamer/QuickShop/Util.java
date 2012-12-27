@@ -18,6 +18,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionType;
 
 public class Util{
@@ -292,8 +293,8 @@ public class Util{
 			}
 			return mat.toString();
 		case 373:
-			//Special case
-			if(damage == 64) return "MUNDANE_POTION";
+			//Special case,.. Why?
+			if(damage == 64 || damage == 8192) return "MUNDANE_POTION";
 			Potion pot;
 			try{
 				pot = Potion.fromDamage(damage);
@@ -308,25 +309,24 @@ public class Util{
 			if(pot.hasExtendedDuration()) prefix += "EXTENDED_";
 			if(pot.isSplash()) prefix += "SPLASH_";
 			
-			switch((int) pot.getNameId()){
-			case 0: return prefix + "WATER_BOTTLE" + suffix;
-			case 1: return prefix + "POTION_OF_REGENERATION" + suffix;
-			case 2: return prefix + "POTION_OF_SWIFTNESS" + suffix;
-			case 3: return prefix + "POTION_OF_FIRE_RESISTANCE" + suffix;
-			case 4: return prefix + "POTION_OF_POISON" + suffix;
-			case 5: return prefix + "POTION_OF_HEALING" + suffix;
-			case 6: return prefix + "CLEAR_POTION" + suffix;
-			case 7: return prefix + "CLEAR_POTION" + suffix;
-			case 8: return prefix + "POTION_OF_WEAKNESS" + suffix;
-			case 9: return prefix + "POTION_OF_STRENGTH" + suffix;
-			case 10: return prefix + "POTION_OF_SLOWNESS" + suffix;
-			case 11: return prefix + "DIFFUSE_POTION" + suffix;
-			case 12: return prefix + "POTION_OF_HARMING" + suffix;
-			case 13: return prefix + "ARTLESS_POTION" + suffix;
-			case 14: return prefix + "THIN_POTION" + suffix;
-			case 15: return prefix + "THIN_POTION" + suffix;
-			case 16: return prefix + "AWKWARD_POTION" + suffix;
-			case 32: return prefix + "THICK_POTION" + suffix;
+			
+			if(pot.getEffects().isEmpty()){
+				switch((int) pot.getNameId()){
+				case 0: return prefix + "WATER_BOTTLE" + suffix;
+				case 7: return prefix + "CLEAR_POTION" + suffix;
+				case 11: return prefix + "DIFFUSE_POTION" + suffix;
+				case 13: return prefix + "ARTLESS_POTION" + suffix;
+				case 15: return prefix + "THIN_POTION" + suffix;
+				case 16: return prefix + "AWKWARD_POTION" + suffix;
+				case 32: return prefix + "THICK_POTION" + suffix;
+				}
+			}
+			else{
+				String effects = "";
+				for(PotionEffect effect : pot.getEffects()){
+					effects += effect.toString().split(":")[0];
+				}
+				return prefix + effects + suffix;
 			}
 			return mat.toString();
 		case 6:
