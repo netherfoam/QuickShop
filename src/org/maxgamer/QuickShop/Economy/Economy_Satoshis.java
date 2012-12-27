@@ -6,7 +6,7 @@ import me.meta1203.plugins.satoshis.Satoshis;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
-public class Economy_Satoshis implements Economy_Core{
+public class Economy_Satoshis implements EconomyCore{
 	SatoshisEconAPI econ;
 	
 	/**

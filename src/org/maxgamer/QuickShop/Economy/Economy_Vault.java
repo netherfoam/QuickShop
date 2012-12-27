@@ -2,7 +2,7 @@ package org.maxgamer.QuickShop.Economy;
 
 import org.bukkit.Bukkit;
 
-public class Economy_Vault implements Economy_Core{
+public class Economy_Vault implements EconomyCore{
 	private net.milkbowl.vault.economy.Economy vault;
 	public Economy_Vault(){
 		setupEconomy();

@@ -28,7 +28,7 @@ import org.bukkit.scheduler.BukkitTask;
 import org.maxgamer.QuickShop.Command.QS;
 import org.maxgamer.QuickShop.Database.Database;
 import org.maxgamer.QuickShop.Economy.Economy;
-import org.maxgamer.QuickShop.Economy.Economy_Core;
+import org.maxgamer.QuickShop.Economy.EconomyCore;
 import org.maxgamer.QuickShop.Economy.Economy_Vault;
 import org.maxgamer.QuickShop.Listeners.*;
 import org.maxgamer.QuickShop.Shop.Shop;
@@ -229,10 +229,10 @@ public class QuickShop extends JavaPlugin{
 		String econ = getConfig().getString("economy");
 		if(econ == null || econ.isEmpty()) econ = "Vault";
 		econ = econ.substring(0, 1).toUpperCase() + econ.substring(1).toLowerCase();
-		Economy_Core core = null;
+		EconomyCore core = null;
 		try{
 			getLogger().info("Hooking " + econ);
-			Class<? extends Economy_Core> ecoClass = Class.forName("org.maxgamer.QuickShop.Economy.Economy_"+econ).asSubclass(Economy_Core.class);
+			Class<? extends EconomyCore> ecoClass = Class.forName("org.maxgamer.QuickShop.Economy.Economy_"+econ).asSubclass(EconomyCore.class);
 			core = ecoClass.newInstance();
 		}
 		catch(NoClassDefFoundError e){
@@ -286,7 +286,7 @@ public class QuickShop extends JavaPlugin{
 	 * Returns the economy for moving currency around
 	 * @return The economy for moving currency around
 	 */
-	public Economy_Core getEcon(){
+	public EconomyCore getEcon(){
 		return economy;
 	}
 	

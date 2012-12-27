@@ -4,7 +4,7 @@ package org.maxgamer.QuickShop.Economy;
  * @author netherfoam
  * Represents an economy.
  */
-public interface Economy_Core{
+public interface EconomyCore{
 	/**
 	 * Checks that this economy is valid. Returns false if it is not valid.
 	 * @return True if this economy will work, false if it will not.

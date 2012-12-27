@@ -1,9 +1,9 @@
 package org.maxgamer.QuickShop.Economy;
 
-public class Economy implements Economy_Core{
-	private Economy_Core core;
+public class Economy implements EconomyCore{
+	private EconomyCore core;
 	
-	public Economy(Economy_Core core){
+	public Economy(EconomyCore core){
 		this.core = core;
 	}
 	/**
