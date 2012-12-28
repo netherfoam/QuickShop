@@ -36,9 +36,9 @@ public class QS implements CommandExecutor{
 				Block b = bIt.next();
 				Shop shop = plugin.getShopManager().getShop(b.getLocation());
 				if(shop != null){
-					shop.setUnlimited(true);
+					shop.setUnlimited(!shop.isUnlimited());
 					shop.update();
-					sender.sendMessage(MsgUtil.getMessage("command.success-created-unlimited"));
+					sender.sendMessage(MsgUtil.getMessage("command.toggle-unlimited", (shop.isUnlimited() ? "unlimited" : "limited")));
 					return;
 				}
 			}

@@ -64,7 +64,8 @@ blacklisted-item: "&cThat item is blacklisted. You may not sell it"
 how-much-to-trade-for: "&aEnter how much you wish to trade one &e{0}&a for in chat."
 
 command:
-   success-created-unlimited: "&aUnlimited QuickShop created."
+   #success-created-unlimited: "&aUnlimited QuickShop created."
+   toggle-unlimited: "&aShop is now {0}"
    no-owner-given: "&cNo owner given. Use &a/qs setowner <player>&c"
    new-owner: "&aNew owner: &e{0}"
    now-buying: "&aNow &dBUYING&a &e{0}"
