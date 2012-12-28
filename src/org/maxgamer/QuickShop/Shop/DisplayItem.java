@@ -59,6 +59,7 @@ public class DisplayItem{
 			this.item.setItemStack(iStack);
 		}
 		catch(Exception e){
+			e.printStackTrace();
 			System.out.println("QuickShop version mismatch! This version of QuickShop is incompatible with this version of bukkit! Try update?");
 		}
 	}

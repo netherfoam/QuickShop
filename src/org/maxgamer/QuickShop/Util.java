@@ -211,8 +211,9 @@ public class Util{
 			return "";
 		}
 		catch(Error e){
+			e.printStackTrace();
 			System.out.println("This version of QuickShop is incompatible with your build of bukkit!");
-			return null;
+			return "";
 		}
 	}
 	public static ItemStack getItemStack(String nbt){
