@@ -171,7 +171,7 @@ public class MsgUtil{
 				
 				enchs = stor.getStoredEnchants();
 				if(enchs != null && !enchs.isEmpty()){
-					p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+MsgUtil.getMessage("menu.stored-enchants")+"-----------------------+");
+					p.sendMessage(ChatColor.DARK_PURPLE + "+-----------------"+MsgUtil.getMessage("menu.stored-enchants")+"--------------------+");
 					for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
 						p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
 					}
@@ -203,7 +203,7 @@ public class MsgUtil{
 		
 		enchs = shop.getItem().getItemMeta().getEnchants();
 		if(enchs != null && !enchs.isEmpty()){
-			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+MsgUtil.getMessage("menu.enchants-stored")+"-----------------------+");
+			p.sendMessage(ChatColor.DARK_PURPLE + "+-----------------"+MsgUtil.getMessage("menu.stored-enchants")+"--------------------+");
 			for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
 				p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
 			}
@@ -218,7 +218,7 @@ public class MsgUtil{
 				
 				enchs = stor.getStoredEnchants();
 				if(enchs != null && !enchs.isEmpty()){
-					p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+MsgUtil.getMessage("menu.stored-enchants")+"-----------------------+");
+					p.sendMessage(ChatColor.DARK_PURPLE + "+-----------------"+MsgUtil.getMessage("menu.stored-enchants")+"--------------------+");
 					for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
 						p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
 					}
