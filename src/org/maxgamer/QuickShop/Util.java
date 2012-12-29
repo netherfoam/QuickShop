@@ -195,13 +195,13 @@ public class Util{
 	
 	public static String getNBTString(ItemStack i){
 		try{
-			net.minecraft.server.v1_4_5.ItemStack is = org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack.asNMSCopy(i);
+			net.minecraft.server.v1_4_6.ItemStack is = org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asNMSCopy(i);
 			//Save the NMS itemstack to a new NBT tag
-			net.minecraft.server.v1_4_5.NBTTagCompound itemCompound = new net.minecraft.server.v1_4_5.NBTTagCompound();
+			net.minecraft.server.v1_4_6.NBTTagCompound itemCompound = new net.minecraft.server.v1_4_6.NBTTagCompound();
 			itemCompound = is.save(itemCompound);
 			
 			//Convert the NBT tag to a byte[]
-			byte[] bytes = net.minecraft.server.v1_4_5.NBTCompressedStreamTools.a(itemCompound);
+			byte[] bytes = net.minecraft.server.v1_4_6.NBTCompressedStreamTools.a(itemCompound);
 			//Convert the byte[] to a string
 			return new String(bytes, "ISO-8859-1");
 		}
@@ -219,9 +219,9 @@ public class Util{
 	public static ItemStack getItemStack(String nbt){
 		try{
 			byte[] bytes = nbt.getBytes("ISO-8859-1");
-			net.minecraft.server.v1_4_5.NBTTagCompound c = net.minecraft.server.v1_4_5.NBTCompressedStreamTools.a(bytes);
-			net.minecraft.server.v1_4_5.ItemStack is = net.minecraft.server.v1_4_5.ItemStack.a(c);
-			return org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack.asBukkitCopy(is);
+			net.minecraft.server.v1_4_6.NBTTagCompound c = net.minecraft.server.v1_4_6.NBTCompressedStreamTools.a(bytes);
+			net.minecraft.server.v1_4_6.ItemStack is = net.minecraft.server.v1_4_6.ItemStack.a(c);
+			return org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asBukkitCopy(is);
 		}
 		catch(UnsupportedEncodingException e){
 			e.printStackTrace();
@@ -234,6 +234,32 @@ public class Util{
 		}
 	}
 	
+	public static String getName(ItemStack i){
+		return getDataName(i.getType(), i.getDurability());
+		
+	}
+	
+	public static String toRomain(Integer value) {
+		return toRoman(value.intValue());
+	}
+
+	private static final String[] ROMAN = {"X", "IX", "V", "IV", "I"};
+	private static final int[] DECIMAL = {10, 9, 5, 4, 1};
+	
+	public static String toRoman(int n){
+		if(n <= 0 || n >= 40) throw new NumberFormatException(n + " is out of range.  ");
+		String roman = "";
+		
+		for(int i = 0; i < ROMAN.length; i++){
+			while(n >= DECIMAL[i]){
+				n -= DECIMAL[i];
+				roman += ROMAN[i];
+			}
+		}
+		
+		return roman;
+	}
+	
 	/**
 	 * Converts a given material and data value into a format similar to Material.<?>.toString().
 	 * Upper case, with underscores.  Includes material name in result.
@@ -241,7 +267,7 @@ public class Util{
 	 * @param damage The durability/damage of the item.
 	 * @return A string with the name of the item.
 	 */
-	public static String getDataName(Material mat, short damage){
+	private static String getDataName(Material mat, short damage){
 		int id = mat.getId();
 		switch(id){
 		case 35: 

@@ -16,6 +16,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.maxgamer.QuickShop.Shop.Shop;
 
 public class MsgUtil{
@@ -130,7 +131,7 @@ public class MsgUtil{
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.shop-information"));
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.owner", shop.getOwner()));
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.item", Util.getDataName(items.getType(), items.getDurability())));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.item", shop.getDataName()));
 		
 		if(Util.isTool(items.getType())){
 			p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.damage-percent-remaining", Util.getToolPercentage(items)));
@@ -144,7 +145,7 @@ public class MsgUtil{
 			p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.space", ""+space));
 		}
 		
-		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.price-per", Util.getDataName(shop.getMaterial(), shop.getDurability()), Util.format(shop.getPrice())));
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.price-per", shop.getDataName(), Util.format(shop.getPrice())));
 		
 		if(shop.isBuying()){
 			p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.this-shop-is-buying"));
@@ -152,14 +153,36 @@ public class MsgUtil{
 		else{
 			p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.this-shop-is-selling"));
 		}
-			
-		Map<Enchantment, Integer> enchs = items.getEnchantments();
-		if(enchs != null && enchs.size() > 0){
+		
+		Map<Enchantment, Integer> enchs = items.getItemMeta().getEnchants();
+		if(enchs != null && !enchs.isEmpty()){
 			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+MsgUtil.getMessage("menu.enchants")+"-----------------------+");
 			for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
 				p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
 			}
 		}
+		
+		try{
+			Class.forName("org.bukkit.inventory.meta.EnchantmentStorageMeta");
+			
+			if(items.getItemMeta() instanceof EnchantmentStorageMeta){
+				EnchantmentStorageMeta stor = (EnchantmentStorageMeta) items.getItemMeta();
+				stor.getStoredEnchants();
+				
+				enchs = stor.getStoredEnchants();
+				if(enchs != null && !enchs.isEmpty()){
+					p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+MsgUtil.getMessage("menu.stored-enchants")+"-----------------------+");
+					for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
+						p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
+					}
+				}
+			}
+		}
+		catch(ClassNotFoundException e){
+			//They don't have an up to date enough build of CB to do this.
+			//TODO: Remove this when it becomes redundant
+		}
+		
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 	}
 	
@@ -170,13 +193,43 @@ public class MsgUtil{
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), Util.format((amount * shop.getPrice()))));
 		
 
-		Map<Enchantment, Integer> enchs = shop.getEnchants();
-		if(enchs != null && enchs.size() > 0){
+		Map<Enchantment, Integer> enchs = shop.getItem().getItemMeta().getEnchants();
+		if(enchs != null && !enchs.isEmpty()){
 			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+MsgUtil.getMessage("menu.enchants")+"-----------------------+");
 			for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
 				p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
 			}
 		}
+		
+		enchs = shop.getItem().getItemMeta().getEnchants();
+		if(enchs != null && !enchs.isEmpty()){
+			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+MsgUtil.getMessage("menu.enchants-stored")+"-----------------------+");
+			for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
+				p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
+			}
+		}
+		
+		try{
+			Class.forName("org.bukkit.inventory.meta.EnchantmentStorageMeta");
+			
+			if(shop.getItem().getItemMeta() instanceof EnchantmentStorageMeta){
+				EnchantmentStorageMeta stor = (EnchantmentStorageMeta) shop.getItem().getItemMeta();
+				stor.getStoredEnchants();
+				
+				enchs = stor.getStoredEnchants();
+				if(enchs != null && !enchs.isEmpty()){
+					p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+MsgUtil.getMessage("menu.stored-enchants")+"-----------------------+");
+					for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
+						p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
+					}
+				}
+			}
+		}
+		catch(ClassNotFoundException e){
+			//They don't have an up to date enough build of CB to do this.
+			//TODO: Remove this when it becomes redundant
+		}
+		
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 	}
 	
@@ -184,14 +237,36 @@ public class MsgUtil{
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.successfully-sold"));
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), Util.format((amount * shop.getPrice()))));
-
-		Map<Enchantment, Integer> enchs = shop.getEnchants();
-		if(enchs != null && enchs.size() > 0){
+		
+		Map<Enchantment, Integer> enchs = shop.getItem().getItemMeta().getEnchants();
+		if(enchs != null && !enchs.isEmpty()){
 			p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+MsgUtil.getMessage("menu.enchants")+"-----------------------+");
 			for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
 				p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
 			}
 		}
+		
+		try{
+			Class.forName("org.bukkit.inventory.meta.EnchantmentStorageMeta");
+			
+			if(shop.getItem().getItemMeta() instanceof EnchantmentStorageMeta){
+				EnchantmentStorageMeta stor = (EnchantmentStorageMeta) shop.getItem().getItemMeta();
+				stor.getStoredEnchants();
+				
+				enchs = stor.getStoredEnchants();
+				if(enchs != null && !enchs.isEmpty()){
+					p.sendMessage(ChatColor.DARK_PURPLE + "+--------------------"+MsgUtil.getMessage("menu.stored-enchants")+"-----------------------+");
+					for(Entry<Enchantment, Integer> entries : enchs.entrySet()){
+						p.sendMessage(ChatColor.DARK_PURPLE + "| " + ChatColor.YELLOW + entries.getKey() .getName() + " " + entries.getValue() );
+					}
+				}
+			}
+		}
+		catch(ClassNotFoundException e){
+			//They don't have an up to date enough build of CB to do this.
+			//TODO: Remove this when it becomes redundant
+		}
+		
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 	}
 	

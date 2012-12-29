@@ -40,6 +40,7 @@ menu:
     successfully-sold: "&aSuccessfully Sold:"
     item-name-and-price: "&e{0} {1} &afor &e{2}"
     enchants: "&5Enchants"
+    enchants-stored: "&5Enchants"
     
     shop-information: "&aShop Information:"
     owner: "&aOwner: {0}"

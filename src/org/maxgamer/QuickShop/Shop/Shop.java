@@ -256,7 +256,7 @@ public class Shop{
 	 * @return The enchantments the shop has on its items.
 	 */
 	public Map<Enchantment, Integer> getEnchants(){
-		return this.item.getEnchantments();
+		return this.item.getItemMeta().getEnchants();
 	}
 	/**
 	 * @return Returns a dummy itemstack of the item this shop is selling.
@@ -497,7 +497,7 @@ public class Shop{
 		if(this.isSelling()){
 			lines[1] = MsgUtil.getMessage("signs.selling");
 		}
-		lines[2] = Util.getDataName(this.getMaterial(), this.getDurability());
+		lines[2] = Util.getName(this.item);
 		lines[3] = MsgUtil.getMessage("signs.price", ""+this.getPrice());
 		this.setSignText(lines);
 	}
@@ -596,8 +596,12 @@ public class Shop{
 		return this.getLocation().getBlock().equals(Util.getAttached(b));
 	}
 	
+	/**
+	 * Convenience method. Equivilant to org.maxgamer.QuickShop.Util.getName(shop.getItem()).
+	 * @return The name of this shops item
+	 */
 	public String getDataName(){
-		return Util.getDataName(this.getMaterial(), this.getDurability());
+		return Util.getName(this.getItem());
 	}
 	
 	/**
