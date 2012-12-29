@@ -65,7 +65,7 @@ public class QS implements CommandExecutor{
 					shop.setOwner(args[1]);
 					shop.update();
 					
-					sender.sendMessage(ChatColor.GREEN + "New Owner: " + shop.getOwner());
+					sender.sendMessage(MsgUtil.getMessage("command.new-owner", shop.getOwner()));
 					return;
 				}
 			}
