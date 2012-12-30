@@ -98,4 +98,20 @@ public class Database {
 		return this.dbCore.escape(s);
 	}
 	
+	/** Debugs the database and prints the columns */
+	public void debug(){
+		try{
+			ResultSet rs = this.getConnection().prepareStatement("SELECT * FROM shops").executeQuery();
+			StringBuilder sb = new StringBuilder(rs.getMetaData().getColumnName(1));
+			
+			for(int i = 2; i <= rs.getMetaData().getColumnCount(); i++){
+				sb.append(" | " + rs.getMetaData().getColumnName(i));
+			}
+			
+			System.out.println("Columns: " + sb.toString());
+		}
+		catch(SQLException e){
+			System.out.println("Could not fetch DB columns");
+		}
+	}
 }

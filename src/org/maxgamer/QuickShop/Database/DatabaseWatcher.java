@@ -46,6 +46,7 @@ public class DatabaseWatcher implements Runnable{
 		catch(SQLException e){
 			e.printStackTrace();
 			QuickShop.instance.getLogger().severe("Could not update database!");
+			db.debug();
 			QuickShop.instance.getLogger().severe("It was one of the following queries: " + history.toString());
 		}
 		//Ensure it's released
