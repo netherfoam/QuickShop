@@ -43,10 +43,10 @@ public class QuickShop extends JavaPlugin{
 	/** The Shop Manager used to store shops */
 	private ShopManager shopManager;
 	
-	/** A set of players who have been warned ("Your shop isnt automatically locked") */
+	/** A set of players who have been warned ("Your shop isn't automatically locked") */
 	public HashSet<String> warnings = new HashSet<String>(10);
 	
-	/** The database for storing all our data for persistance */
+	/** The database for storing all our data for persistence */
 	private Database database;
 	
 	//Listeners - We decide which one to use at runtime
