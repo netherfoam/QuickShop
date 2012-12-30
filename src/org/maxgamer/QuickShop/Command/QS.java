@@ -78,6 +78,64 @@ public class QS implements CommandExecutor{
 		}
 	}
 	
+	private void refill(CommandSender sender, String[] args){
+		if(sender instanceof Player && sender.hasPermission("quickshop.refill")){
+			if(args.length < 2){
+				sender.sendMessage(MsgUtil.getMessage("command.no-amount-given"));
+				return;
+			}
+			
+			int add;
+			try{
+				add = Integer.parseInt(args[1]);
+			}
+			catch(NumberFormatException e){
+				sender.sendMessage(MsgUtil.getMessage("thats-not-a-number"));
+				return;
+			}
+			
+			BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
+			while(bIt.hasNext()){
+				Block b = bIt.next();
+				Shop shop = plugin.getShopManager().getShop(b.getLocation());
+				if(shop != null){
+					shop.add(shop.getItem(), add);
+					
+					sender.sendMessage(MsgUtil.getMessage("refill-success"));
+					return;
+				}
+			}
+			sender.sendMessage(MsgUtil.getMessage("not-looking-at-shop"));
+			return;
+		}
+		else{
+			sender.sendMessage(MsgUtil.getMessage("no-permission"));
+			return;
+		}
+	}
+	
+	private void empty(CommandSender sender, String[] args){
+		if(sender instanceof Player && sender.hasPermission("quickshop.refill")){
+			BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
+			while(bIt.hasNext()){
+				Block b = bIt.next();
+				Shop shop = plugin.getShopManager().getShop(b.getLocation());
+				if(shop != null){
+					shop.getChest().getInventory().clear();
+					
+					sender.sendMessage(MsgUtil.getMessage("empty-success"));
+					return;
+				}
+			}
+			sender.sendMessage(MsgUtil.getMessage("not-looking-at-shop"));
+			return;
+		}
+		else{
+			sender.sendMessage(MsgUtil.getMessage("no-permission"));
+			return;
+		}
+	}
+	
 	private void find(CommandSender sender, String[] args){
 		if(sender instanceof Player && sender.hasPermission("quickshop.find")){
 			if(args.length < 2){
@@ -202,7 +260,7 @@ public class QS implements CommandExecutor{
 				Block b = bIt.next();
 				Shop shop = plugin.getShopManager().getShop(b.getLocation());
 				
-				if(shop != null && shop.getOwner().equalsIgnoreCase(((Player) sender).getName())){
+				if(shop != null && (shop.getOwner().equalsIgnoreCase(((Player) sender).getName()) || sender.hasPermission("quickshop.other.price"))){
 					//Update the shop
 					shop.setPrice(price);
 					shop.setSignText();
@@ -305,6 +363,14 @@ public class QS implements CommandExecutor{
 				return true;
 			}
 			
+			else if(subArg.equals("refill")){
+				refill(sender, args);
+				return true;
+			}
+			else if(subArg.equals("empty")){
+				empty(sender, args);
+				return true;
+			}
 			else if(subArg.equals("clean")){
 				clean(sender);
 				return true;
@@ -316,7 +382,10 @@ public class QS implements CommandExecutor{
 			else if(subArg.equals("debug")){
 				if(sender.hasPermission("quickshop.debug")){
 					plugin.debug = !plugin.debug;
-					sender.sendMessage(ChatColor.RED + "[QuickShop] Debug is now " + plugin.debug + ". Pfft - As if there's bugs.");
+					sender.sendMessage(ChatColor.RED + "[QuickShop] Debug is now " + plugin.debug);
+					if(plugin.debug){
+						plugin.getDB().debug();
+					}
 					return true;
 				}
 				sender.sendMessage(MsgUtil.getMessage("no-permission"));
@@ -427,6 +496,8 @@ public class QS implements CommandExecutor{
 		if(s.hasPermission("quickshop.create.changeprice")) s.sendMessage(ChatColor.GREEN + "/qs price" + ChatColor.YELLOW + " - "+MsgUtil.getMessage("command.description.price"));
 		if(s.hasPermission("quickshop.clean")) s.sendMessage(ChatColor.GREEN + "/qs clean" + ChatColor.YELLOW + " - "+MsgUtil.getMessage("command.description.clean"));
 		if(s.hasPermission("quickshop.find")) s.sendMessage(ChatColor.GREEN + "/qs find <item>" + ChatColor.YELLOW + " - "+MsgUtil.getMessage("command.description.find"));
+		if(s.hasPermission("quickshop.refill")) s.sendMessage(ChatColor.GREEN + "/qs refill <amount>" + ChatColor.YELLOW + " - "+MsgUtil.getMessage("command.description.refill"));
+		if(s.hasPermission("quickshop.empty")) s.sendMessage(ChatColor.GREEN + "/qs empty" + ChatColor.YELLOW + " - "+MsgUtil.getMessage("command.description.empty"));
 		
 	}
 }

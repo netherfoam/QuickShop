@@ -34,6 +34,8 @@ nearby-shop-this-way: "&aShop is {0} blocks away from you."
 no-nearby-shop: "&cNo shops matching {0} nearby."
 buying-more-than-selling: "&cWARNING: You are buying items for more than you are selling them!"
 not-enough-space: "&cYou only have room for {0} more of that!"
+refill-success: "&aRefill success"
+empty-success: "&aEmpty success"
 
 menu:
     successful-purchase: "&aSuccessfully Purchased:"
@@ -85,6 +87,8 @@ command:
        price: "&eChanges the buy/selling price of one of your shops"
        find: "&eLocates the nearest shop of a specific type."
        reload: "&eReloads QuickShop from config.yml"
+       refill: "&eAdds a given number of items to a shop"
+       empty: "&eRemoves all stock from a shop"
        
 signs:
     #Line 1 is used as an identifier at the moment, so I kind of need it to work, thats why I won't let you change it

@@ -284,7 +284,7 @@ public class Shop{
 	}
 	
 	/**
-	 * Add an item from to shop.
+	 * Add an item to shops chest.
 	 * @param item The itemstack.  The amount does not matter, just everything else
 	 * @param amount The amount to add to the shop.
 	 */

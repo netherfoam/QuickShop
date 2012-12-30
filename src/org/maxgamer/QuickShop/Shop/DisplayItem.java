@@ -45,6 +45,9 @@ public class DisplayItem{
 		this.item.setPickupDelay(Integer.MAX_VALUE);
 		
 		//TODO: When bukkit releases a build with an EntityPickupItemEvent or makes entities obey item.getPickupDelay() this can be removed.
+		if(QuickShop.instance.debug){
+			System.out.println("Spawned item. Setting stack count to 0");
+		}
 		try{
 			//Throws NoClassDefFoundException if out of date.
 			Class.forName("net.minecraft.server.v1_4_6.ItemStack");
@@ -57,8 +60,14 @@ public class DisplayItem{
 			iStack = org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asBukkitCopy(nmsI);
 			//Set the display item to the stack.
 			this.item.setItemStack(iStack);
+			if(QuickShop.instance.debug){
+				System.out.println("Success");
+			}
 		}
 		catch(Exception e){
+			if(QuickShop.instance.debug){
+				System.out.println("Failure");
+			}
 			e.printStackTrace();
 			System.out.println("QuickShop version mismatch! This version of QuickShop is incompatible with this version of bukkit! Try update?");
 		}
@@ -96,6 +105,9 @@ public class DisplayItem{
 					e.remove();
 					qs.log("[Debug] Removed dupe @" + near.getType());
 					removed = true;
+					if(qs.debug){
+						System.out.println("Removed rogue item: " + near.getType());
+					}
 				}
 			}
 		}

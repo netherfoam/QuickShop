@@ -82,6 +82,9 @@ public class Database {
 	
 	/** Queues the given query in the buffer to be executed in the near future. */
 	public void execute(String q){
+		if(QuickShop.instance.debug){
+			System.out.println("Adding query: " + q);
+		}
 		this.getBuffer().addString(q);
 	}
 
