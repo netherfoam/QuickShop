@@ -69,6 +69,10 @@ public class ShopManager{
 		st.execute(createTable);
 	}
 	
+	/**
+	 * Creates the database table 'messages'
+	 * @throws SQLException If the connection is invalid
+	 */
 	public void createMessagesTable() throws SQLException{
 		Statement st = getDatabase().getConnection().createStatement();
 		String createTable = 
@@ -80,9 +84,13 @@ public class ShopManager{
 		st.execute(createTable);
 	}
 	
+	/**
+	 * Verifies that all required columns exist.
+	 */
 	public void checkColumns(){
 		PreparedStatement ps = null;
 		try {
+			//V0.5
 			ps = getDatabase().getConnection().prepareStatement(" ALTER TABLE shops ADD unlimited boolean");
 			ps.execute();
 			ps.close();
@@ -90,6 +98,7 @@ public class ShopManager{
 			plugin.getLogger().info("Found unlimited");
 		}
 		try {
+			//V0.9
 			ps = getDatabase().getConnection().prepareStatement(" ALTER TABLE shops ADD type int");
 			ps.execute();
 			ps.close();
@@ -99,14 +108,27 @@ public class ShopManager{
 	}
 	
 	/**
-	 * External API Component.
-	 * Returns true if the location is a shop block.
-	 * If you want to use the shop, use QuickShop.getShopManager().getShop(Location) instead.
-	 * @param loc The location to check
-	 * @return true is it's a shop, false if it's not.
+	 * Creates a new shop with the given details. If you wish to change the details after creation, you can use shop.update().
+	 * @param loc The location to create the shop
+	 * @param price The price per item
+	 * @param item The item to sell. Note that this NBT data will be preserved (Eg color, name)
+	 * @param owner The owner of the shop
+	 * @return The shop object that was created.
 	 */
-	public boolean isShop(Location loc){
-		return getShop(loc.getBlock().getLocation()) != null;
+	public Shop createShop(Location loc, double price, ItemStack item, String owner){	
+		Shop shop = new Shop(loc, price, item, owner);
+		
+		//Write it to the database
+		String q = "INSERT INTO shops (owner, price, item, x, y, z, world, unlimited, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		plugin.getDB().execute(q, shop.getOwner(), shop.getPrice(), Util.getNBTString(shop.getItem()), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), loc.getWorld().getName(), (shop.isUnlimited() ? 1 : 0), shop.getShopType().toID());
+		
+		//Add it to the world
+		addShop(loc.getWorld().getName(), shop);
+		return shop;
+	}
+	
+	public void loadShop(String world, Shop shop){
+		this.addShop(world, shop);
 	}
 	
 	/**
@@ -163,7 +185,7 @@ public class ShopManager{
 	 * @param world The name of the world
 	 * @param shop The shop to add
 	 */
-	public void addShop(String world, Shop shop){
+	private void addShop(String world, Shop shop){
 		HashMap<ShopChunk, HashMap<Location, Shop>> inWorld = this.getShops().get(world);
 		
 		//There's no world storage yet. We need to create that hashmap.
@@ -293,14 +315,15 @@ public class ShopManager{
 						}
 						
 						//Add the shop to the list.
-						Shop shop = new Shop(info.getLocation(), price, info.getItem(), p.getName());
+						Shop shop = createShop(info.getLocation(), price, info.getItem(), p.getName());
+						//new Shop(info.getLocation(), price, info.getItem(), p.getName()); //TODO: Delete dead code
 						
 						ShopCreateEvent e = new ShopCreateEvent(shop, p);
 						Bukkit.getPluginManager().callEvent(e);
 						
 						if(e.isCancelled()) return;
 
-						plugin.getShopManager().addShop(shop.getLocation().getWorld().getName(), shop);
+						//plugin.getShopManager().addShop(shop.getLocation().getWorld().getName(), shop);
 						
 						if(tax != 0){
 							if(!plugin.getEcon().withdraw(p.getName(), tax)){
@@ -315,7 +338,7 @@ public class ShopManager{
 						plugin.log(p.getName() + " created a "+shop.getDataName()+" shop at ("+loc.getWorld().getName()+" - "+loc.getX()+","+loc.getY()+","+loc.getZ()+")");
 						
 						//Writes the shop to the database
-						shop.update(true);
+						//shop.update(true);
 						
 						if(!plugin.getConfig().getBoolean("shop.lock")){
 							//Warn them if they haven't been warned since reboot

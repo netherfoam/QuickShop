@@ -1,7 +1,7 @@
 package org.maxgamer.QuickShop.Database;
 
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.LinkedList;
 
 import org.maxgamer.QuickShop.QuickShop;
@@ -31,17 +31,19 @@ public class DatabaseWatcher implements Runnable{
 		
 		LinkedList<String> history = new LinkedList<String>();
 		try{
-			Statement st = db.getConnection().createStatement();
-			
 			while(db.getBuffer().queries.size() > 0){
-				String q = db.getBuffer().queries.remove(0);
-				st.addBatch(q);
-				history.add(q);
+				BufferStatement bs = db.getBuffer().queries.remove(0);
+				if(bs == null){
+					System.out.println("Null statement found! Skipping!");
+					continue;
+				}
+				history.add(bs.toString());
+				
+				PreparedStatement ps = bs.prepareStatement(db.getConnection());
+				ps.execute();
 			}
 			//We can release this now
 			db.getBuffer().locked = false;
-			
-			st.executeBatch();
 		}
 		catch(SQLException e){
 			e.printStackTrace();

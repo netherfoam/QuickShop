@@ -58,9 +58,8 @@ public class MsgUtil{
 		Player p = Bukkit.getPlayerExact(player);
 		if(p == null){
 			player = player.toLowerCase();		
-			String q = "INSERT INTO messages (owner, message, time) VALUES ('"+player+"','"+message+"','"+System.currentTimeMillis()+"')";
-			
-			plugin.getDB().execute(q);
+			String q = "INSERT INTO messages (owner, message, time) VALUES (?, ?, ?)";
+			plugin.getDB().execute(q, player, message, System.currentTimeMillis());
 		}
 		else{
 			p.sendMessage(message);
@@ -88,7 +87,7 @@ public class MsgUtil{
 	 * Deletes all messages for a player in the database.
 	*/
 	public static void deleteMessages(String player){
-		plugin.getDB().execute("DELETE FROM messages WHERE owner = '"+player.toLowerCase()+"'");
+		plugin.getDB().execute("DELETE FROM messages WHERE owner = ?", player.toLowerCase());
 	}
 	
 	/**
@@ -101,7 +100,7 @@ public class MsgUtil{
 		
 		List<String> messages = new ArrayList<String>(5);
 		
-		String q = "SELECT * FROM messages WHERE owner = '"+player+"' ORDER BY time ASC";
+		String q = "SELECT * FROM messages WHERE owner = '"+plugin.getDB().escape(player)+"' ORDER BY time ASC";
 		
 		try{
 			PreparedStatement ps = plugin.getDB().getConnection().prepareStatement(q);

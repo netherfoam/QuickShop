@@ -169,7 +169,7 @@ public class QuickShop extends JavaPlugin{
 				
 				shop.setShopType(ShopType.fromID(type));
 				
-				shopManager.addShop(rs.getString("world"), shop);
+				shopManager.loadShop(rs.getString("world"), shop);
 				count++;
 			}
 			
@@ -380,7 +380,7 @@ public class QuickShop extends JavaPlugin{
 			shop.setUnlimited(rs.getBoolean("unlimited"));
 			shop.setShopType(ShopType.fromID(type));
 			
-			shopManager.addShop(rs.getString("world"), shop);
+			shopManager.loadShop(rs.getString("world"), shop);
 			shops++;
 		}
 		ps.close();

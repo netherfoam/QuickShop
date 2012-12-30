@@ -10,7 +10,7 @@ public class Buffer {
 	private Database db;
 	public boolean locked = false;
 	
-	public List<String> queries = new ArrayList<String>(5);
+	public List<BufferStatement> queries = new ArrayList<BufferStatement>(5);
 	
 	public Buffer(Database db){
 		this.db = db;
@@ -20,7 +20,7 @@ public class Buffer {
 	 * Adds a query to the buffer
 	 * @param q The query to add.  This should be sanitized beforehand.
 	 */
-	public void addString(final String q){
+	public void addQuery(final BufferStatement bs){
 		Runnable r = new Runnable(){
 			public void run() {
 				while(locked){
@@ -32,7 +32,7 @@ public class Buffer {
 					}
 				}
 				locked = true;
-				queries.add(q);
+				queries.add(bs);
 				locked = false;
 				
 				if(db.getTask() == null){

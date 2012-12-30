@@ -203,35 +203,18 @@ public class Shop{
 	}
 	
 	/**
-	 * Updates the shop in the database.
-	 * @param isNew True if this shop is not in the database yet
+	 * Upates the shop into the database. 
 	 */
-	public void update(boolean isNew){
+	public void update(){
 		int x = this.getLocation().getBlockX();
 		int y = this.getLocation().getBlockY();
 		int z = this.getLocation().getBlockZ();
 		
-		String world = this.getLocation().getWorld().getName();
-		
+		String world = this.getLocation().getWorld().getName();		
 		int unlimited = this.isUnlimited() ? 1 : 0;
 
-		String q = "";
-		if(isNew){
-			q = "INSERT INTO shops VALUES ('"+this.getOwner()+"', '"+this.getPrice()+"', '"+plugin.getDB().escape(Util.getNBTString(this.getItem()))+"', '"+x+"', '"+y+"', '"+z+"', '"+world+"', '"+unlimited+"', '"+ShopType.toID(this.shopType)+"')";
-		}
-		else{
-			q = "UPDATE shops SET owner = '"+this.getOwner()+"', item = '"+plugin.getDB().escape(Util.getNBTString(this.getItem()))+"', unlimited = '"+unlimited+"', type = '"+ShopType.toID(this.shopType)+"', price = '"+this.price+"' WHERE x = '"+x+"' AND y = '"+y+"' AND z = '"+z+"' AND world = '"+world+"'";  
-		}
-		
-		plugin.getDB().execute(q);
-	}
-	
-	/**
-	 * Upates the shop into the database.
-	 * Equivilant to update(false);
-	 */
-	public void update(){
-		this.update(false);
+		String q = "UPDATE shops SET owner = ?, item = ?, unlimited = ?, type = ?, price = ? WHERE x = ? AND y = ? and z = ? and world = ?";
+		plugin.getDB().execute(q, this.getOwner(), Util.getNBTString(this.getItem()), unlimited, shopType.toID(), this.getPrice(), x, y, z, world);  
 	}
 	
 	/**
@@ -459,6 +442,9 @@ public class Shop{
 			else{
 				return -1;
 			}
+		}
+		public int toID(){
+			return ShopType.toID(this);
 		}
 	}
 	
