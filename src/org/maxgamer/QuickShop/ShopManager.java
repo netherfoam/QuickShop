@@ -127,6 +127,12 @@ public class ShopManager{
 		return shop;
 	}
 	
+	/**
+	 * Loads the given shop into storage.  This method is used for loading data from the database. 
+	 * Do not use this method to create a shop.
+	 * @param world The world the shop is in
+	 * @param shop The shop to load
+	 */
 	public void loadShop(String world, Shop shop){
 		this.addShop(world, shop);
 	}
