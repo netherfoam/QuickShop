@@ -314,6 +314,7 @@ public class QS implements CommandExecutor{
 			for(Shop shop : toRemove){
 				plugin.getShopManager().removeShop(shop);
 			}
+			MsgUtil.clean();
 			sender.sendMessage(MsgUtil.getMessage("command.cleaned", ""+i));
 			return;
 		}
@@ -324,8 +325,8 @@ public class QS implements CommandExecutor{
 	private void reload(CommandSender sender){
 		if(sender.hasPermission("quickshop.reload")){
 			sender.sendMessage(MsgUtil.getMessage("command.reloading"));
-			QuickShop.instance.onDisable();
-			QuickShop.instance.onEnable();
+			Bukkit.getPluginManager().disablePlugin(plugin);
+			Bukkit.getPluginManager().enablePlugin(plugin);
 			return;
 		}
 		sender.sendMessage(MsgUtil.getMessage("no-permission"));
