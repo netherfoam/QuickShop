@@ -117,7 +117,6 @@ public class QuickShop extends JavaPlugin{
 			this.database = new Database(new File(this.getDataFolder(), "shops.db"));
 		}
 		
-		
 		/* Creates DB table 'shops' */
 		if(!getDB().hasTable("shops")){
 			try {
@@ -162,8 +161,9 @@ public class QuickShop extends JavaPlugin{
 			PreparedStatement ps = con.prepareStatement("SELECT * FROM shops");
 			ResultSet rs = ps.executeQuery();
 			
-			if(!rs.getMetaData().getColumnTypeName(3).equalsIgnoreCase("BLOB")){
-				System.out.println("item column is " + rs.getMetaData().getColumnTypeName(3));
+			String colType = rs.getMetaData().getColumnTypeName(3);
+			if(!colType.equalsIgnoreCase("BLOB")){
+				System.out.println("Item column type: " + colType + ", converting to BLOB.");
 				
 				//We're using the old format
 				try{
@@ -219,8 +219,6 @@ public class QuickShop extends JavaPlugin{
 					
 					shopManager.loadShop(rs.getString("world"), shop);
 					count++;
-					
-					System.out.println("Loaded shop: " + item.getType());
 				}
 				catch(ClassNotFoundException e){
 					e.printStackTrace();
@@ -279,6 +277,8 @@ public class QuickShop extends JavaPlugin{
 		catch(IOException e){
 			getLogger().info("Could not start metrics.");
 		}
+		
+		getLogger().info("QuickShop loaded!");
 	}
 	/** Reloads QuickShops config */
 	@Override

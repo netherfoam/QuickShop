@@ -3,6 +3,7 @@ package org.maxgamer.QuickShop.Listeners;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -106,7 +107,7 @@ public class PlayerListener implements Listener{
 			return;
 		}
 		//Handles creating shops
-		else if(shop == null && item != null && item.getType() != Material.AIR && p.hasPermission("quickshop.create.sell") && b.getType() == Material.CHEST){
+		else if(shop == null && item != null && item.getType() != Material.AIR && p.hasPermission("quickshop.create.sell") && b.getType() == Material.CHEST && p.getGameMode() != GameMode.CREATIVE){
 			if(!plugin.getShopManager().canBuildShop(p, b, e.getBlockFace())){
 				//As of the new checking system, most plugins will tell the player why they can't create a shop there.
 				//So telling them a message would cause spam etc.
