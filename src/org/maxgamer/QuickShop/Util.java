@@ -195,45 +195,35 @@ public class Util{
 		return itemString;
 	}
 	
-	public static String getNBTString(ItemStack i){
-		try{
-			net.minecraft.server.v1_4_6.ItemStack is = org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asNMSCopy(i);
-			//Save the NMS itemstack to a new NBT tag
-			net.minecraft.server.v1_4_6.NBTTagCompound itemCompound = new net.minecraft.server.v1_4_6.NBTTagCompound();
-			itemCompound = is.save(itemCompound);
-			
-			//Convert the NBT tag to a byte[]
-			byte[] bytes = net.minecraft.server.v1_4_6.NBTCompressedStreamTools.a(itemCompound);
-			//Convert the byte[] to a string
-			return new String(bytes, "ISO-8859-1");
-		}
-		catch(UnsupportedEncodingException e){
-			e.printStackTrace();
-			System.out.println("Error: Your system does not support the encoding: ISO-8859-1.  Try install it? Shops won't save to the database because of this.");
-			return "";
-		}
-		catch(Error e){
-			e.printStackTrace();
-			System.out.println("This version of QuickShop is incompatible with your build of bukkit!");
-			return "";
-		}
+	/**
+	 * Converts the given ItemStack into a compound NBT tag, then the tag to an archived byte[], then the byte[] to a String using ISO-8859-1. Then returns the string.
+	 * @param i The itemstack to serialize
+	 * @return The String representing the item
+	 * @throws UnsupportedEncodingException If the system does not have ISO-8859-1 installed as an encoding
+	 * @throws ClassNotFoundException If the server is not v1_4_6.
+	 */
+	public static String getNBTString(ItemStack i) throws UnsupportedEncodingException, ClassNotFoundException{
+		Class.forName("net.minecraft.server.v1_4_6.ItemStack");
+		net.minecraft.server.v1_4_6.ItemStack is = org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asNMSCopy(i);
+		//Save the NMS itemstack to a new NBT tag
+		net.minecraft.server.v1_4_6.NBTTagCompound itemCompound = new net.minecraft.server.v1_4_6.NBTTagCompound();
+		itemCompound = is.save(itemCompound);
+		
+		//Convert the NBT tag to a byte[]
+		byte[] bytes = net.minecraft.server.v1_4_6.NBTCompressedStreamTools.a(itemCompound);
+		//Convert the byte[] to a string
+		return new String(bytes, "ISO-8859-1");
 	}
-	public static ItemStack getItemStack(String nbt){
-		try{
-			byte[] bytes = nbt.getBytes("ISO-8859-1");
-			net.minecraft.server.v1_4_6.NBTTagCompound c = net.minecraft.server.v1_4_6.NBTCompressedStreamTools.a(bytes);
-			net.minecraft.server.v1_4_6.ItemStack is = net.minecraft.server.v1_4_6.ItemStack.a(c);
-			return org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asBukkitCopy(is);
-		}
-		catch(UnsupportedEncodingException e){
-			e.printStackTrace();
-			System.out.println("Error: Your system does not support the encoding: ISO-8859-1.  Try install it? Shops won't save to the database because of this.");
-			return null;
-		}
-		catch(Error e){
-			System.out.println("This version of QuickShop is incompatible with your build of bukkit!");
-			return null;
-		}
+	/**
+	 * Reverses the effects of Util.getNBTString(ItemStack).
+	 * @param nbt The output of Util.getNBTString(ItemStack)
+	 * @return The input of Util.getNBTString(ItemStack)
+	 */
+	public static ItemStack getItemStack(String nbt) throws UnsupportedEncodingException, ClassNotFoundException{
+		byte[] bytes = nbt.getBytes("ISO-8859-1");
+		net.minecraft.server.v1_4_6.NBTTagCompound c = net.minecraft.server.v1_4_6.NBTCompressedStreamTools.a(bytes);
+		net.minecraft.server.v1_4_6.ItemStack is = net.minecraft.server.v1_4_6.ItemStack.a(c);
+		return org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asBukkitCopy(is);
 	}
 	
 	public static String getName(ItemStack i){

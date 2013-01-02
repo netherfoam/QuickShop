@@ -115,15 +115,20 @@ public class ShopManager{
 	 * @param owner The owner of the shop
 	 * @return The shop object that was created.
 	 */
-	public Shop createShop(Location loc, double price, ItemStack item, String owner){	
+	public Shop createShop(Location loc, double price, ItemStack item, String owner){
 		Shop shop = new Shop(loc, price, item, owner);
-		
-		//Write it to the database
-		String q = "INSERT INTO shops (owner, price, item, x, y, z, world, unlimited, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-		plugin.getDB().execute(q, shop.getOwner(), shop.getPrice(), Util.getNBTString(shop.getItem()), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), loc.getWorld().getName(), (shop.isUnlimited() ? 1 : 0), shop.getShopType().toID());
-		
-		//Add it to the world
-		addShop(loc.getWorld().getName(), shop);
+		try{
+			//Write it to the database
+			String q = "INSERT INTO shops (owner, price, item, x, y, z, world, unlimited, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			plugin.getDB().execute(q, shop.getOwner(), shop.getPrice(), Util.getNBTString(shop.getItem()), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), loc.getWorld().getName(), (shop.isUnlimited() ? 1 : 0), shop.getShopType().toID());
+			
+			//Add it to the world
+			addShop(loc.getWorld().getName(), shop);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			System.out.println("Could not create shop! Changes will revert after a reboot!");
+		}
 		return shop;
 	}
 	

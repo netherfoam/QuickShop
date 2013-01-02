@@ -146,31 +146,41 @@ public class QuickShop extends JavaPlugin{
 			PreparedStatement ps = con.prepareStatement("SELECT * FROM shops");
 			ResultSet rs = ps.executeQuery();
 			while(rs.next()){
-				int x = rs.getInt("x");
-				int y = rs.getInt("y");
-				int z = rs.getInt("z");
-				World world = Bukkit.getWorld(rs.getString("world"));
-
-				ItemStack item = Util.getItemStack(rs.getString("item"));
-				
-				String owner = rs.getString("owner");
-				double price = rs.getDouble("price");
-				Location loc = new Location(world, x, y, z);
-				/* Delete invalid shops, if we know of any */
-				if(world != null && loc.getBlock().getType() != Material.CHEST){
-					getLogger().info("Shop is not a chest in " +rs.getString("world") + " at: " + x + ", " + y + ", " + z + ".  Removing from DB.");
-					getDB().execute("DELETE FROM shops WHERE x = "+x+" AND y = "+y+" AND z = "+z+" AND world = '"+rs.getString("world")+"'");
+				try{
+					int x = rs.getInt("x");
+					int y = rs.getInt("y");
+					int z = rs.getInt("z");
+					World world = Bukkit.getWorld(rs.getString("world"));
+	
+					ItemStack item = Util.getItemStack(rs.getString("item"));
+					
+					String owner = rs.getString("owner");
+					double price = rs.getDouble("price");
+					Location loc = new Location(world, x, y, z);
+					/* Delete invalid shops, if we know of any */
+					if(world != null && loc.getBlock().getType() != Material.CHEST){
+						getLogger().info("Shop is not a chest in " +rs.getString("world") + " at: " + x + ", " + y + ", " + z + ".  Removing from DB.");
+						getDB().execute("DELETE FROM shops WHERE x = "+x+" AND y = "+y+" AND z = "+z+" AND world = '"+rs.getString("world")+"'");
+					}
+					
+					int type = rs.getInt("type");
+					
+					Shop shop = new Shop(loc, price, item, owner);
+					shop.setUnlimited(rs.getBoolean("unlimited"));
+					
+					shop.setShopType(ShopType.fromID(type));
+					
+					shopManager.loadShop(rs.getString("world"), shop);
+					count++;
 				}
-				
-				int type = rs.getInt("type");
-				
-				Shop shop = new Shop(loc, price, item, owner);
-				shop.setUnlimited(rs.getBoolean("unlimited"));
-				
-				shop.setShopType(ShopType.fromID(type));
-				
-				shopManager.loadShop(rs.getString("world"), shop);
-				count++;
+				catch(ClassNotFoundException e){
+					e.printStackTrace();
+					getLogger().severe("This version of QuickShop is incompatible with this version of bukkit!");
+				}
+				catch(Exception e){
+					e.printStackTrace();
+					getLogger().severe("Error loading a shop! Skipping it...");
+				}
 			}
 			
 		} catch (SQLException e) {
