@@ -2,6 +2,7 @@ package org.maxgamer.QuickShop.Listeners;
 
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -167,9 +168,14 @@ public class PlayerListener implements Listener{
 	}
 	
 	@EventHandler
-	public void onJoin(PlayerJoinEvent e){
+	public void onJoin(final PlayerJoinEvent e){
 		//Notify the player any messages they were sent
-		MsgUtil.flush(e.getPlayer(), 60);
+		Bukkit.getScheduler().runTaskLater(QuickShop.instance, new Runnable(){
+			@Override
+			public void run(){
+				MsgUtil.flush(e.getPlayer());
+			}
+		}, 60);
 	}
 	
 	@EventHandler

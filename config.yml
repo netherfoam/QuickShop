@@ -12,6 +12,14 @@ log-actions: true
 # Want yours added? Contact me (Netherfoam) on dev.bukkit.org
 economy: Vault
 
+database:
+    mysql: false
+    host: localhost
+    port: 3306
+    database: quickshop
+    user: root
+    password: passwd
+
 shop:
     #Cost to make a stall
     cost: 10

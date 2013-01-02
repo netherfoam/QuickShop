@@ -27,6 +27,8 @@ public class Util{
 	private static HashSet<Material> blacklist = new HashSet<Material>();
 	private static QuickShop plugin;
 	
+	private final static String charset = "ISO-8859-1";
+	
 	static{
 		plugin = QuickShop.instance;
 	
@@ -196,13 +198,18 @@ public class Util{
 	}
 	
 	/**
-	 * Converts the given ItemStack into a compound NBT tag, then the tag to an archived byte[], then the byte[] to a String using ISO-8859-1. Then returns the string.
+	 * Converts the given ItemStack into a compound NBT tag, then the tag to an archived byte[], then the byte[] to a String using ISO-LATIN-1. Then returns the string.
 	 * @param i The itemstack to serialize
 	 * @return The String representing the item
-	 * @throws UnsupportedEncodingException If the system does not have ISO-8859-1 installed as an encoding
+	 * @throws UnsupportedEncodingException If the system does not have ISO-LATIN-1 installed as an encoding
 	 * @throws ClassNotFoundException If the server is not v1_4_6.
 	 */
 	public static String getNBTString(ItemStack i) throws UnsupportedEncodingException, ClassNotFoundException{
+		byte[] bytes = getNBTBytes(i);
+		return new String(bytes, charset);
+	}
+	
+	public static byte[] getNBTBytes(ItemStack i) throws ClassNotFoundException{
 		Class.forName("net.minecraft.server.v1_4_6.ItemStack");
 		net.minecraft.server.v1_4_6.ItemStack is = org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asNMSCopy(i);
 		//Save the NMS itemstack to a new NBT tag
@@ -210,17 +217,19 @@ public class Util{
 		itemCompound = is.save(itemCompound);
 		
 		//Convert the NBT tag to a byte[]
-		byte[] bytes = net.minecraft.server.v1_4_6.NBTCompressedStreamTools.a(itemCompound);
-		//Convert the byte[] to a string
-		return new String(bytes, "ISO-8859-1");
+		return net.minecraft.server.v1_4_6.NBTCompressedStreamTools.a(itemCompound);
 	}
+	
 	/**
 	 * Reverses the effects of Util.getNBTString(ItemStack).
 	 * @param nbt The output of Util.getNBTString(ItemStack)
 	 * @return The input of Util.getNBTString(ItemStack)
 	 */
 	public static ItemStack getItemStack(String nbt) throws UnsupportedEncodingException, ClassNotFoundException{
-		byte[] bytes = nbt.getBytes("ISO-8859-1");
+		return getItemStack((nbt.getBytes(charset)));
+	}
+	
+	public static ItemStack getItemStack(byte[] bytes) throws UnsupportedEncodingException, ClassNotFoundException{
 		net.minecraft.server.v1_4_6.NBTTagCompound c = net.minecraft.server.v1_4_6.NBTCompressedStreamTools.a(bytes);
 		net.minecraft.server.v1_4_6.ItemStack is = net.minecraft.server.v1_4_6.ItemStack.a(c);
 		return org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asBukkitCopy(is);

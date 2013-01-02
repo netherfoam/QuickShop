@@ -54,17 +54,17 @@ public class ShopManager{
 	public void createShopsTable() throws SQLException{
 		Statement st = getDatabase().getConnection().createStatement();
 		String createTable = 
-		"CREATE TABLE \"shops\" (" + 
-				"\"owner\"  TEXT(20) NOT NULL, " +
-				"\"price\"  INTEGER(32) NOT NULL, " +
-				"\"item\"  TEXT(2000) NOT NULL, " +
-				"\"x\"  INTEGER(32) NOT NULL, " +
-				"\"y\"  INTEGER(32) NOT NULL, " +
-				"\"z\"  INTEGER(32) NOT NULL, " +
-				"\"world\"  TEXT(30) NOT NULL, " +
-				"\"unlimited\"  boolean, " +
-				"\"type\"  boolean, " +
-				"PRIMARY KEY ('x', 'y','z','world') " +
+		"CREATE TABLE shops (" + 
+				"owner  TEXT(20) NOT NULL, " +
+				"price  INTEGER(32) NOT NULL, " +
+				"item  blob NOT NULL, " +
+				"x  INTEGER(32) NOT NULL, " +
+				"y  INTEGER(32) NOT NULL, " +
+				"z  INTEGER(32) NOT NULL, " +
+				"world VARCHAR(32) NOT NULL, " +
+				"unlimited  boolean, " +
+				"type  boolean, " +
+				"PRIMARY KEY (x, y, z, world) " +
 				");";
 		st.execute(createTable);
 	}
@@ -76,10 +76,10 @@ public class ShopManager{
 	public void createMessagesTable() throws SQLException{
 		Statement st = getDatabase().getConnection().createStatement();
 		String createTable = 
-		"CREATE TABLE \"messages\" (" + 
-				"\"owner\"  TEXT(20) NOT NULL, " +
-				"\"message\"  TEXT(200) NOT NULL, " +
-				"\"time\"  INTEGER(32) NOT NULL " +
+		"CREATE TABLE messages (" + 
+				"owner  TEXT(20) NOT NULL, " +
+				"message  TEXT(200) NOT NULL, " +
+				"time  INTEGER(32) NOT NULL " +
 				");";
 		st.execute(createTable);
 	}
@@ -120,7 +120,7 @@ public class ShopManager{
 		try{
 			//Write it to the database
 			String q = "INSERT INTO shops (owner, price, item, x, y, z, world, unlimited, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-			plugin.getDB().execute(q, shop.getOwner(), shop.getPrice(), Util.getNBTString(shop.getItem()), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), loc.getWorld().getName(), (shop.isUnlimited() ? 1 : 0), shop.getShopType().toID());
+			plugin.getDB().execute(q, shop.getOwner(), shop.getPrice(), Util.getNBTBytes(item), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), loc.getWorld().getName(), (shop.isUnlimited() ? 1 : 0), shop.getShopType().toID());
 			
 			//Add it to the world
 			addShop(loc.getWorld().getName(), shop);

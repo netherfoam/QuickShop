@@ -2,11 +2,10 @@ package org.maxgamer.QuickShop;
 
 import java.io.File;
 import java.io.InputStream;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -22,12 +21,16 @@ import org.maxgamer.QuickShop.Shop.Shop;
 public class MsgUtil{
 	private static QuickShop plugin;
 	private static YamlConfiguration messages;
+	private static HashMap<String, LinkedList<String>> player_messages = new HashMap<String, LinkedList<String>>();
 	
 	static{
 		plugin = QuickShop.instance;
 	}
 	
-	public static void loadMessages(){
+	/**
+	 * Loads all the messages from messages.yml
+	 */
+	public static void loadCfgMessages(){
 		//Load messages.yml
 		File messageFile = new File(plugin.getDataFolder(), "messages.yml");
 		if(!messageFile.exists()){
@@ -47,6 +50,35 @@ public class MsgUtil{
 		//Parse colour codes
 		Util.parseColours(messages);
 	}
+	
+	/**
+	 * loads all player purchase messages from the database.
+	 */
+	public static void loadTransactionMessages(){
+		player_messages.clear(); //Delete old messages
+		try{
+			ResultSet rs = plugin.getDB().getConnection().prepareStatement("SELECT * FROM messages").executeQuery();
+			
+			while(rs.next()){
+				String owner = rs.getString("owner");
+				String message = rs.getString("message");
+				
+				LinkedList<String> msgs = player_messages.get(owner);
+				if(msgs == null){
+					msgs = new LinkedList<String>();
+					player_messages.put(owner, msgs);
+				}
+				
+				msgs.add(message);
+			}
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+			System.out.println("Could not load transaction messages from database. Skipping.");
+		}
+	}
+	
+	
 
 	/**
 	 * @param player The name of the player to message
@@ -57,7 +89,15 @@ public class MsgUtil{
 	public static void send(String player, String message){
 		Player p = Bukkit.getPlayerExact(player);
 		if(p == null){
-			player = player.toLowerCase();		
+			player = player.toLowerCase();
+			
+			LinkedList<String> msgs = player_messages.get(player);
+			if(msgs == null){
+				msgs = new LinkedList<String>();
+				player_messages.put(player, msgs);
+			}
+			msgs.add(message);
+			
 			String q = "INSERT INTO messages (owner, message, time) VALUES (?, ?, ?)";
 			plugin.getDB().execute(q, player, message, System.currentTimeMillis());
 		}
@@ -67,54 +107,39 @@ public class MsgUtil{
 	}
 	
 	/**
-	 * Empties the queue of messages a player has and sends them to the player.
-	 * Loads the messages from the database in a seperate thread. 
+	 * Deletes any messages that are older than a week in the database, to save on space.
+	 */
+	public static void clean(){
+		System.out.println("Cleaning purchase messages from database that are over a week old...");
+		
+		//604800,000 msec = 1 week.
+		long weekAgo = System.currentTimeMillis() - 604800000;
+		
+		plugin.getDB().execute("DELETE FROM messages WHERE time < ?", weekAgo);
+	}
+	
+	/**
+	 * Empties the queue of messages a player has and sends them to the player. 
 	 * @param p The player to message
-	 * @param delay The number of ticks to wait before sending the messages
 	 * @return true if success, false if the player is offline or null
 	 */
-	public static boolean flush(Player p, int delay){
+	public static boolean flush(Player p){
 		if(p != null && p.isOnline()){
-			Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, new Messenger(p), delay);
+			String pName = p.getName().toLowerCase();
+			LinkedList<String> msgs = player_messages.get(pName);
+			
+			if(msgs != null){
+				for(String msg : msgs){
+					p.sendMessage(msg);
+				}
+				
+				plugin.getDB().execute("DELETE FROM messages WHERE owner = ?", pName);
+				msgs.clear();
+			}
 			
 			return true;
 		}
 		return false;
-	}
-	
-	/**
-	 * @param player The player whose messages to remove from the database.
-	 * Deletes all messages for a player in the database.
-	*/
-	public static void deleteMessages(String player){
-		plugin.getDB().execute("DELETE FROM messages WHERE owner = ?", player.toLowerCase());
-	}
-	
-	/**
-	 * @param player The player whose messages you wish to fetch
-	 * @return An arraylist of messages in order of time that should be sent to the player.
-	 * 
-	*/
-	public static List<String> getMessages(String player){
-		player = player.toLowerCase();
-		
-		List<String> messages = new ArrayList<String>(5);
-		
-		String q = "SELECT * FROM messages WHERE owner = '"+plugin.getDB().escape(player)+"' ORDER BY time ASC";
-		
-		try{
-			PreparedStatement ps = plugin.getDB().getConnection().prepareStatement(q);
-			ResultSet rs = ps.executeQuery();
-			
-			while(rs.next()){
-				messages.add(rs.getString("message"));
-			}
-		}
-		catch(SQLException e){
-			e.printStackTrace();
-			plugin.getLogger().info("Could not load messages for " + player);
-		}
-		return messages;
 	}
 	
 	public static void sendShopInfo(Player p, Shop shop){

@@ -42,22 +42,22 @@ public class Shop{
 	 * itemstack, location and owner as
 	 * this shop does. Do not modify them or
 	 * you will modify this shop.
+	 * 
+	 * **NOT A DEEP CLONE**
 	 */
 	public Shop clone(){
-		Shop s = new Shop();
-		s.displayItem = this.displayItem;
-		s.shopType = this.shopType;
-		s.item = this.item;
-		s.loc = this.loc;
-		s.plugin = this.plugin;
-		s.unlimited = this.unlimited;
-		s.owner = this.owner;
-		s.price = this.price;
-		return s;
+		return new Shop(this);
 	}
 	
-	private Shop(){
-		//Nothing
+	private Shop(Shop s){
+		this.displayItem = s.displayItem;
+		this.shopType = s.shopType;
+		this.item = s.item;
+		this.loc = s.loc;
+		this.plugin = s.plugin;
+		this.unlimited = s.unlimited;
+		this.owner = s.owner;
+		this.price = s.price;
 	}
 	
 	/**
@@ -215,7 +215,7 @@ public class Shop{
 
 		String q = "UPDATE shops SET owner = ?, item = ?, unlimited = ?, type = ?, price = ? WHERE x = ? AND y = ? and z = ? and world = ?";
 		try{
-			plugin.getDB().execute(q, this.getOwner(), Util.getNBTString(this.getItem()), unlimited, shopType.toID(), this.getPrice(), x, y, z, world);
+			plugin.getDB().execute(q, this.getOwner(), Util.getNBTBytes(this.getItem()), unlimited, shopType.toID(), this.getPrice(), x, y, z, world);
 		}
 		catch(Exception e){
 			e.printStackTrace();

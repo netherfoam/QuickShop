@@ -17,10 +17,32 @@ public class Database {
 	private DatabaseWatcher dbw;
 	private BukkitTask task;
 	
-	public Database(File file){
-		this.dbCore = new SQLite(file);
+	private Database(){
 		this.buffer = new Buffer(this);
 		this.dbw = new DatabaseWatcher(this);
+	}
+	
+	/**
+	 * Creates a new SQLite based database.
+	 * @param file The SQLite file to use.
+	 */
+	public Database(File file){
+		this();
+		this.dbCore = new SQLite(file);
+	}
+	
+	/**
+	 * Creates a new MySQL database connection.
+	 * @param host The host to connect to
+	 * @param port The port to connect using (usually 3306)
+	 * @param dbName The database name (E.g. QuickShop)
+	 * @param user The username to connect with
+	 * @param pass The password to connect with
+	 */
+	public Database(String host, String port, String dbName, String user, String pass){
+		this();
+		String url = "jdbc:mysql://"+host+":"+port+"/"+dbName;
+		this.dbCore = new MySQL(url, user, pass);
 	}
 	
 	/**
