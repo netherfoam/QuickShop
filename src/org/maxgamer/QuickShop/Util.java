@@ -236,8 +236,38 @@ public class Util{
 	}
 	
 	public static String getName(ItemStack i){
-		return getDataName(i.getType(), i.getDurability());
-		
+		String vanillaName = getDataName(i.getType(), i.getDurability());
+		if(plugin.useSpout){
+			org.getspout.spoutapi.inventory.SpoutItemStack spoutItemStack = new org.getspout.spoutapi.inventory.SpoutItemStack(i);
+			String spoutName = null;
+			try{
+				spoutName = spoutItemStack.getMaterial().getName();
+				if(spoutName.length() > vanillaName.length() || vanillaName.contains(":")){
+					return prettifyText(spoutName);
+				}
+			} catch(Exception e){ }
+		}
+		return prettifyText(vanillaName);
+	}
+	
+	public static String prettifyText(String ugly){
+		if(!ugly.contains("_") || (!ugly.equals(ugly.toUpperCase())))
+			return ugly;
+		String fin = "";
+		ugly = ugly.toLowerCase();
+		if(ugly.contains("_")){
+			String[] splt = ugly.split("_");
+			int i = 0;
+			for(String s : splt){
+				i += 1;
+				fin += Character.toUpperCase(s.charAt(0)) + s.substring(1);
+				if(i<splt.length)
+					fin += " ";
+			}
+		} else {
+			fin += Character.toUpperCase(ugly.charAt(0)) + ugly.substring(1);
+		}
+		return fin;
 	}
 	
 	public static String toRomain(Integer value) {
