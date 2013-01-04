@@ -229,12 +229,23 @@ public class Util{
 		return getItemStack((nbt.getBytes(charset)));
 	}
 	
-	public static ItemStack getItemStack(byte[] bytes) throws UnsupportedEncodingException, ClassNotFoundException{
+	/**
+	 * Converts the given byte representation of an NBT tag into an ItemStack.
+	 * @param bytes The array of bytes that represent a compressed NBT itemstac.
+	 * @return The ItemStack represented by bytes.
+	 * @throws ClassNotFoundException If this version of QuickShop is not compatible with the version of bukkit (net.minecraft.server.v1_4_6)
+	 */
+	public static ItemStack getItemStack(byte[] bytes) throws ClassNotFoundException{
 		net.minecraft.server.v1_4_6.NBTTagCompound c = net.minecraft.server.v1_4_6.NBTCompressedStreamTools.a(bytes);
 		net.minecraft.server.v1_4_6.ItemStack is = net.minecraft.server.v1_4_6.ItemStack.a(c);
 		return org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asBukkitCopy(is);
 	}
 	
+	/**
+	 * Fetches an ItemStack's name - For example, converting INK_SAC:11 to Dandellion Yellow, or WOOL:14 to Red Wool
+	 * @param i The itemstack to fetch the name of
+	 * @return The human readable item name.
+	 */
 	public static String getName(ItemStack i){
 		String vanillaName = getDataName(i.getType(), i.getDurability());
 		if(plugin.useSpout){
@@ -250,9 +261,15 @@ public class Util{
 		return prettifyText(vanillaName);
 	}
 	
+	/**
+	 * Converts a name like IRON_INGOT into Iron Ingot to improve readability
+	 * @param ugly The string such as IRON_INGOT
+	 * @return A nicer version, such as Iron Ingot
+	 * 
+	 * Credits to mikenon on GitHub!
+	 */
 	public static String prettifyText(String ugly){
-		if(!ugly.contains("_") || (!ugly.equals(ugly.toUpperCase())))
-			return ugly;
+		if(!ugly.contains("_") && (!ugly.equals(ugly.toUpperCase()))) return ugly;
 		String fin = "";
 		ugly = ugly.toLowerCase();
 		if(ugly.contains("_")){
@@ -261,8 +278,7 @@ public class Util{
 			for(String s : splt){
 				i += 1;
 				fin += Character.toUpperCase(s.charAt(0)) + s.substring(1);
-				if(i<splt.length)
-					fin += " ";
+				if(i<splt.length) fin += " ";
 			}
 		} else {
 			fin += Character.toUpperCase(ugly.charAt(0)) + ugly.substring(1);
@@ -277,8 +293,13 @@ public class Util{
 	private static final String[] ROMAN = {"X", "IX", "V", "IV", "I"};
 	private static final int[] DECIMAL = {10, 9, 5, 4, 1};
 	
+	/**
+	 * Converts the given number to roman numerals.  If the number is >= 40 or <= 0, it will just return the number as a string.
+	 * @param n The number to convert
+	 * @return The roman numeral representation of this number, or the number in decimal form as a string if n <= 0 || n >= 40.
+	 */
 	public static String toRoman(int n){
-		if(n <= 0 || n >= 40) throw new NumberFormatException(n + " is out of range.  ");
+		if(n <= 0 || n >= 40) return ""+n;
 		String roman = "";
 		
 		for(int i = 0; i < ROMAN.length; i++){
