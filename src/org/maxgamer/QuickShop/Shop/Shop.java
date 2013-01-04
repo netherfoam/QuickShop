@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -359,15 +360,24 @@ public class Shop{
 		if(amount < 0) this.sell(p, -amount);
 		
 		if(this.isUnlimited()){
-			Inventory pInv = p.getInventory();
-			ItemStack item = this.item.clone();
+			ItemStack[] contents = p.getInventory().getContents();
 			
-			while(amount > 0){
-				int stackSize = Math.min(amount, this.item.getMaxStackSize());
-				item.setAmount(stackSize);
-				pInv.removeItem(item);
-				
-				amount -= stackSize;
+			for(int i = 0; amount > 0 && i < contents.length; i++){
+				ItemStack stack = contents[i];
+				if(stack == null) continue; //No item
+				if(matches(stack)){
+					int stackSize = Math.min(amount, stack.getAmount());
+					
+					stack.setAmount(stack.getAmount() - stackSize);
+					amount -= stackSize;
+				}
+			}
+			//Send the players new inventory to them
+			p.getInventory().setContents(contents);
+			
+			//This should not happen.
+			if(amount > 0){
+				plugin.getLogger().log(Level.WARNING, "Could not take all items from a players inventory on purchase! " + p.getName() + ", missing: " + amount + ", item: " + this.getDataName() + "!");
 			}
 		}
 		else{
