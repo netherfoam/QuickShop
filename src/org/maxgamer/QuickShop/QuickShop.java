@@ -363,8 +363,11 @@ public class QuickShop extends JavaPlugin{
 		shopManager.clear();
 		
 		/* Empty the buffer */
-		this.database.getTask().cancel();
-		this.database.getDatabaseWatcher().run();
+		if(database.getTask() != null){
+			this.database.getTask().cancel();
+			this.database.setTask(null);
+			this.database.getDatabaseWatcher().run();
+		}
 		
 		try {
 			this.database.getConnection().close();
