@@ -70,6 +70,9 @@ public class QuickShop extends JavaPlugin{
 	/** Whether we should use display items or not */
 	public boolean display = true;
 	
+	/** Use SpoutPlugin to get item / block names */
+	public boolean useSpout = false;
+	
 	private Metrics metrics;
 	
 	/** Whether debug info should be shown in the console */
@@ -266,6 +269,19 @@ public class QuickShop extends JavaPlugin{
 		
 		if(getConfig().getInt("shop.find-distance") > 100){
 			getLogger().severe("Shop.find-distance is TOO HIGH! This will cause you LAG! Pick a number under 100 or don't whinge.");
+		}
+		
+		/**
+		 * If the server has Spout we can get the names of custom items.
+		 * Latest SpoutPlugin http://get.spout.org/1412/SpoutPlugin.jar
+		 * http://build.spout.org/view/Legacy/job/SpoutPlugin/1412/ 
+		 */
+		if(Bukkit.getPluginManager().getPlugin("Spout") != null){
+			this.getLogger().info("Found Spout...");
+			this.useSpout = true;
+		}
+		else{
+			this.useSpout = false;
 		}
 		
 		try{
