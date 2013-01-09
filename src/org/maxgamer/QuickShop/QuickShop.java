@@ -30,6 +30,8 @@ import org.maxgamer.QuickShop.Command.QS;
 import org.maxgamer.QuickShop.Database.Database;
 import org.maxgamer.QuickShop.Economy.*;
 import org.maxgamer.QuickShop.Listeners.*;
+import org.maxgamer.QuickShop.Metrics.Metrics;
+import org.maxgamer.QuickShop.Metrics.ShopListener;
 import org.maxgamer.QuickShop.Shop.*;
 import org.maxgamer.QuickShop.Shop.Shop.ShopType;
 import org.maxgamer.QuickShop.Watcher.*;
@@ -77,6 +79,9 @@ public class QuickShop extends JavaPlugin{
 	
 	/** Whether debug info should be shown in the console */
 	public boolean debug = false;
+	
+	/** The plugin metrics from Hidendra */
+	public Metrics getMetrics(){ return metrics; }
 	
 	public void onEnable(){
 		instance = this;
@@ -286,8 +291,12 @@ public class QuickShop extends JavaPlugin{
 		
 		try{
 			this.metrics = new Metrics(this);
-			if(this.metrics.start()){
-				getLogger().info("Metrics started.");
+			
+			if(metrics.isOptOut() == false){
+				getServer().getPluginManager().registerEvents(new ShopListener(), this);
+				if(this.metrics.start()){
+					getLogger().info("Metrics started.");
+				}
 			}
 		}
 		catch(IOException e){

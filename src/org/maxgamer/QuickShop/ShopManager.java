@@ -56,7 +56,7 @@ public class ShopManager{
 		String createTable = 
 		"CREATE TABLE shops (" + 
 				"owner  TEXT(20) NOT NULL, " +
-				"price  INTEGER(32) NOT NULL, " +
+				"price  double(32, 2) NOT NULL, " +
 				"item  blob NOT NULL, " +
 				"x  INTEGER(32) NOT NULL, " +
 				"y  INTEGER(32) NOT NULL, " +
@@ -91,7 +91,7 @@ public class ShopManager{
 		PreparedStatement ps = null;
 		try {
 			//V0.5
-			ps = getDatabase().getConnection().prepareStatement(" ALTER TABLE shops ADD unlimited boolean");
+			ps = getDatabase().getConnection().prepareStatement("ALTER TABLE shops ADD unlimited boolean");
 			ps.execute();
 			ps.close();
 		} catch (SQLException e) {
@@ -99,12 +99,19 @@ public class ShopManager{
 		}
 		try {
 			//V0.9
-			ps = getDatabase().getConnection().prepareStatement(" ALTER TABLE shops ADD type int");
+			ps = getDatabase().getConnection().prepareStatement("ALTER TABLE shops ADD type int");
 			ps.execute();
 			ps.close();
 		} catch (SQLException e) {
 			plugin.getLogger().info("Found type column");
 		}
+		try{
+			//V3.4.2
+			ps = getDatabase().getConnection().prepareStatement("ALTER TABLE shops MODIFY COLUMN price real(32,2) NOT NULL AFTER owner");
+			ps.execute();
+			ps.close();
+		}
+		catch(SQLException e){}
 	}
 	
 	/**

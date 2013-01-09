@@ -107,6 +107,10 @@ public class Auction{
 		Bukkit.broadcastMessage(ChatColor.RED + "[Auction] The auction has been cancelled.");
 	}
 	
+	public boolean isRunning(){
+		return timer != null;
+	}
+	
 	/**
 	 * Ends the auction, and awards the highest bidder their items.
 	 */

@@ -26,7 +26,7 @@
  * either expressed or implied, of anybody else.
  */
 
-package org.maxgamer.QuickShop;
+package org.maxgamer.QuickShop.Metrics;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
