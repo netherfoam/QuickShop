@@ -497,6 +497,15 @@ public class Util{
 			case 65: return "BAT_EGG";
 			}
 			return mat.toString();
+		case 397:
+			switch((int) damage){
+			case 0: return "SKELETON_SKULL";
+			case 1: return "WITHER_SKULL";
+			case 2: return "ZOMBIE_HEAD";
+			case 3: return "PLAYER_HEAD";
+			case 4: return "CREEPER_HEAD";
+			}
+			break;
 		case 76:
 			return "REDSTONE_TORCH";
 		case 115:
