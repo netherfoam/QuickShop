@@ -18,14 +18,20 @@ public class ShopListener implements Listener{
 		graph.addPlotter(new Metrics.Plotter("Sales") {
 			@Override
 			public int getValue() {
-				return sales;
+				//Returns the current sales # and sets it back to 0
+				int oldsales = sales;
+				sales = 0;
+				return oldsales;
 			}
 		});
 		
 		graph.addPlotter(new Metrics.Plotter("Purchases") {
 			@Override
 			public int getValue() {
-				return purchases;
+				//Returns the current purchases # and sets it back to 0
+				int oldpurchases = purchases;
+				purchases = 0;
+				return oldpurchases;
 			}
 		});
 	}
