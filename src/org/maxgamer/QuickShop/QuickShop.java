@@ -33,7 +33,6 @@ import org.maxgamer.QuickShop.Listeners.*;
 import org.maxgamer.QuickShop.Metrics.Metrics;
 import org.maxgamer.QuickShop.Metrics.ShopListener;
 import org.maxgamer.QuickShop.Shop.*;
-import org.maxgamer.QuickShop.Shop.Shop.ShopType;
 import org.maxgamer.QuickShop.Watcher.*;
 
 public class QuickShop extends JavaPlugin{
@@ -220,7 +219,7 @@ public class QuickShop extends JavaPlugin{
 					
 					int type = rs.getInt("type");
 					
-					Shop shop = new Shop(loc, price, item, owner);
+					Shop shop = new ChestShop(loc, price, item, owner);
 					shop.setUnlimited(rs.getBoolean("unlimited"));
 					
 					shop.setShopType(ShopType.fromID(type));
@@ -469,7 +468,7 @@ public class QuickShop extends JavaPlugin{
 			Location loc = new Location(world, x, y, z);
 			
 			int type = rs.getInt("type");
-			Shop shop = new Shop(loc, price, item, owner);
+			Shop shop = new ChestShop(loc, price, item, owner);
 			shop.setUnlimited(rs.getBoolean("unlimited"));
 			shop.setShopType(ShopType.fromID(type));
 			
@@ -565,7 +564,7 @@ public class QuickShop extends JavaPlugin{
 			Location loc = new Location(world, x, y, z);
 			
 			int type = rs.getInt("type");
-			Shop shop = new Shop(loc, price, item, owner);
+			Shop shop = new ChestShop(loc, price, item, owner);
 			shop.setUnlimited(rs.getBoolean("unlimited"));
 			shop.setShopType(ShopType.fromID(type));
 			

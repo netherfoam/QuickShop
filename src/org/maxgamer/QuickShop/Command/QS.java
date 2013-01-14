@@ -19,8 +19,9 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.util.BlockIterator;
 import org.maxgamer.QuickShop.MsgUtil;
 import org.maxgamer.QuickShop.QuickShop;
+import org.maxgamer.QuickShop.Shop.ChestShop;
 import org.maxgamer.QuickShop.Shop.Shop;
-import org.maxgamer.QuickShop.Shop.Shop.ShopType;
+import org.maxgamer.QuickShop.Shop.ShopType;
 import org.maxgamer.QuickShop.Shop.ShopChunk;
 
 public class QS implements CommandExecutor{
@@ -121,10 +122,16 @@ public class QS implements CommandExecutor{
 				Block b = bIt.next();
 				Shop shop = plugin.getShopManager().getShop(b.getLocation());
 				if(shop != null){
-					shop.getChest().getInventory().clear();
-					
-					sender.sendMessage(MsgUtil.getMessage("empty-success"));
-					return;
+					if(shop instanceof ChestShop){
+						ChestShop cs = (ChestShop) shop;
+						cs.getChest().getInventory().clear();
+						sender.sendMessage(MsgUtil.getMessage("empty-success"));
+						return;
+					}
+					else{
+						sender.sendMessage(MsgUtil.getMessage("not-looking-at-shop"));
+						return;
+					}
 				}
 			}
 			sender.sendMessage(MsgUtil.getMessage("not-looking-at-shop"));
@@ -145,10 +152,10 @@ public class QS implements CommandExecutor{
 			
 			StringBuilder sb = new StringBuilder(args[1]);
 			for(int i = 2; i < args.length; i++){
-				sb.append("_" + args[i]);
+				sb.append(" " + args[i]);
 			}
 			String lookFor = sb.toString();
-			lookFor = lookFor.toUpperCase();
+			lookFor = lookFor.toLowerCase();
 			
 			Player p = (Player) sender;
 			Location loc = p.getEyeLocation().clone();
@@ -166,7 +173,7 @@ public class QS implements CommandExecutor{
 					HashMap<Location, Shop> inChunk = plugin.getShopManager().getShops(d);
 					if(inChunk == null) continue;
 					for(Shop shop : inChunk.values()){
-						if(shop.getDataName().contains(lookFor) && shop.getLocation().distanceSquared(loc) < minDistanceSquared){
+						if(shop.getDataName().toLowerCase().contains(lookFor)&& shop.getLocation().distanceSquared(loc) < minDistanceSquared){
 							closest = shop;
 							minDistanceSquared = shop.getLocation().distanceSquared(loc);
 						}
@@ -267,22 +274,25 @@ public class QS implements CommandExecutor{
 					shop.update();
 					sender.sendMessage(MsgUtil.getMessage("price-is-now", plugin.getEcon().format(shop.getPrice())));
 					
-					if(shop.isDoubleShop()){
-						Shop nextTo = shop.getAttachedShop();
-						
-						if(shop.isSelling()){
-							if(shop.getPrice() < nextTo.getPrice()){
-								sender.sendMessage(MsgUtil.getMessage("buying-more-than-selling"));
+					//Chest shops can be double shops.
+					if(shop instanceof ChestShop){
+						ChestShop cs = (ChestShop) shop;
+						if(cs.isDoubleShop()){
+							Shop nextTo = cs.getAttachedShop();
+							
+							if(cs.isSelling()){
+								if(cs.getPrice() < nextTo.getPrice()){
+									sender.sendMessage(MsgUtil.getMessage("buying-more-than-selling"));
+								}
 							}
-						}
-						else{
-							//Buying
-							if(shop.getPrice() > nextTo.getPrice()){
-								sender.sendMessage(MsgUtil.getMessage("buying-more-than-selling"));
+							else{
+								//Buying
+								if(cs.getPrice() > nextTo.getPrice()){
+									sender.sendMessage(MsgUtil.getMessage("buying-more-than-selling"));
+								}
 							}
 						}
 					}
-					
 					return;
 				}
 			}
@@ -302,9 +312,10 @@ public class QS implements CommandExecutor{
 				if(Bukkit.getWorld(worlds.getKey()) == null) continue;
 				for(HashMap<Location, Shop> inChunk : worlds.getValue().values()){
 					for(Shop shop : inChunk.values()){
-						if(shop.getLocation().getWorld() != null && shop.isSelling() && shop.getRemainingStock() == 0){
-							if(shop.isDoubleShop()) continue; //Dont delete double shops
-							shop.delete(false);
+						if(shop.getLocation().getWorld() != null && shop.isSelling() && shop.getRemainingStock() == 0 && shop instanceof ChestShop){
+							ChestShop cs = (ChestShop) shop;
+							if(cs.isDoubleShop()) continue; //Dont delete double shops
+							cs.delete(false);
 							toRemove.add(shop);
 							i++;
 						}
@@ -412,11 +423,10 @@ public class QS implements CommandExecutor{
 									selling++;
 								}
 								
-								if(shop.isDoubleShop()){
+								if(shop instanceof ChestShop && ((ChestShop) shop).isDoubleShop()){
 									doubles++;
 								}
-								
-								if(shop.isSelling() && !shop.isDoubleShop() && shop.getRemainingStock() == 0){
+								else if(shop.isSelling() && shop.getRemainingStock() == 0){
 									nostock++;
 								}
 							}

@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Sign;
 import org.maxgamer.QuickShop.Database.Database;
+import org.maxgamer.QuickShop.Shop.ChestShop;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.ShopAction;
@@ -79,7 +80,7 @@ public class ShopManager{
 		"CREATE TABLE messages (" + 
 				"owner  TEXT(20) NOT NULL, " +
 				"message  TEXT(200) NOT NULL, " +
-				"time  INTEGER(32) NOT NULL " +
+				"time  BIGINT(32) NOT NULL " +
 				");";
 		st.execute(createTable);
 	}
@@ -107,7 +108,14 @@ public class ShopManager{
 		}
 		try{
 			//V3.4.2
-			ps = getDatabase().getConnection().prepareStatement("ALTER TABLE shops MODIFY COLUMN price real(32,2) NOT NULL AFTER owner");
+			ps = getDatabase().getConnection().prepareStatement("ALTER TABLE shops MODIFY COLUMN price double(32,2) NOT NULL AFTER owner");
+			ps.execute();
+			ps.close();
+		}
+		catch(SQLException e){}
+		try{
+			//V3.4.3
+			ps = getDatabase().getConnection().prepareStatement("ALTER TABLE messages MODIFY COLUMN time BIGINT(32) NOT NULL AFTER message");
 			ps.execute();
 			ps.close();
 		}
@@ -123,7 +131,7 @@ public class ShopManager{
 	 * @return The shop object that was created.
 	 */
 	public Shop createShop(Location loc, double price, ItemStack item, String owner){
-		Shop shop = new Shop(loc, price, item, owner);
+		Shop shop = new ChestShop(loc, price, item, owner);
 		try{
 			//Write it to the database
 			String q = "INSERT INTO shops (owner, price, item, x, y, z, world, unlimited, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -379,12 +387,15 @@ public class ShopManager{
 							
 							shop.setSignText();
 						}
-						if(shop.isDoubleShop()){
-							Shop nextTo = shop.getAttachedShop();
-							
-							if(nextTo.getPrice() > shop.getPrice()){
-								//The one next to it must always be a buying shop.
-								p.sendMessage(MsgUtil.getMessage("buying-more-than-selling"));
+						if(shop instanceof ChestShop){
+							ChestShop cs = (ChestShop) shop;
+							if(cs.isDoubleShop()){
+								Shop nextTo = cs.getAttachedShop();
+								
+								if(nextTo.getPrice() > shop.getPrice()){
+									//The one next to it must always be a buying shop.
+									p.sendMessage(MsgUtil.getMessage("buying-more-than-selling"));
+								}
 							}
 						}
 					}

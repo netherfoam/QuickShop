@@ -35,7 +35,6 @@ public class Auction{
 		this.amount = amount;
 		this.price = price;
 	}
-	
 	public void setLength(int ticks){
 		this.ticks = ticks;
 	}
