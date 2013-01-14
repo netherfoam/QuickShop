@@ -3,6 +3,7 @@ package org.maxgamer.QuickShop.Metrics;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.maxgamer.QuickShop.QuickShop;
+import org.maxgamer.QuickShop.Metrics.Metrics.Graph;
 import org.maxgamer.QuickShop.Shop.ShopPurchaseEvent;
 
 public class ShopListener implements Listener{
@@ -12,14 +13,16 @@ public class ShopListener implements Listener{
 	public ShopListener(){
 		Metrics metrics = QuickShop.instance.getMetrics();
 		
-		metrics.addCustomData(new Metrics.Plotter("Sales") {
+		Graph graph = metrics.createGraph("Sales vs Purchases");
+
+		graph.addPlotter(new Metrics.Plotter("Sales") {
 			@Override
 			public int getValue() {
 				return sales;
 			}
 		});
 		
-		metrics.addCustomData(new Metrics.Plotter("Purchases") {
+		graph.addPlotter(new Metrics.Plotter("Purchases") {
 			@Override
 			public int getValue() {
 				return purchases;
