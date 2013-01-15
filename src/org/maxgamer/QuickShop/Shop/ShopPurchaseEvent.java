@@ -62,6 +62,6 @@ public class ShopPurchaseEvent extends Event implements Cancellable{
 
 	@Override
 	public void setCancelled(boolean cancel) {
-		this.setCancelled(cancel);
+		this.cancelled = cancel;
 	}
 }
