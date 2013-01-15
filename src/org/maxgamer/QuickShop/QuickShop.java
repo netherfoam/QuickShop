@@ -1,11 +1,7 @@
 package org.maxgamer.QuickShop;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,10 +9,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map.Entry;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -151,45 +144,19 @@ public class QuickShop extends JavaPlugin{
 		Connection con;
 		try {
 			getLogger().info("Loading shops from database...");
+			int res = Converter.convert();
 			
-			if(database.hasColumn("shops", "itemString")){
-				//Convert.
-				try{
-					this.convertDatabase_2_9();
-				}
-				catch(Exception e){
-					e.printStackTrace();
-					System.out.println("Could not convert shops to 2.9. Exitting");
-					return;
-				}
+			if(res < 0){
+				System.out.println("Could not convert shops. Exitting.");
+				return;
+			}
+			if(res > 0){
+				System.out.println("Conversion success. Continuing...");
 			}
 			
 			con = database.getConnection();
-			PreparedStatement ps = con.prepareStatement("SELECT * FROM shops");
+			PreparedStatement ps = con.prepareStatement("SELECT * FROM SHOPS");
 			ResultSet rs = ps.executeQuery();
-			
-			String colType = rs.getMetaData().getColumnTypeName(3);
-			if(!colType.equalsIgnoreCase("BLOB")){
-				System.out.println("Item column type: " + colType + ", converting to BLOB.");
-				
-				//We're using the old format
-				try{
-					this.convertDatabase_3_4();
-				}
-				catch(Exception e){
-					e.printStackTrace();
-					System.out.println("Could not convert shops to 3.4, exitting!");
-					return;
-				}
-				
-				ps.close();
-				rs.close();
-				
-				//Try again.
-				con = database.getConnection();
-				ps = con.prepareStatement("SELECT * FROM shops");
-				rs = ps.executeQuery();
-			}
 			
 			while(rs.next()){
 				try{
@@ -205,7 +172,8 @@ public class QuickShop extends JavaPlugin{
 					Location loc = new Location(world, x, y, z);
 					/* Delete invalid shops, if we know of any */
 					if(world != null && loc.getBlock().getType() != Material.CHEST){
-						getLogger().info("Shop is not a chest in " +rs.getString("world") + " at: " + x + ", " + y + ", " + z + ".  Removing from DB.");
+						getLogger().info("Shop is not a chest in " +rs.getString("world") + " at: " + x + ", " + y + ", " + z + ".  Skipping.");
+						/*
 						//getDB().execute("DELETE FROM shops WHERE x = "+x+" AND y = "+y+" AND z = "+z+" AND world = '"+rs.getString("world")+"'");
 						PreparedStatement delps = getDB().getConnection().prepareStatement("DELETE FROM shops WHERE x = ? AND y = ? and z = ? and world = ?");
 						delps.setInt(1, x);
@@ -213,7 +181,7 @@ public class QuickShop extends JavaPlugin{
 						delps.setInt(3, z);
 						delps.setString(4, rs.getString("world"));
 						
-						delps.execute();
+						delps.execute();*/
 						continue;
 					}
 					
@@ -444,194 +412,5 @@ public class QuickShop extends JavaPlugin{
 	 */
 	public ShopManager getShopManager(){
 		return this.shopManager;
-	}
-	/** Converts the database to v 2.9 format. 
-	 * @throws SQLException */
-	public void convertDatabase_2_9() throws Exception{
-		Connection con = database.getConnection();
-		System.out.println("Converting shops to 2.9 format...");
-		//Step 1: Load existing shops.
-		PreparedStatement ps = con.prepareStatement("SELECT * FROM shops");
-		ResultSet rs = ps.executeQuery();
-		int shops = 0;
-		System.out.println("Loading shops...");
-		while(rs.next()){
-			int x = rs.getInt("x");
-			int y = rs.getInt("y");
-			int z = rs.getInt("z");
-			World world = Bukkit.getWorld(rs.getString("world"));
-
-			ItemStack item = Util.makeItem(rs.getString("itemString"));				
-			
-			String owner = rs.getString("owner");
-			double price = rs.getDouble("price");
-			Location loc = new Location(world, x, y, z);
-			
-			int type = rs.getInt("type");
-			Shop shop = new ChestShop(loc, price, item, owner);
-			shop.setUnlimited(rs.getBoolean("unlimited"));
-			shop.setShopType(ShopType.fromID(type));
-			
-			shopManager.loadShop(rs.getString("world"), shop);
-			shops++;
-		}
-		ps.close();
-		rs.close();
-		
-		System.out.println("Loading complete. Backing up and deleting shops table...");
-		//Step 2: Delete shops table.
-		File existing = new File(this.getDataFolder(), "shops.db");
-		File backup = new File(existing.getAbsolutePath() + ".bak");
-		
-		InputStream in = new FileInputStream(existing);
-		OutputStream out = new FileOutputStream(backup);
-		
-		byte[] buf = new byte[1024];
-		int len;
-		while((len = in.read(buf)) > 0){
-			out.write(buf, 0, len);
-		}
-		in.close();
-		out.close();
-		
-		ps = con.prepareStatement("DELETE FROM shops");
-		ps.execute();
-		ps.close();
-		con.close();
-		
-		con = database.getConnection();
-		ps = con.prepareStatement("DROP TABLE shops");
-		ps.execute();
-		ps.close();
-		
-		//Step 3: Create shops table.
-		shopManager.createShopsTable();
-		
-		//Step 4: Export the new data into the table
-		for(Entry<String, HashMap<ShopChunk, HashMap<Location, Shop>>> worlds : shopManager.getShops().entrySet()){
-			String world = worlds.getKey();
-			for(Entry<ShopChunk, HashMap<Location, Shop>> chunks : worlds.getValue().entrySet()){
-				for(Shop shop : chunks.getValue().values()){
-					ps = con.prepareStatement("INSERT INTO shops (owner, price, item, x, y, z, world, unlimited, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-					ps.setString(1, shop.getOwner());
-					ps.setDouble(2, shop.getPrice());
-					
-					//Use the old setString, because it is still below v3.4
-					ps.setString(3, Util.getNBTString(shop.getItem()));
-					
-					ps.setInt(4, shop.getLocation().getBlockX());
-					ps.setInt(5, shop.getLocation().getBlockY());
-					ps.setInt(6, shop.getLocation().getBlockZ());
-					ps.setString(7, world); 
-					ps.setInt(8, (shop.isUnlimited() ? 1 : 0));
-					ps.setInt(9, ShopType.toID(shop.getShopType()));
-					
-					ps.execute();
-					ps.close();
-					
-					shops--;
-					if(shops % 10 == 0){
-						System.out.println("Remaining: " + shops + " shops.");
-					}
-				}
-			}
-		}
-		
-		System.out.println("Conversion complete.");
-	}
-	
-	/** Converts the database to v 3.4 format. 
-	 * @throws SQLException */
-	public void convertDatabase_3_4() throws Exception{
-		Connection con = database.getConnection();
-		System.out.println("Converting shops to 3.4 format...");
-		//Step 1: Load existing shops.
-		PreparedStatement ps = con.prepareStatement("SELECT * FROM shops");
-		ResultSet rs = ps.executeQuery();
-		int shops = 0;
-		System.out.println("Loading shops...");
-		while(rs.next()){
-			int x = rs.getInt("x");
-			int y = rs.getInt("y");
-			int z = rs.getInt("z");
-			World world = Bukkit.getWorld(rs.getString("world"));
-
-			//ItemStack item = Util.makeItem(rs.getString("item"));
-			ItemStack item = Util.getItemStack(rs.getString("item"));
-			
-			String owner = rs.getString("owner");
-			double price = rs.getDouble("price");
-			Location loc = new Location(world, x, y, z);
-			
-			int type = rs.getInt("type");
-			Shop shop = new ChestShop(loc, price, item, owner);
-			shop.setUnlimited(rs.getBoolean("unlimited"));
-			shop.setShopType(ShopType.fromID(type));
-			
-			shopManager.loadShop(rs.getString("world"), shop);
-			shops++;
-		}
-		ps.close();
-		rs.close();
-		
-		System.out.println("Loading complete. Backing up and deleting shops table...");
-		//Step 2: Delete shops table.
-		File existing = new File(this.getDataFolder(), "shops.db");
-		File backup = new File(existing.getAbsolutePath() + ".bak2");
-		
-		InputStream in = new FileInputStream(existing);
-		OutputStream out = new FileOutputStream(backup);
-		
-		byte[] buf = new byte[1024];
-		int len;
-		while((len = in.read(buf)) > 0){
-			out.write(buf, 0, len);
-		}
-		in.close();
-		out.close();
-		
-		ps = con.prepareStatement("DELETE FROM shops");
-		ps.execute();
-		ps.close();
-		con.close();
-		
-		con = database.getConnection();
-		ps = con.prepareStatement("DROP TABLE shops");
-		ps.execute();
-		ps.close();
-		
-		//Step 3: Create shops table.
-		shopManager.createShopsTable();
-		
-		//Step 4: Export the new data into the table
-		for(Entry<String, HashMap<ShopChunk, HashMap<Location, Shop>>> worlds : shopManager.getShops().entrySet()){
-			String world = worlds.getKey();
-			for(Entry<ShopChunk, HashMap<Location, Shop>> chunks : worlds.getValue().entrySet()){
-				for(Shop shop : chunks.getValue().values()){
-					ps = con.prepareStatement("INSERT INTO shops (owner, price, item, x, y, z, world, unlimited, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-					ps.setString(1, shop.getOwner());
-					ps.setDouble(2, shop.getPrice());
-					
-					ps.setBytes(3, Util.getNBTBytes(shop.getItem()));
-					
-					ps.setInt(4, shop.getLocation().getBlockX());
-					ps.setInt(5, shop.getLocation().getBlockY());
-					ps.setInt(6, shop.getLocation().getBlockZ());
-					ps.setString(7, world); 
-					ps.setInt(8, (shop.isUnlimited() ? 1 : 0));
-					ps.setInt(9, ShopType.toID(shop.getShopType()));
-					
-					ps.execute();
-					ps.close();
-					
-					shops--;
-					if(shops % 10 == 0){
-						System.out.println("Remaining: " + shops + " shops.");
-					}
-				}
-			}
-		}
-		
-		System.out.println("Conversion complete.");
 	}
 }

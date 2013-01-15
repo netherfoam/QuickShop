@@ -224,6 +224,7 @@ public class Util{
 	 * Reverses the effects of Util.getNBTString(ItemStack).
 	 * @param nbt The output of Util.getNBTString(ItemStack)
 	 * @return The input of Util.getNBTString(ItemStack)
+	 * This method should not be used, except for conversions now.
 	 */
 	public static ItemStack getItemStack(String nbt) throws UnsupportedEncodingException, ClassNotFoundException{
 		return getItemStack((nbt.getBytes(charset)));

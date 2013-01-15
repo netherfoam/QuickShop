@@ -58,7 +58,7 @@ public class ShopManager{
 		"CREATE TABLE shops (" + 
 				"owner  TEXT(20) NOT NULL, " +
 				"price  double(32, 2) NOT NULL, " +
-				"item  blob NOT NULL, " +
+				"item  BLOB NOT NULL, " +
 				"x  INTEGER(32) NOT NULL, " +
 				"y  INTEGER(32) NOT NULL, " +
 				"z  INTEGER(32) NOT NULL, " +
