@@ -222,7 +222,6 @@ public class Converter{
 			shop.setShopType(ShopType.fromID(type));
 			
 			shopManager.loadShop(rs.getString("world"), shop);
-			System.out.println("Loaded: " + shop.getDataName());
 			shops++;
 		}
 		ps.close();
