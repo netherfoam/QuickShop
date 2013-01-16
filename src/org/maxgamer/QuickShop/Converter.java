@@ -93,21 +93,27 @@ public class Converter{
 			int x = rs.getInt("x");
 			int y = rs.getInt("y");
 			int z = rs.getInt("z");
-			World world = Bukkit.getWorld(rs.getString("world"));
-
-			ItemStack item = Util.makeItem(rs.getString("itemString"));				
-			
-			String owner = rs.getString("owner");
-			double price = rs.getDouble("price");
-			Location loc = new Location(world, x, y, z);
-			
-			int type = rs.getInt("type");
-			Shop shop = new ChestShop(loc, price, item, owner);
-			shop.setUnlimited(rs.getBoolean("unlimited"));
-			shop.setShopType(ShopType.fromID(type));
-			
-			shopManager.loadShop(rs.getString("world"), shop);
-			shops++;
+			String worldName = rs.getString("world");
+			try{
+				World world = Bukkit.getWorld(worldName);
+	
+				ItemStack item = Util.makeItem(rs.getString("itemString"));				
+				
+				String owner = rs.getString("owner");
+				double price = rs.getDouble("price");
+				Location loc = new Location(world, x, y, z);
+				
+				int type = rs.getInt("type");
+				Shop shop = new ChestShop(loc, price, item, owner);
+				shop.setUnlimited(rs.getBoolean("unlimited"));
+				shop.setShopType(ShopType.fromID(type));
+				
+				shopManager.loadShop(rs.getString("world"), shop);
+				shops++;
+			}
+			catch(Exception e){
+				System.out.println("Error loading a shop! Coords: "+worldName+" (" + x + ", " + y + ", " + z + ") - Skipping it...");
+			}
 		}
 		ps.close();
 		rs.close();
@@ -208,21 +214,28 @@ public class Converter{
 			int x = rs.getInt("x");
 			int y = rs.getInt("y");
 			int z = rs.getInt("z");
-			World world = Bukkit.getWorld(rs.getString("world"));
-
-			ItemStack item = Util.getItemStack(rs.getString("item"));
+			String worldName = rs.getString("worldName");
 			
-			String owner = rs.getString("owner");
-			double price = rs.getDouble("price");
-			Location loc = new Location(world, x, y, z);
-			
-			int type = rs.getInt("type");
-			Shop shop = new ChestShop(loc, price, item, owner);
-			shop.setUnlimited(rs.getBoolean("unlimited"));
-			shop.setShopType(ShopType.fromID(type));
-			
-			shopManager.loadShop(rs.getString("world"), shop);
-			shops++;
+			try{
+				World world = Bukkit.getWorld(worldName);
+	
+				ItemStack item = Util.getItemStack(rs.getString("item"));
+				
+				String owner = rs.getString("owner");
+				double price = rs.getDouble("price");
+				Location loc = new Location(world, x, y, z);
+				
+				int type = rs.getInt("type");
+				Shop shop = new ChestShop(loc, price, item, owner);
+				shop.setUnlimited(rs.getBoolean("unlimited"));
+				shop.setShopType(ShopType.fromID(type));
+				
+				shopManager.loadShop(rs.getString("world"), shop);
+				shops++;
+			}
+			catch(Exception e){
+				System.out.println("Error loading a shop! Coords: "+worldName+" (" + x + ", " + y + ", " + z + ") - Skipping it...");
+			}
 		}
 		ps.close();
 		rs.close();
