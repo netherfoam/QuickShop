@@ -155,7 +155,7 @@ public class QuickShop extends JavaPlugin{
 			}
 			
 			con = database.getConnection();
-			PreparedStatement ps = con.prepareStatement("SELECT * FROM SHOPS");
+			PreparedStatement ps = con.prepareStatement("SELECT * FROM shops");
 			ResultSet rs = ps.executeQuery();
 			
 			while(rs.next()){
