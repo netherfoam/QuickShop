@@ -159,18 +159,23 @@ public class QuickShop extends JavaPlugin{
 			ResultSet rs = ps.executeQuery();
 			
 			while(rs.next()){
+				int x = 0;
+				int y = 0;
+				int z = 0;
+				String worldName = null;
 				try{
-					int x = rs.getInt("x");
-					int y = rs.getInt("y");
-					int z = rs.getInt("z");
-					World world = Bukkit.getWorld(rs.getString("world"));
-	
+					x = rs.getInt("x");
+					y = rs.getInt("y");
+					z = rs.getInt("z");
+					worldName = rs.getString("world");
+					World world = Bukkit.getWorld(worldName);
+					
 					ItemStack item = Util.getItemStack(rs.getBytes("item"));
 					
 					String owner = rs.getString("owner");
 					double price = rs.getDouble("price");
 					Location loc = new Location(world, x, y, z);
-					/* Delete invalid shops, if we know of any */
+					/* Skip invalid shops, if we know of any */
 					if(world != null && loc.getBlock().getType() != Material.CHEST){
 						getLogger().info("Shop is not a chest in " +rs.getString("world") + " at: " + x + ", " + y + ", " + z + ".  Skipping.");
 						/*
@@ -201,7 +206,7 @@ public class QuickShop extends JavaPlugin{
 				}
 				catch(Exception e){
 					e.printStackTrace();
-					getLogger().severe("Error loading a shop! Skipping it...");
+					getLogger().severe("Error loading a shop! Coords: "+worldName+" (" + x + ", " + y + ", " + z + ") - Skipping it...");
 				}
 			}
 			
