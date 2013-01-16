@@ -130,6 +130,7 @@ public class ShopManager{
 	 * @param owner The owner of the shop
 	 * @return The shop object that was created.
 	 */
+	/*
 	public Shop createShop(Location loc, double price, ItemStack item, String owner){
 		Shop shop = new ChestShop(loc, price, item, owner);
 		try{
@@ -145,6 +146,22 @@ public class ShopManager{
 			System.out.println("Could not create shop! Changes will revert after a reboot!");
 		}
 		return shop;
+	}*/
+	public void createShop(Shop shop){
+		Location loc = shop.getLocation();
+		ItemStack item = shop.getItem();
+		try{
+			//Write it to the database
+			String q = "INSERT INTO shops (owner, price, item, x, y, z, world, unlimited, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			plugin.getDB().execute(q, shop.getOwner(), shop.getPrice(), Util.getNBTBytes(item), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), loc.getWorld().getName(), (shop.isUnlimited() ? 1 : 0), shop.getShopType().toID());
+			
+			//Add it to the world
+			addShop(loc.getWorld().getName(), shop);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			System.out.println("Could not create shop! Changes will revert after a reboot!");
+		}
 	}
 	
 	/**
@@ -311,6 +328,7 @@ public class ShopManager{
 				/* Creation handling */
 				if(info.getAction() == ShopAction.CREATE){
 					try{
+						//Checking the shop can be created
 						if(plugin.getShopManager().getShop(info.getLocation()) != null){
 							p.sendMessage(MsgUtil.getMessage("shop-already-owned"));
 							return;
@@ -340,31 +358,34 @@ public class ShopManager{
 							return;
 						}
 						
-						//Add the shop to the list.
-						Shop shop = createShop(info.getLocation(), price, info.getItem(), p.getName());
-						//new Shop(info.getLocation(), price, info.getItem(), p.getName()); //TODO: Delete dead code
+						//Create the sample shop.
+						Shop shop = new ChestShop(info.getLocation(), price, info.getItem(), p.getName());
 						
 						ShopCreateEvent e = new ShopCreateEvent(shop, p);
-						Bukkit.getPluginManager().callEvent(e);
+						Bukkit.getPluginManager().callEvent(e);						
+						if(e.isCancelled()){
+							shop.getDisplayItem().remove();
+							return;
+						}
 						
-						if(e.isCancelled()) return;
-
-						//plugin.getShopManager().addShop(shop.getLocation().getWorld().getName(), shop);
-						
+						//This must be called after the event has been called.
+						//Else, if the event is cancelled, they won't get their money back.
 						if(tax != 0){
 							if(!plugin.getEcon().withdraw(p.getName(), tax)){
 								p.sendMessage(MsgUtil.getMessage("you-cant-afford-a-new-shop", format(tax)));
+								shop.getDisplayItem().remove();
 								return;
 							}
 							
 							plugin.getEcon().deposit(plugin.getConfig().getString("tax-account"), tax);
 						}
 						
+						/* The shop has hereforth been successfully created */
+						createShop(shop);
+						
 						Location loc = shop.getLocation();
 						plugin.log(p.getName() + " created a "+shop.getDataName()+" shop at ("+loc.getWorld().getName()+" - "+loc.getX()+","+loc.getY()+","+loc.getZ()+")");
 						
-						//Writes the shop to the database
-						//shop.update(true);
 						
 						if(!plugin.getConfig().getBoolean("shop.lock")){
 							//Warn them if they haven't been warned since reboot
