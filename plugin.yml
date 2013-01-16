@@ -1,5 +1,5 @@
 name: QuickShop
-version: 3.5.4
+version: 3.5.5
 main: org.maxgamer.QuickShop.QuickShop
 author: Netherfoam
 
@@ -16,13 +16,13 @@ commands:
 permissions:
     quickshop.create.sell:
         description: Allows a player to sell from a shop
-        default: true
+        default: false
     quickshop.create.buy:
         description: Allows a player to buy from a shop
-        default: true
+        default: false
     quickshop.create.double:
         description: Allows a player to create a double shop
-        default: true
+        default: false
     quickshop.use:
         description: Allows a player to buy/sell using other players shops
         default: true
