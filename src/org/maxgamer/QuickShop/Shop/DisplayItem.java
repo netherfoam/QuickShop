@@ -15,7 +15,6 @@ import org.maxgamer.QuickShop.Util.NMS;
  * A display item, that spawns a block above the chest and cannot be interacted with.
  */
 public class DisplayItem{
-	//private QuickShop plugin;
 	private Shop shop;
 	private ItemStack iStack;
 	private Item item;
@@ -45,9 +44,8 @@ public class DisplayItem{
 		this.item.setVelocity(new Vector(0, 0.1, 0));
 		this.item.setPickupDelay(Integer.MAX_VALUE);
 		
-		//TODO: When bukkit releases a build with an EntityPickupItemEvent or makes entities obey item.getPickupDelay() this can be removed.
 		if(QuickShop.instance.debug){
-			System.out.println("Spawned item. Setting stack count to 0");
+			System.out.println("Spawned item. Safeguarding.");
 		}
 		try{
 			NMS.safeGuard(this.item);
