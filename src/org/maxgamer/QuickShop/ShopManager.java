@@ -26,6 +26,7 @@ import org.maxgamer.QuickShop.Shop.ShopAction;
 import org.maxgamer.QuickShop.Shop.ShopChunk;
 import org.maxgamer.QuickShop.Shop.ShopCreateEvent;
 import org.maxgamer.QuickShop.Shop.ShopPurchaseEvent;
+import org.maxgamer.QuickShop.Util.Util;
 
 public class ShopManager{
 	private QuickShop plugin;

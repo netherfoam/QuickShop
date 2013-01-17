@@ -22,7 +22,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.maxgamer.QuickShop.MsgUtil;
 import org.maxgamer.QuickShop.QuickShop;
-import org.maxgamer.QuickShop.Util;
+import org.maxgamer.QuickShop.Util.Util;
 
 public class ChestShop implements Shop{
 	private Location loc;

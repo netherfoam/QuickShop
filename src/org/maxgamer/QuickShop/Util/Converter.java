@@ -1,4 +1,4 @@
-package org.maxgamer.QuickShop;
+package org.maxgamer.QuickShop.Util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +17,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
+import org.maxgamer.QuickShop.QuickShop;
+import org.maxgamer.QuickShop.ShopManager;
 import org.maxgamer.QuickShop.Database.Database;
 import org.maxgamer.QuickShop.Shop.ChestShop;
 import org.maxgamer.QuickShop.Shop.Shop;

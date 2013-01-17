@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 import org.maxgamer.QuickShop.QuickShop;
-import org.maxgamer.QuickShop.Util;
+import org.maxgamer.QuickShop.Util.Util;
 
 public class Auction{
 	private Player seller;

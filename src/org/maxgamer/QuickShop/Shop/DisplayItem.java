@@ -8,6 +8,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.maxgamer.QuickShop.QuickShop;
+import org.maxgamer.QuickShop.Util.NMS;
 
 /**
  * @author Netherfoam
@@ -49,25 +50,9 @@ public class DisplayItem{
 			System.out.println("Spawned item. Setting stack count to 0");
 		}
 		try{
-			//Throws NoClassDefFoundException if out of date.
-			Class.forName("net.minecraft.server.v1_4_6.ItemStack");
-			
-			//Fetch the NMS item
-			net.minecraft.server.v1_4_6.ItemStack nmsI = org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asNMSCopy(iStack);
-			//Force the count to 0, don't notify anything though.
-			nmsI.count = 0;
-			//Get the itemstack back as a bukkit stack
-			iStack = org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asBukkitCopy(nmsI);
-			//Set the display item to the stack.
-			this.item.setItemStack(iStack);
-			if(QuickShop.instance.debug){
-				System.out.println("Success");
-			}
+			NMS.safeGuard(this.item);
 		}
 		catch(Exception e){
-			if(QuickShop.instance.debug){
-				System.out.println("Failure");
-			}
 			e.printStackTrace();
 			System.out.println("QuickShop version mismatch! This version of QuickShop is incompatible with this version of bukkit! Try update?");
 		}

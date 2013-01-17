@@ -17,6 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.maxgamer.QuickShop.Shop.Shop;
+import org.maxgamer.QuickShop.Util.Util;
 
 public class MsgUtil{
 	private static QuickShop plugin;

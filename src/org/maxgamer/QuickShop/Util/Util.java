@@ -1,4 +1,4 @@
-package org.maxgamer.QuickShop;
+package org.maxgamer.QuickShop.Util;
 
 import java.io.UnsupportedEncodingException;
 import java.text.DecimalFormat;
@@ -21,6 +21,7 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.material.MaterialData;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
+import org.maxgamer.QuickShop.QuickShop;
 
 public class Util{
 	private static HashSet<Material> tools = new HashSet<Material>();
@@ -210,14 +211,7 @@ public class Util{
 	}
 	
 	public static byte[] getNBTBytes(ItemStack i) throws ClassNotFoundException{
-		Class.forName("net.minecraft.server.v1_4_6.ItemStack");
-		net.minecraft.server.v1_4_6.ItemStack is = org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asNMSCopy(i);
-		//Save the NMS itemstack to a new NBT tag
-		net.minecraft.server.v1_4_6.NBTTagCompound itemCompound = new net.minecraft.server.v1_4_6.NBTTagCompound();
-		itemCompound = is.save(itemCompound);
-		
-		//Convert the NBT tag to a byte[]
-		return net.minecraft.server.v1_4_6.NBTCompressedStreamTools.a(itemCompound);
+		return NMS.getNBTBytes(i);
 	}
 	
 	/**
@@ -237,9 +231,7 @@ public class Util{
 	 * @throws ClassNotFoundException If this version of QuickShop is not compatible with the version of bukkit (net.minecraft.server.v1_4_6)
 	 */
 	public static ItemStack getItemStack(byte[] bytes) throws ClassNotFoundException{
-		net.minecraft.server.v1_4_6.NBTTagCompound c = net.minecraft.server.v1_4_6.NBTCompressedStreamTools.a(bytes);
-		net.minecraft.server.v1_4_6.ItemStack is = net.minecraft.server.v1_4_6.ItemStack.a(c);
-		return org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asBukkitCopy(is);
+		return NMS.getItemStack(bytes);
 	}
 	
 	/**
