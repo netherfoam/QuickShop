@@ -360,6 +360,7 @@ public class ShopManager{
 						
 						//Create the sample shop.
 						Shop shop = new ChestShop(info.getLocation(), price, info.getItem(), p.getName());
+						shop.onLoad();
 						
 						ShopCreateEvent e = new ShopCreateEvent(shop, p);
 						Bukkit.getPluginManager().callEvent(e);						

@@ -30,7 +30,6 @@ public class ChunkListener implements Listener{
 		if(inChunk == null) return;
 		
 		for(Shop shop : inChunk.values()){
-			System.out.println("Loading chunk with " + shop.getDataName());
 			shop.onLoad();
 		}
 	}
