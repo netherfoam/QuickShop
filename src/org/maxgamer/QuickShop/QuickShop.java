@@ -179,16 +179,14 @@ public class QuickShop extends JavaPlugin{
 					Location loc = new Location(world, x, y, z);
 					/* Skip invalid shops, if we know of any */
 					if(world != null && loc.getBlock().getType() != Material.CHEST){
-						getLogger().info("Shop is not a chest in " +rs.getString("world") + " at: " + x + ", " + y + ", " + z + ".  Skipping.");
-						/*
-						//getDB().execute("DELETE FROM shops WHERE x = "+x+" AND y = "+y+" AND z = "+z+" AND world = '"+rs.getString("world")+"'");
+						getLogger().info("Shop is not a chest in " +rs.getString("world") + " at: " + x + ", " + y + ", " + z + ".  Deleting.");
 						PreparedStatement delps = getDB().getConnection().prepareStatement("DELETE FROM shops WHERE x = ? AND y = ? and z = ? and world = ?");
 						delps.setInt(1, x);
 						delps.setInt(2, y);
 						delps.setInt(3, z);
-						delps.setString(4, rs.getString("world"));
+						delps.setString(4, worldName);
 						
-						delps.execute();*/
+						delps.execute();
 						continue;
 					}
 					
