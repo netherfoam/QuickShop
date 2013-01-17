@@ -214,7 +214,7 @@ public class Converter{
 			int x = rs.getInt("x");
 			int y = rs.getInt("y");
 			int z = rs.getInt("z");
-			String worldName = rs.getString("worldName");
+			String worldName = rs.getString("world");
 			
 			try{
 				World world = Bukkit.getWorld(worldName);
