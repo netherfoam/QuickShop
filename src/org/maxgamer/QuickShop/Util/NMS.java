@@ -50,7 +50,7 @@ public class NMS{
 				return org.bukkit.craftbukkit.inventory.CraftItemStack.asBukkitStack(is);
 			}
 		};
-		dependents.put("1.4", dep);
+		dependents.put("", dep);
 		
 		/* ***********************
 		 * **      1.4.6      ** *
@@ -89,7 +89,46 @@ public class NMS{
 				return org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asBukkitCopy(is);
 			}
 		};
-		dependents.put("1.4.6", dep);
+		dependents.put("v1_4_6", dep);
+		
+		/* ***********************
+		 * **      1.4.7      ** *
+		 * ***********************/
+		dep = new NMSDependent(){
+			@Override
+			public void safeGuard(Item item) {
+				ItemStack iStack = item.getItemStack();
+				
+				//Fetch the NMS item
+				net.minecraft.server.v1_4_R1.ItemStack nmsI = org.bukkit.craftbukkit.v1_4_R1.inventory.CraftItemStack.asNMSCopy(iStack);
+				//Force the count to 0, don't notify anything though.
+				nmsI.count = 0;
+				//Get the itemstack back as a bukkit stack
+				iStack = org.bukkit.craftbukkit.v1_4_R1.inventory.CraftItemStack.asBukkitCopy(nmsI);
+				
+				//Set the display item to the stack.
+				item.setItemStack(iStack);
+			}
+			
+			@Override
+			public byte[] getNBTBytes(ItemStack iStack) {
+				net.minecraft.server.v1_4_R1.ItemStack is = org.bukkit.craftbukkit.v1_4_R1.inventory.CraftItemStack.asNMSCopy(iStack);
+				//Save the NMS itemstack to a new NBT tag
+				net.minecraft.server.v1_4_R1.NBTTagCompound itemCompound = new net.minecraft.server.v1_4_R1.NBTTagCompound();
+				itemCompound = is.save(itemCompound);
+				
+				//Convert the NBT tag to a byte[]
+				return net.minecraft.server.v1_4_R1.NBTCompressedStreamTools.a(itemCompound);
+			}
+			
+			@Override
+			public ItemStack getItemStack(byte[] bytes) {
+				net.minecraft.server.v1_4_R1.NBTTagCompound c = net.minecraft.server.v1_4_R1.NBTCompressedStreamTools.a(bytes);
+				net.minecraft.server.v1_4_R1.ItemStack is = net.minecraft.server.v1_4_R1.ItemStack.createStack(c);
+				return org.bukkit.craftbukkit.v1_4_R1.inventory.CraftItemStack.asBukkitCopy(is);
+			}
+		};
+		dependents.put("v1_4_R1", dep);
 	}
 	
 	/** The known working NMSDependent. This will be null if we haven't found one yet. */
