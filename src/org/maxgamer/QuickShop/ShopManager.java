@@ -305,7 +305,7 @@ public class ShopManager{
 	public boolean canBuildShop(Player p, Block b, BlockFace bf){
 		PlayerInteractEvent event = new PlayerInteractEvent(p, Action.RIGHT_CLICK_BLOCK, new ItemStack(Material.AIR), b, bf);
 		Bukkit.getPluginManager().callEvent(event);
-		event.getPlayer().closeInventory(); //TODO: Verify, does this fix plugins (OpenInv?) opening inventories?
+		event.getPlayer().closeInventory(); //If the player has chat open, this will close their chat.
 		
 		if(event.isCancelled()){
 			return false;

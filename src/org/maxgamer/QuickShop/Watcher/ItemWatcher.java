@@ -62,7 +62,7 @@ public class ItemWatcher implements Runnable{
 						disItem.respawn();
 					}
 					else if(disItem.getDisplayLocation().distanceSquared(disItem.getItem().getLocation()) > 1){
-						//Needs to be teleported back. (TODO: Despawn the item after 3 strikes OSTL? Necessary?)
+						//Needs to be teleported back.
 						disItem.getItem().teleport(disItem.getDisplayLocation(), TeleportCause.PLUGIN);
 					}
 				}
