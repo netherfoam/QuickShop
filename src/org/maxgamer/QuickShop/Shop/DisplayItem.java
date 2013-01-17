@@ -57,7 +57,7 @@ public class DisplayItem{
 	}
 	
 	/**
-	 * Spawns the new display item and removes duplicate items.
+	 * Spawns the new display item. Does not remove duplicate items.
 	 */
 	public void respawn(){
 		remove();

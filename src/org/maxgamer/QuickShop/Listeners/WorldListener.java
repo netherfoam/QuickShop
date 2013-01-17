@@ -3,11 +3,13 @@ package org.maxgamer.QuickShop.Listeners;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.ShopChunk;
@@ -21,20 +23,13 @@ public class WorldListener implements Listener{
 	
 	@EventHandler
 	public void onWorldLoad(WorldLoadEvent e){
-		/**
-		 * Update all the references to worlds, if any.
-		 * 
-		 * Method:
-		 * 		for one instance of world=>
-		 *		For each chunk in the world
-		 *			for each shop in the chunk
-		 *				update the location
-		 *				fix item/display items
-		 *				store it in the new chunk
-		 *			store the new chunk in the new world
-		 *		store the new world in the world list
-		 */
-		
+		/* *************************************
+		 * This listener fixes any broken world 
+		 * references.  Such as hashmap lookups
+		 * will fail, because the World reference
+		 * is different, but the world value is
+		 * the same.
+		 * *************************************/
 		World world = e.getWorld();
 		
 		//New world data
@@ -53,27 +48,38 @@ public class WorldListener implements Listener{
 			inWorld.put(oldInChunk.getKey(), inChunk);
 			
 			for(Entry<Location, Shop> entry : oldInChunk.getValue().entrySet()){
-				/**
-				 * 1. Fix each shops world
-				 * 2. Fix each shops display item's world
-				 * 3. Fix each shops display item's item's world
-				 * 4. Put the shops back in the new inChunk
-				 */
-
 				Shop shop = entry.getValue();
 				shop.getLocation().setWorld(world);
-				
-				if(plugin.display){
-					shop.getDisplayItem().getDisplayLocation().setWorld(world);
-					if(shop.getDisplayItem().getItem() != null){
-						shop.getDisplayItem().getItem().getLocation().setWorld(world);
-					}
-				}
-				
+
 				inChunk.put(shop.getLocation(), shop);
 			}
 		}
 		//Done - Now we can store the new world dataz!
 		plugin.getShopManager().getShops().put(world.getName(), inWorld);
+		
+		//This is a workaround, because I don't get parsed chunk events when a world first loads....
+		//So manually tell all of these shops they're loaded.
+		for(Chunk chunk : world.getLoadedChunks()){
+			HashMap<Location, Shop> inChunk = plugin.getShopManager().getShops(chunk);
+			if(inChunk == null) continue;
+			
+			for(Shop shop : inChunk.values()){
+				shop.onLoad();
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onWorldUnload(WorldUnloadEvent e){
+		//This is a workaround, because I don't get parsed chunk events when a world unloads, I think...
+		//So manually tell all of these shops they're unloaded.
+		for(Chunk chunk : e.getWorld().getLoadedChunks()){
+			HashMap<Location, Shop> inChunk = plugin.getShopManager().getShops(chunk);
+			if(inChunk == null) continue;
+			
+			for(Shop shop : inChunk.values()){
+				shop.onUnload();
+			}
+		}
 	}
 }

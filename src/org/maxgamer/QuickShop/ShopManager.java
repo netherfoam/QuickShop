@@ -286,8 +286,7 @@ public class ShopManager{
 			for(HashMap<ShopChunk, HashMap<Location, Shop>> inWorld : this.getShops().values()){
 				for(HashMap<Location, Shop> inChunk : inWorld.values()){
 					for(Shop shop : inChunk.values()){
-						shop.getDisplayItem().removeDupe();
-						shop.getDisplayItem().remove();
+						shop.onUnload();
 					}
 				}
 			}
@@ -365,7 +364,7 @@ public class ShopManager{
 						ShopCreateEvent e = new ShopCreateEvent(shop, p);
 						Bukkit.getPluginManager().callEvent(e);						
 						if(e.isCancelled()){
-							shop.getDisplayItem().remove();
+							shop.onUnload();
 							return;
 						}
 						
@@ -374,7 +373,7 @@ public class ShopManager{
 						if(tax != 0){
 							if(!plugin.getEcon().withdraw(p.getName(), tax)){
 								p.sendMessage(MsgUtil.getMessage("you-cant-afford-a-new-shop", format(tax)));
-								shop.getDisplayItem().remove();
+								shop.onUnload();
 								return;
 							}
 							

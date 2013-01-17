@@ -107,12 +107,6 @@ public interface Shop{
 	 */
 	public void setOwner(String owner);
 	
-	/**
-	 * Returns the display item associated with this shop.
-	 * @return The display item associated with this shop.
-	 */
-	public DisplayItem getDisplayItem();
-	
 	public void setUnlimited(boolean unlimited);
 	public boolean isUnlimited();
 	
@@ -166,4 +160,32 @@ public interface Shop{
 	 * @param fromMemory True if you are *NOT* iterating over this currently, *false if you are iterating*
 	 */
 	public void delete(boolean fromMemory);
+	
+	/**
+	 * Should return true if this shop is valid.
+	 * Should return false if it is not - Such as, a ChestShop should be situated on a chest.
+	 * 
+	 * This method is called periodically.  Here, you should check:
+	 * <br/> * The block this is on has not changed (E.g. WorldEdit does not throw block events)
+	 * <br/> * The display item (if any) is still valid etc
+	 * <br/> * And anything else that has to be brute force checked periodically.
+	 * <br/>
+	 * <br/> You can safely assume that this shop's world is loaded during this method.
+	 * @return
+	 */
+	public boolean isValid();
+	/**
+	 * This method is called whenever the shop should be unloaded.
+	 * E.g. for chest shops, they should clean up their own display items.
+	 * This method is called when the chunk the shop is stored in is unloaded.
+	 * 
+	 * This should not remove the shop from memory (That is done by the caller, if at all).
+	 */
+	public void onUnload();
+	/**
+	 * This method is called whenever the shop is loaded.
+	 * Such as when it is first created, or when the chunk
+	 * it is in is loaded from disk.
+	 */
+	public void onLoad();
 }

@@ -13,6 +13,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.maxgamer.QuickShop.MsgUtil;
 import org.maxgamer.QuickShop.QuickShop;
+import org.maxgamer.QuickShop.Shop.ChestShop;
 import org.maxgamer.QuickShop.Shop.DisplayItem;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
@@ -108,15 +109,19 @@ public class BlockListener implements Listener{
 		if(e.isCancelled()) return;
 		for(int i = 0; i < e.blockList().size(); i++){
 			Block b = e.blockList().get(i);
-			if(plugin.getShopManager().getShop(b.getLocation()) != null){
+			Shop shop = plugin.getShopManager().getShop(b.getLocation());
+			if(shop != null){
 				if(plugin.lock){
 					//ToDo: Shouldn't I be decrementing 1 here? Concurrency and all..
 					e.blockList().remove(b);
-					DisplayItem disItem = plugin.getShopManager().getShop(b.getLocation()).getDisplayItem();
-					disItem.remove();
+					
+					if(shop instanceof ChestShop){
+						ChestShop cs = (ChestShop) shop;
+						DisplayItem disItem = cs.getDisplayItem();
+						disItem.remove();
+					}
 				}
 				else{
-					Shop shop = plugin.getShopManager().getShop(b.getLocation());
 					shop.delete();
 				}
 			}

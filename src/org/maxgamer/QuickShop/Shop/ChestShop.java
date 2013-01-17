@@ -16,7 +16,9 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -76,8 +78,6 @@ public class ChestShop implements Shop{
 		
 		if(plugin.display){
 			this.displayItem = new DisplayItem(this, this.item);
-			this.displayItem.removeDupe();
-			this.displayItem.respawn();
 		}
 		
 		this.shopType = ShopType.SELLING;
@@ -629,5 +629,42 @@ public class ChestShop implements Shop{
 		}
 		
 		return total / count;
+	}
+	
+	public boolean isValid(){
+		if(plugin.display){
+			DisplayItem disItem = this.getDisplayItem();
+			Location dispLoc = disItem.getDisplayLocation();
+			
+			if(dispLoc.getBlock().getType() == Material.WATER){ //Flowing water.  Stationery water does not move items.
+				disItem.remove();
+			}
+			if(disItem.getItem() != null){
+				Item item = disItem.getItem();
+				if(item.getLocation().distanceSquared(dispLoc) > 1){
+					item.teleport(dispLoc, TeleportCause.PLUGIN);
+				}
+				if(item.getTicksLived() > 5000 || disItem.getItem().isDead()){
+					if(disItem.removeDupe()) plugin.log("[Debug] Item watcher was forced to remove that!");
+					disItem.respawn();
+				}
+			}
+		}
+		
+		return this.getLocation().getBlock().getType() == Material.CHEST;
+	}
+	
+	public void onUnload(){
+		if(this.getDisplayItem() != null){
+			this.getDisplayItem().remove();
+			this.displayItem = null;
+		}
+	}
+	public void onLoad(){
+		if(plugin.display){
+			this.displayItem = new DisplayItem(this, this.getItem());
+			this.getDisplayItem().removeDupe();
+			this.getDisplayItem().respawn();
+		}
 	}
 }

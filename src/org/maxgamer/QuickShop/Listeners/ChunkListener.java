@@ -10,7 +10,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.maxgamer.QuickShop.QuickShop;
-import org.maxgamer.QuickShop.Shop.DisplayItem;
 import org.maxgamer.QuickShop.Shop.Shop;
 
 
@@ -31,10 +30,8 @@ public class ChunkListener implements Listener{
 		if(inChunk == null) return;
 		
 		for(Shop shop : inChunk.values()){
-			DisplayItem disItem = shop.getDisplayItem();
-			disItem.removeDupe();
-			disItem.remove();
-			disItem.spawn();
+			System.out.println("Loading chunk with " + shop.getDataName());
+			shop.onLoad();
 		}
 	}
 	
@@ -46,9 +43,7 @@ public class ChunkListener implements Listener{
 		
 		if(inChunk == null) return;
 		for(Shop shop : inChunk.values()){
-			DisplayItem disItem = shop.getDisplayItem();
-			disItem.removeDupe();
-			disItem.remove();
+			shop.onUnload();
 		}
 	}
 }

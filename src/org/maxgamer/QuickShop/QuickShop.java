@@ -198,6 +198,11 @@ public class QuickShop extends JavaPlugin{
 					shop.setShopType(ShopType.fromID(type));
 					
 					shopManager.loadShop(rs.getString("world"), shop);
+					
+					if(loc.getWorld() != null && loc.getChunk().isLoaded()){
+						shop.onLoad();
+					}
+					
 					count++;
 				}
 				catch(ClassNotFoundException e){
