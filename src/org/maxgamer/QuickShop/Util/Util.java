@@ -366,7 +366,12 @@ public class Util{
 		case 373:
 			//Special case,.. Why?
 			if(damage == 0) return "WATER_BOTTLE";
-			Potion pot = Potion.fromDamage(damage);
+			
+			Potion pot;
+			try{
+				pot = Potion.fromDamage(damage);
+			}
+			catch(Exception e){ return "CUSTOM_POTION"; }
 			
 			String prefix = "";
 			String suffix = "";
