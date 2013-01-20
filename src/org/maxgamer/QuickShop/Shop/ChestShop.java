@@ -510,20 +510,15 @@ public class ChestShop implements Shop{
 			if(!isAttached(b)) continue;
 			Sign sign = (Sign) b.getState();
 			
-			if(sign.getLine(0).contains("[QuickShop")){
+			if(sign.getLine(0).contains("[QuickShop]")){
 				signs.add(sign);
 			}
 			else{
-				boolean text = false;
 				for(String s : sign.getLines()){
 					if(!s.isEmpty()){
-						text = true;
-						break;
+						//One of the lines isn't empty
+						continue;
 					}
-				}
-				
-				if(!text){
-					signs.add(sign);
 				}
 			}
 		}
