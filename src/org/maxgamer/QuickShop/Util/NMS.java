@@ -53,6 +53,45 @@ public class NMS{
 		dependents.put("", dep);
 		
 		/* ***********************
+		 * **      1.4.5      ** *
+		 * ***********************/
+		dep = new NMSDependent(){
+			@Override
+			public void safeGuard(Item item) {
+				ItemStack iStack = item.getItemStack();
+				
+				//Fetch the NMS item
+				net.minecraft.server.v1_4_5.ItemStack nmsI = org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack.createNMSItemStack(iStack);
+				//Force the count to 0, don't notify anything though.
+				nmsI.count = 0;
+				//Get the itemstack back as a bukkit stack
+				iStack = org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack.asBukkitStack(nmsI);
+				
+				//Set the display item to the stack.
+				item.setItemStack(iStack);
+			}
+			
+			@Override
+			public byte[] getNBTBytes(ItemStack iStack) {
+				net.minecraft.server.v1_4_5.ItemStack is = org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack.createNMSItemStack(iStack);
+				//Save the NMS itemstack to a new NBT tag
+				net.minecraft.server.v1_4_5.NBTTagCompound itemCompound = new net.minecraft.server.v1_4_5.NBTTagCompound();
+				itemCompound = is.save(itemCompound);
+				
+				//Convert the NBT tag to a byte[]
+				return net.minecraft.server.v1_4_5.NBTCompressedStreamTools.a(itemCompound);
+			}
+			
+			@Override
+			public ItemStack getItemStack(byte[] bytes) {
+				net.minecraft.server.v1_4_5.NBTTagCompound c = net.minecraft.server.v1_4_5.NBTCompressedStreamTools.a(bytes);
+				net.minecraft.server.v1_4_5.ItemStack is = net.minecraft.server.v1_4_5.ItemStack.a(c);
+				return org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack.asBukkitStack(is);
+			}
+		};
+		dependents.put("v1_4_5", dep);
+		
+		/* ***********************
 		 * **      1.4.6      ** *
 		 * ***********************/
 		dep = new NMSDependent(){
