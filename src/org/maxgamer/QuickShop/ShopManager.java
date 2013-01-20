@@ -10,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -283,8 +284,10 @@ public class ShopManager{
 	 */
 	public void clear(){
 		if(plugin.display){
-			for(HashMap<ShopChunk, HashMap<Location, Shop>> inWorld : this.getShops().values()){
-				for(HashMap<Location, Shop> inChunk : inWorld.values()){
+			for(World world : Bukkit.getWorlds()){
+				for(Chunk chunk : world.getLoadedChunks()){
+					HashMap<Location, Shop> inChunk = this.getShops(chunk);
+					if(inChunk == null) continue;
 					for(Shop shop : inChunk.values()){
 						shop.onUnload();
 					}

@@ -250,7 +250,7 @@ public class QuickShop extends JavaPlugin{
 		getCommand("qs").setExecutor(commandExecutor);
 		
 		if(getConfig().getInt("shop.find-distance") > 100){
-			getLogger().severe("Shop.find-distance is TOO HIGH! This will cause you LAG! Pick a number under 100 or don't whinge.");
+			getLogger().severe("Shop.find-distance is too high! Pick a number under 100!");
 		}
 		
 		/**
