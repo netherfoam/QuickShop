@@ -26,6 +26,7 @@ import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.ShopAction;
 import org.maxgamer.QuickShop.Shop.ShopChunk;
 import org.maxgamer.QuickShop.Shop.ShopCreateEvent;
+import org.maxgamer.QuickShop.Shop.ShopPreCreateEvent;
 import org.maxgamer.QuickShop.Shop.ShopPurchaseEvent;
 import org.maxgamer.QuickShop.Util.Util;
 
@@ -305,16 +306,21 @@ public class ShopManager{
 	 * @return True if they're allowed to place a shop there.
 	 */
 	public boolean canBuildShop(Player p, Block b, BlockFace bf){
-		PlayerInteractEvent event = new PlayerInteractEvent(p, Action.RIGHT_CLICK_BLOCK, new ItemStack(Material.AIR), b, bf);
-		Bukkit.getPluginManager().callEvent(event);
-		event.getPlayer().closeInventory(); //If the player has chat open, this will close their chat.
+		PlayerInteractEvent pie = new PlayerInteractEvent(p, Action.RIGHT_CLICK_BLOCK, new ItemStack(Material.AIR), b, bf); //PIE = PlayerInteractEvent - What else?
+		Bukkit.getPluginManager().callEvent(pie);
+		pie.getPlayer().closeInventory(); //If the player has chat open, this will close their chat.
 		
-		if(event.isCancelled()){
+		if(pie.isCancelled()){
 			return false;
 		}
-		else{
-			return true;
+		
+		ShopPreCreateEvent spce = new ShopPreCreateEvent(p, b.getLocation());
+		Bukkit.getPluginManager().callEvent(spce);
+		if(spce.isCancelled()){
+			return false;
 		}
+		
+		return true;
 	}
 	
 	public void handleChat(final Player p, String msg){
