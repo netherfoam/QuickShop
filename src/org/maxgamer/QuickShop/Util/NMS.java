@@ -16,7 +16,7 @@ public class NMS{
 		/* ***********************
 		 * **       1.4       ** *
 		 * ***********************/
-		dep = new NMSDependent(){
+		dep = new NMSDependent(){ //**NO EXCEPTION THROWN HERE**
 			@Override
 			public void safeGuard(Item item) {
 				ItemStack iStack = item.getItemStack();
@@ -208,7 +208,7 @@ public class NMS{
 	 * @param iStack the itemstack to rename.
 	 */
 	private static void rename(ItemStack iStack){
-		//This might stop it merging with other items. * Unless they're named funnily... In which case, shit.
+		//This stops it merging with other items. * Unless they're named funnily... In which case, shit.
 		ItemMeta meta = iStack.getItemMeta();
 		meta.setDisplayName(ChatColor.RED + "QuickShop " + Util.getName(iStack));
 		iStack.setItemMeta(meta);
