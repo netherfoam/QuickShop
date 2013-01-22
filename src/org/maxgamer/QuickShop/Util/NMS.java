@@ -16,7 +16,7 @@ public class NMS{
 		/* ***********************
 		 * **       1.4       ** *
 		 * ***********************/
-		dep = new NMSDependent(){ //**NO EXCEPTION THROWN HERE**
+		dep = new NMSDependent(""){ //**NO EXCEPTION THROWN HERE**
 			@Override
 			public void safeGuard(Item item) {
 				ItemStack iStack = item.getItemStack();
@@ -55,7 +55,7 @@ public class NMS{
 		/* ***********************
 		 * **      1.4.5      ** *
 		 * ***********************/
-		dep = new NMSDependent(){
+		dep = new NMSDependent("v1_4_5"){
 			@Override
 			public void safeGuard(Item item) {
 				ItemStack iStack = item.getItemStack();
@@ -94,7 +94,7 @@ public class NMS{
 		/* ***********************
 		 * **      1.4.6      ** *
 		 * ***********************/
-		dep = new NMSDependent(){
+		dep = new NMSDependent("v1_4_6"){
 			@Override
 			public void safeGuard(Item item) {
 				ItemStack iStack = item.getItemStack();
@@ -133,7 +133,7 @@ public class NMS{
 		/* ***********************
 		 * **      1.4.7      ** *
 		 * ***********************/
-		dep = new NMSDependent(){
+		dep = new NMSDependent("v1_4_R1"){
 			@Override
 			public void safeGuard(Item item) {
 				ItemStack iStack = item.getItemStack();
@@ -183,23 +183,9 @@ public class NMS{
 	 * @throws ClassNotFoundException 
 	 */
 	public static void safeGuard(Item item) throws ClassNotFoundException{
-		if(nms == null){ //We haven't found it yet.
-			for(NMSDependent dep : dependents.values()){
-				try{
-					dep.safeGuard(item); //Try apply it.
-					nms = dep; //If we made it this far, we've found a working version.
-					rename(item.getItemStack());
-					return; //End of loop.
-				}
-				catch(Exception e){}
-				catch(Error e){}
-			}
-			throw new ClassNotFoundException("This version of QuickShop is incompatible."); //We haven't got code to support your version!
-		}
-		else{ //We have a known safeguarder.
-			nms.safeGuard(item);
-			rename(item.getItemStack());
-		}
+		rename(item.getItemStack());
+		validate();
+		nms.safeGuard(item);
 	}
 	
 	/** 
@@ -222,21 +208,8 @@ public class NMS{
 	 * @throws ClassNotFoundException if QS is not updated to this build of bukkit.
 	 */
 	public static byte[] getNBTBytes(ItemStack iStack) throws ClassNotFoundException{
-		if(nms == null){ //We haven't found it yet.
-			for(NMSDependent dep : dependents.values()){
-				try{
-					byte[] bytes = dep.getNBTBytes(iStack); //Try apply it.
-					nms = dep; //If we made it this far, we've found a working version.
-					return bytes; //End of loop.
-				}
-				catch(Exception e){}
-				catch(Error e){}
-			}
-			throw new ClassNotFoundException("This version of QuickShop is incompatible."); //We haven't got code to support your version!
-		}
-		else{ //We have a known safeguarder.
-			return nms.getNBTBytes(iStack);
-		}
+		validate();
+		return nms.getNBTBytes(iStack);
 	}
 	
 	/**
@@ -246,26 +219,36 @@ public class NMS{
 	 * @throws ClassNotFoundException if QS is not updated to this build of bukkit.
 	 */
 	public static ItemStack getItemStack(byte[] bytes) throws ClassNotFoundException{
-		if(nms == null){ //We haven't found it yet.
-			for(NMSDependent dep : dependents.values()){
-				try{
-					ItemStack iStack = dep.getItemStack(bytes); //Try apply it.
-					nms = dep; //If we made it this far, we've found a working version.
-					return iStack; //End of loop.
-				}
-				catch(Exception e){}
-				catch(Error e){}
-			}
-			throw new ClassNotFoundException("This version of QuickShop is incompatible."); //We haven't got code to support your version!
-		}
-		else{ //We have a known safeguarder.
-			return nms.getItemStack(bytes);
-		}
+		validate();
+		return nms.getItemStack(bytes);
 	}
 	
-	private interface NMSDependent{
-		public void safeGuard(Item item);
-		public byte[] getNBTBytes(ItemStack iStack);
-		public ItemStack getItemStack(byte[] bytes);
+	/**
+	 * Finds the proper NMS version.  If a version is already
+	 * selected, this method does nothing, even if the version
+	 * is invalid.
+	 * @throws ClassNotFoundException If there is no found working version.
+	 */
+	private static void validate() throws ClassNotFoundException{
+		if(nms != null) return;
+		for(NMSDependent dep : dependents.values()){
+			if(dep.isValid() == false) continue;
+			nms = dep;
+			return;
+		}
+		throw new ClassNotFoundException("This version of MaxClans is incompatible."); //We haven't got code to support your version!
+	}
+	
+	private static abstract class NMSDependent{
+		private String version;
+		public NMSDependent(String version){ this.version = version; }
+		public abstract void safeGuard(Item item);
+		public abstract byte[] getNBTBytes(ItemStack iStack);
+		public abstract ItemStack getItemStack(byte[] bytes);
+		/** Returns true if this can be used as a NMS version */
+		public boolean isValid(){
+			try{ Class.forName("net.minecraft.server"+(version == null || version.isEmpty() ? "" : "."+version)+".ItemStack"); return true; }
+			catch(ClassNotFoundException e){ return false; }
+		}
 	}
 }
