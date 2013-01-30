@@ -1,6 +1,6 @@
 package org.maxgamer.QuickShop.Util;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Item;
@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class NMS{
-	private static HashMap<String, NMSDependent> dependents = new HashMap<String, NMSDependent>();
+	private static ArrayList<NMSDependent> dependents = new ArrayList<NMSDependent>();
 	
 	static{
 		NMSDependent dep;
@@ -50,7 +50,7 @@ public class NMS{
 				return org.bukkit.craftbukkit.inventory.CraftItemStack.asBukkitStack(is);
 			}
 		};
-		dependents.put("", dep);
+		dependents.add(dep);
 		
 		/* ***********************
 		 * **      1.4.5      ** *
@@ -89,7 +89,7 @@ public class NMS{
 				return org.bukkit.craftbukkit.v1_4_5.inventory.CraftItemStack.asBukkitStack(is);
 			}
 		};
-		dependents.put("v1_4_5", dep);
+		dependents.add(dep);
 		
 		/* ***********************
 		 * **      1.4.6      ** *
@@ -128,7 +128,7 @@ public class NMS{
 				return org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asBukkitCopy(is);
 			}
 		};
-		dependents.put("v1_4_6", dep);
+		dependents.add(dep);
 		
 		/* ***********************
 		 * **      1.4.7      ** *
@@ -167,7 +167,7 @@ public class NMS{
 				return org.bukkit.craftbukkit.v1_4_R1.inventory.CraftItemStack.asBukkitCopy(is);
 			}
 		};
-		dependents.put("v1_4_R1", dep);
+		dependents.add(dep);
 	}
 	
 	/** The known working NMSDependent. This will be null if we haven't found one yet. */
@@ -231,7 +231,7 @@ public class NMS{
 	 */
 	private static void validate() throws ClassNotFoundException{
 		if(nms != null) return;
-		for(NMSDependent dep : dependents.values()){
+		for(NMSDependent dep : dependents){
 			if(dep.isValid() == false) continue;
 			nms = dep;
 			return;
@@ -247,7 +247,10 @@ public class NMS{
 		public abstract ItemStack getItemStack(byte[] bytes);
 		/** Returns true if this can be used as a NMS version */
 		public boolean isValid(){
-			try{ Class.forName("net.minecraft.server"+(version == null || version.isEmpty() ? "" : "."+version)+".ItemStack"); return true; }
+			try{
+				Class.forName("net.minecraft.server"+(version == null || version.isEmpty() ? "" : "."+version)+".ItemStack");
+				return true; 
+			}
 			catch(ClassNotFoundException e){ return false; }
 		}
 	}
