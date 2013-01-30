@@ -6,6 +6,7 @@ tax-account: tax
 #Should we log transactions/creations to Bukkit\Plugins\QuickShop\qs.log?
 log-actions: true
 
+
 #Advanced.  This chooses which economy to hook into.  If it fails, it will fall back to trying vault. Spelling must be exact. Case insensitive.
 # Vault - Will hook into anything vault can hook into (Vault is required for this to work)
 # Satoshis
@@ -25,6 +26,12 @@ shop:
     cost: 10
     #Should we refund when their shops are deleted/removed/broken?
     refund: false
+
+    #Is there a fee for changing prices on a shop (Help deter endless undercutting)
+    price-change-requires-fee: true
+    #If price changes require a fee, how much is the fee
+    fee-for-price-change: 50
+
     #Should we try and lock their shops from other players, so people can't steal from them?
     lock: true
     #Should we require players be sneaking to create and use shops?
