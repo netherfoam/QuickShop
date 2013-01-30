@@ -93,22 +93,6 @@ public class ShopManager{
 	 */
 	public void checkColumns(){
 		PreparedStatement ps = null;
-		try {
-			//V0.5
-			ps = getDatabase().getConnection().prepareStatement("ALTER TABLE shops ADD unlimited boolean");
-			ps.execute();
-			ps.close();
-		} catch (SQLException e) {
-			plugin.getLogger().info("Found unlimited");
-		}
-		try {
-			//V0.9
-			ps = getDatabase().getConnection().prepareStatement("ALTER TABLE shops ADD type int");
-			ps.execute();
-			ps.close();
-		} catch (SQLException e) {
-			plugin.getLogger().info("Found type column");
-		}
 		try{
 			//V3.4.2
 			ps = getDatabase().getConnection().prepareStatement("ALTER TABLE shops MODIFY COLUMN price double(32,2) NOT NULL AFTER owner");
