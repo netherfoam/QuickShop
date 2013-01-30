@@ -1,17 +1,14 @@
 package org.maxgamer.QuickShop.Shop;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
@@ -464,10 +461,10 @@ public class ChestShop implements Shop{
 		String[] lines = new String[4];
 		lines[0] = ChatColor.RED + "[QuickShop]";
 		if(this.isBuying()){
-			lines[1] = MsgUtil.getMessage("signs.buying");
+			lines[1] = MsgUtil.getMessage("signs.buying", ""+this.getRemainingSpace());
 		}
 		if(this.isSelling()){
-			lines[1] = MsgUtil.getMessage("signs.selling");
+			lines[1] = MsgUtil.getMessage("signs.selling", ""+this.getRemainingSpace());
 		}
 		lines[2] = Util.getName(this.item);
 		lines[3] = MsgUtil.getMessage("signs.price", ""+this.getPrice());
@@ -569,11 +566,9 @@ public class ChestShop implements Shop{
 		blocks[1] = loc.getBlock().getRelative(-1, 0, 0);
 		blocks[2] = loc.getBlock().getRelative(0, 0, 1);
 		blocks[3] = loc.getBlock().getRelative(0, 0, -1);
-		
-		for(Block b : blocks){
-			if(b.getType() == Material.WALL_SIGN){
-				b.setType(Material.AIR);
-			}
+
+		for(Sign s : this.getSigns()){
+			s.setType(Material.AIR);
 		}
 		
 		//Delete it from the database
@@ -585,7 +580,6 @@ public class ChestShop implements Shop{
 		
 		//Refund if necessary
 		if(plugin.getConfig().getBoolean("shop.refund")){
-			//plugin.getEcon().depositPlayer(this.getOwner(), plugin.getConfig().getDouble("shop.cost"));
 			plugin.getEcon().deposit(this.getOwner(), plugin.getConfig().getDouble("shop.cost"));
 		}
 		
@@ -593,42 +587,6 @@ public class ChestShop implements Shop{
 			//Delete it from memory
 			plugin.getShopManager().removeShop(this);
 		}
-	}
-	
-	/**
-	 * Returns the average price
-	 * @param radius The radius in blocks to check around it.  Note this is rounded to chunks anyway
-	 * @return the average price of shops within the radius offering the same kind of trade
-	 */
-	public double getAverage(int radius){
-		radius = (int) Math.ceil(radius / 16D);
-		
-		Chunk center = this.getLocation().getChunk();
-		World world = this.getLocation().getWorld();
-		
-		double total = 0;
-		int count = 0;
-		
-		for(int x = center.getX() - radius; x <= center.getX() + radius; x++){
-			for(int z = center.getZ() - radius; z <= center.getZ() + radius; z++){
-				HashMap<Location, Shop> shops = plugin.getShopManager().getShops(world.getName(), x, z);
-				if(shops == null) continue;
-				for(Shop shop : shops.values()){
-					//Same shop type (buying/selling)
-					//Same item for sale
-					//Has space if they're buying, or stock if they're selling
-					if(shop.getShopType() == this.getShopType() && shop.matches(this.getItem()) 
-							&& 	(shop.isSelling() && shop.getRemainingStock() > 0 
-								 || shop.isBuying() && shop.getRemainingSpace() > 0)){
-						
-						total += shop.getPrice();
-						count++;
-					}
-				}
-			}
-		}
-		
-		return total / count;
 	}
 	
 	public boolean isValid(){

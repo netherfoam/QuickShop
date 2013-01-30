@@ -93,6 +93,6 @@ command:
 signs:
     #Line 1 is used as an identifier at the moment, so I kind of need it to work, thats why I won't let you change it
     #Line 3 is the item name... There really isnt anything to change.
-    selling: "Selling"
-    buying: "Buying"
+    selling: "Selling {0}"
+    buying: "Buying {0}"
     price: "For {0} each"
