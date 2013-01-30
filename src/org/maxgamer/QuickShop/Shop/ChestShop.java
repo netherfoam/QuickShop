@@ -464,7 +464,7 @@ public class ChestShop implements Shop{
 			lines[1] = MsgUtil.getMessage("signs.buying", ""+this.getRemainingSpace());
 		}
 		if(this.isSelling()){
-			lines[1] = MsgUtil.getMessage("signs.selling", ""+this.getRemainingSpace());
+			lines[1] = MsgUtil.getMessage("signs.selling", ""+this.getRemainingStock());
 		}
 		lines[2] = Util.getName(this.item);
 		lines[3] = MsgUtil.getMessage("signs.price", ""+this.getPrice());
@@ -624,5 +624,8 @@ public class ChestShop implements Shop{
 			this.getDisplayItem().removeDupe();
 			this.getDisplayItem().respawn();
 		}
+	}
+	public void onClick(){
+		this.setSignText();
 	}
 }

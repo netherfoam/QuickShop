@@ -188,4 +188,12 @@ public interface Shop{
 	 * it is in is loaded from disk.
 	 */
 	public void onLoad();
+	
+	/**
+	 * This method is called whenever a player clicks
+	 * on the shop.  For example, a player goes to purchase
+	 * from the shop. Only called when a player has permission
+	 * to open the shop. Does not get called for right click.
+	 */
+	public void onClick();
 }

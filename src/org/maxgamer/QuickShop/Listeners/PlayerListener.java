@@ -27,7 +27,7 @@ import org.maxgamer.QuickShop.Util.Util;
 
 
 public class PlayerListener implements Listener{
-	QuickShop plugin;
+	private QuickShop plugin;
 	public PlayerListener(QuickShop plugin){
 		this.plugin = plugin;
 	}
@@ -91,6 +91,7 @@ public class PlayerListener implements Listener{
 
 		//Purchase handling
 		if(shop != null && p.hasPermission("quickshop.use")){
+			shop.onClick();
 			//Text menu
 			MsgUtil.sendShopInfo(p, shop);
 			if(shop.isSelling()){

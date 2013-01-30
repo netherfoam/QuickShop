@@ -553,6 +553,7 @@ public class ShopManager{
 						Location loc = shop.getLocation();
 						plugin.log(p.getName() + " sold " + amount + " " +shop.getDataName()+" to shop at ("+loc.getWorld().getName()+" - "+loc.getX()+","+loc.getY()+","+loc.getZ()+") for " + (shop.getPrice() * amount));
 					}
+					shop.setSignText(); //Update the signs count
 				}
 				/* If it was already cancelled (from destroyed) */
 				else{
