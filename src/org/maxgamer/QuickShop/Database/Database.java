@@ -41,8 +41,7 @@ public class Database {
 	 */
 	public Database(String host, String port, String dbName, String user, String pass){
 		this();
-		String url = "jdbc:mysql://"+host+":"+port+"/"+dbName;
-		this.dbCore = new MySQL(url, user, pass);
+		this.dbCore = new MySQL(host, user, pass, dbName, port);
 	}
 	
 	/**
