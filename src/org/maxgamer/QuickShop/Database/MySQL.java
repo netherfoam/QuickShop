@@ -17,7 +17,7 @@ public class MySQL implements DatabaseCore{
 		this.pass = pass;
 	}
 	public MySQL(String host, String user, String pass, String database, String port){
-		this("jdbc:mysql://"+host+":"+port+"/"+database+"&autoReconnect=true", user, pass);
+		this("jdbc:mysql://"+host+":"+port+"/"+database+"?autoReconnect=true", user, pass);
 	}
 	
 	
@@ -33,7 +33,6 @@ public class MySQL implements DatabaseCore{
 				return this.connection;
 			}
 			else{
-				System.out.println("[QuickShop] Connecting to: " + url);
 				this.connection = DriverManager.getConnection(this.url, user, pass);
 				return this.connection;
 			}
