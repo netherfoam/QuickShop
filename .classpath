@@ -16,7 +16,7 @@
 			<attribute name="javadoc_location" value="http://jd.bukkit.org/apidocs/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="F:/lib/craftbukkit2492.jar"/>
+	<classpathentry kind="lib" path="F:/lib/libigot-1.4.7-R0.2-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="F:/lib/craftbukkit_dev1.4.5-0.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
