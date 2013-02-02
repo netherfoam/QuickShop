@@ -260,7 +260,15 @@ public class QS implements CommandExecutor{
 				sender.sendMessage(MsgUtil.getMessage("price-too-cheap"));
 				return;
 			}
-			
+			double fee = 0;
+			if(plugin.priceChangeRequiresFee) {
+				fee = plugin.getConfig().getDouble("shop.fee-for-price-change");
+				if(fee > 0 && plugin.getEcon().getBalance(sender.getName()) < fee) {
+					sender.sendMessage(MsgUtil.getMessage("you-cant-afford-to-change-price", plugin.getEcon().format(fee)));
+					return;
+				}
+
+			}
 			BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
 			//Loop through every block they're looking at upto 10 blocks away
 			while(bIt.hasNext()){
@@ -268,12 +276,27 @@ public class QS implements CommandExecutor{
 				Shop shop = plugin.getShopManager().getShop(b.getLocation());
 				
 				if(shop != null && (shop.getOwner().equalsIgnoreCase(((Player) sender).getName()) || sender.hasPermission("quickshop.other.price"))){
+					if(shop.getPrice() == price) {
+						// Stop here if there isn't a price change
+						sender.sendMessage(MsgUtil.getMessage("no-price-change"));
+						return;
+					}
+					if(fee > 0){
+						if(!plugin.getEcon().withdraw(sender.getName(), fee)){
+							sender.sendMessage(MsgUtil.getMessage("you-cant-afford-to-change-price", plugin.getEcon().format(fee)));
+							return;
+						}
+						
+						sender.sendMessage(MsgUtil.getMessage("fee-charged-for-price-change", plugin.getEcon().format(fee)));
+						plugin.getEcon().deposit(plugin.getConfig().getString("tax-account"), fee);
+					}
+
 					//Update the shop
 					shop.setPrice(price);
 					shop.setSignText();
 					shop.update();
 					sender.sendMessage(MsgUtil.getMessage("price-is-now", plugin.getEcon().format(shop.getPrice())));
-					
+				
 					//Chest shops can be double shops.
 					if(shop instanceof ChestShop){
 						ChestShop cs = (ChestShop) shop;
