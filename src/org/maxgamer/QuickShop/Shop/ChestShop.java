@@ -590,7 +590,7 @@ public class ChestShop implements Shop{
 	}
 	
 	public boolean isValid(){
-		if(plugin.display){
+		if(plugin.display && this.getDisplayItem() != null){
 			DisplayItem disItem = this.getDisplayItem();
 			Location dispLoc = disItem.getDisplayLocation();
 			
