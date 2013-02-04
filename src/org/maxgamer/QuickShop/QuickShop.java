@@ -65,6 +65,9 @@ public class QuickShop extends JavaPlugin{
 	public boolean sneak;
 	/** Whether we should use display items or not */
 	public boolean display = true;
+	/** Whether we players are charged a fee to change the price on their shop (To help deter endless undercutting */
+	public boolean priceChangeRequiresFee = false;
+	
 	
 	/** Use SpoutPlugin to get item / block names */
 	public boolean useSpout = false;
@@ -291,6 +294,7 @@ public class QuickShop extends JavaPlugin{
 		this.display = this.getConfig().getBoolean("shop.display-items"); 
 		this.sneak = this.getConfig().getBoolean("shop.sneak-only");
 		this.lock = this.getConfig().getBoolean("shop.lock");
+		this.priceChangeRequiresFee = this.getConfig().getBoolean("shop.price-change-requires-fee");
 		
 		MsgUtil.loadCfgMessages();
 	}
