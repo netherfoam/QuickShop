@@ -19,9 +19,11 @@ public class MySQL implements DatabaseCore{
 	}
 	public MySQL(String host, String user, String pass, String database, String port){
 		info = new Properties();
-		info.put("autoReconnect", true);
+		info.put("autoReconnect", "true");
 		info.put("user", user);
 		info.put("password", pass);
+		info.put("useUnicode", "true");
+		info.put("characterEncoding", "utf8");
 		this.url = "jdbc:mysql://"+host+":"+port+"/"+database;
 	}
 	

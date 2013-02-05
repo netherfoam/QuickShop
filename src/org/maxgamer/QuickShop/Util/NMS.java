@@ -236,7 +236,7 @@ public class NMS{
 			nms = dep;
 			return;
 		}
-		throw new ClassNotFoundException("This version of MaxClans is incompatible."); //We haven't got code to support your version!
+		throw new ClassNotFoundException("This version of QuickShop is incompatible."); //We haven't got code to support your version!
 	}
 	
 	private static abstract class NMSDependent{
@@ -248,7 +248,11 @@ public class NMS{
 		/** Returns true if this can be used as a NMS version */
 		public boolean isValid(){
 			try{
-				Class.forName("net.minecraft.server"+(version == null || version.isEmpty() ? "" : "."+version)+".ItemStack");
+				//Debug
+				String clazz = "net.minecraft.server"+(version == null || version.isEmpty() ? "" : "."+version)+".ItemStack";
+				System.out.println("Testing: " + clazz);
+				Class.forName(clazz);
+				System.out.println("Valid.");
 				return true; 
 			}
 			catch(ClassNotFoundException e){ return false; }
