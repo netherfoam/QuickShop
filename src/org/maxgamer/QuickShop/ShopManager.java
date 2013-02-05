@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -563,7 +565,53 @@ public class ShopManager{
 		});
 	}
 	
+	public Iterator<Shop> getShopIterator(){
+		return new ShopIterator();
+	}
+	
 	public String format(double d){
 		return plugin.getEcon().format(d);
+	}
+	
+	public class ShopIterator implements Iterator<Shop>{
+		private Iterator<Shop> shops;
+		private Iterator<HashMap<Location, Shop>> chunks;
+		private Iterator<HashMap<ShopChunk, HashMap<Location, Shop>>> worlds;
+		
+		private Shop current;
+		
+		public ShopIterator(){
+			worlds = getShops().values().iterator();
+		}
+		@Override
+		public boolean hasNext(){
+			if(shops == null || !shops.hasNext()){
+				if(chunks == null || !chunks.hasNext()){
+					if(!worlds.hasNext()){
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+		@Override
+		public Shop next(){
+			if(shops == null || !shops.hasNext()){
+				if(chunks == null || !chunks.hasNext()){
+					if(!worlds.hasNext()){
+						throw new NoSuchElementException("No more shops to iterate over!");
+					}
+					chunks = worlds.next().values().iterator();
+				}
+				shops = chunks.next().values().iterator();
+			}
+			current = shops.next();
+			return current;
+		}
+		@Override
+		public void remove(){
+			current.delete(false);
+			shops.remove();
+		}
 	}
 }
