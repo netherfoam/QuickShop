@@ -3,21 +3,26 @@ package org.maxgamer.QuickShop.Database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class MySQL implements DatabaseCore{
+	/** The JDBC URL String... jdbc:mysql://host:port/database */
 	private String url;
-	private String user;
-	private String pass;
-	
+	/** The connection properties... user, pass, autoReconnect.. */
+	private Properties info;
+	/** The actual connection... possibly expired. */
 	private Connection connection;
 	
-	public MySQL(String url, String user, String pass){
+	public MySQL(String url, Properties info){
 		this.url = url;
-		this.user = user;
-		this.pass = pass;
+		this.info = info;
 	}
 	public MySQL(String host, String user, String pass, String database, String port){
-		this("jdbc:mysql://"+host+":"+port+"/"+database+"?autoReconnect=true", user, pass);
+		info = new Properties();
+		info.put("autoReconnect", true);
+		info.put("user", user);
+		info.put("password", pass);
+		this.url = "jdbc:mysql://"+host+":"+port+"/"+database;
 	}
 	
 	
@@ -29,11 +34,11 @@ public class MySQL implements DatabaseCore{
 	public Connection getConnection(){
 		try{
 			//If we have a current connection, fetch it
-			if(this.connection != null && !this.connection.isClosed()){
+			if(this.connection != null && !this.connection.isClosed()/* && this.connection.isValid(3)*/){
 				return this.connection;
 			}
 			else{
-				this.connection = DriverManager.getConnection(this.url, user, pass);
+				this.connection = DriverManager.getConnection(this.url, info);
 				return this.connection;
 			}
 		}
