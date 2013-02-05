@@ -456,8 +456,6 @@ public class ChestShop implements Shop{
 	 * Updates signs attached to the shop
 	 */
 	public void setSignText(){
-		if(Util.isLoaded(this.getLocation()) == false) return;
-		
 		String[] lines = new String[4];
 		lines[0] = ChatColor.RED + "[QuickShop]";
 		if(this.isBuying()){
@@ -476,7 +474,7 @@ public class ChestShop implements Shop{
 	 * @param lines The array of lines to change. Index is line number.
 	 */
 	public void setSignText(String[] lines){
-		if(this.getLocation().getWorld() == null) return;
+		if(Util.isLoaded(this.getLocation()) == false) return;
 		
 		for(Sign sign : this.getSigns()){
 			for(int i = 0; i < lines.length; i++){
@@ -528,6 +526,7 @@ public class ChestShop implements Shop{
 	}
 	
 	public boolean isAttached(Block b){
+		if(b.getType() != Material.WALL_SIGN) new IllegalArgumentException(b + " Is not a sign!").printStackTrace();
 		return this.getLocation().getBlock().equals(Util.getAttached(b));
 	}
 	

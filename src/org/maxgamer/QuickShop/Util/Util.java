@@ -591,11 +591,16 @@ public class Util{
 	 * @return The block the sign is attached to
 	 */
 	public static Block getAttached(Block b){
-		Sign sign = (Sign) b.getState().getData();
-		BlockFace attached = sign.getAttachedFace();
-		
-		if(attached == null) return null;
-		return b.getRelative(attached);
+		try{
+			Sign sign = (Sign) b.getState().getData(); //Throws a NPE sometimes??
+			BlockFace attached = sign.getAttachedFace();
+			
+			if(attached == null) return null;
+			return b.getRelative(attached);
+		}
+		catch(NullPointerException e){
+			return null; ///Not sure what causes this.
+		}
 	}
 	
 	/**
