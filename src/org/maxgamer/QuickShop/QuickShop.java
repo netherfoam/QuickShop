@@ -10,7 +10,6 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -286,18 +285,6 @@ public class QuickShop extends JavaPlugin{
 		}
 		
 		getLogger().info("QuickShop loaded!");
-		
-		getLogger().info("Testing iterator...");
-		int i=0;
-		Iterator<Shop> shops = shopManager.getShopIterator();
-		while(shops.hasNext()){
-			shops.next();
-			i++;
-			System.out.println("Shop: " + i);
-			shops.remove();
-			System.out.println("Deleted shop " + i);
-		}
-		System.out.println(i + " shops iterated.");
 	}
 	/** Reloads QuickShops config */
 	@Override
