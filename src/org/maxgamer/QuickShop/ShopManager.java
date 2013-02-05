@@ -565,6 +565,11 @@ public class ShopManager{
 		});
 	}
 	
+	/**
+	 * Returns a new shop iterator object, allowing iteration over shops
+	 * easily, instead of sorting through a 3D hashmap.
+	 * @return a new shop iterator object.
+	 */
 	public Iterator<Shop> getShopIterator(){
 		return new ShopIterator();
 	}
@@ -583,6 +588,10 @@ public class ShopManager{
 		public ShopIterator(){
 			worlds = getShops().values().iterator();
 		}
+		/**
+		 * Returns true if there is still more shops to
+		 * iterate over.
+		 */
 		@Override
 		public boolean hasNext(){
 			if(shops == null || !shops.hasNext()){
@@ -594,6 +603,10 @@ public class ShopManager{
 			}
 			return true;
 		}
+		/**
+		 * Fetches the next shop.
+		 * Throws NoSuchElementException if there are no more shops.
+		 */
 		@Override
 		public Shop next(){
 			if(shops == null || !shops.hasNext()){
@@ -608,6 +621,11 @@ public class ShopManager{
 			current = shops.next();
 			return current;
 		}
+		/**
+		 * Removes the current shop.
+		 * This method will delete the shop from
+		 * memory and the database.
+		 */
 		@Override
 		public void remove(){
 			current.delete(false);

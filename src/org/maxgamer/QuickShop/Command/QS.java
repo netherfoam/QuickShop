@@ -1,9 +1,7 @@
 package org.maxgamer.QuickShop.Command;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
+import java.util.Iterator;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -329,25 +327,18 @@ public class QS implements CommandExecutor{
 	private void clean(CommandSender sender){
 		if(sender.hasPermission("quickshop.clean")){
 			sender.sendMessage(MsgUtil.getMessage("command.cleaning"));
+			Iterator<Shop> shIt = plugin.getShopManager().getShopIterator();
 			int i = 0;
-			List<Shop> toRemove = new ArrayList<Shop>(10);
-			for(Entry<String, HashMap<ShopChunk, HashMap<Location, Shop>>> worlds : plugin.getShopManager().getShops().entrySet()){
-				if(Bukkit.getWorld(worlds.getKey()) == null) continue;
-				for(HashMap<Location, Shop> inChunk : worlds.getValue().values()){
-					for(Shop shop : inChunk.values()){
-						if(shop.getLocation().getWorld() != null && shop.isSelling() && shop.getRemainingStock() == 0 && shop instanceof ChestShop){
-							ChestShop cs = (ChestShop) shop;
-							if(cs.isDoubleShop()) continue; //Dont delete double shops
-							cs.delete(false);
-							toRemove.add(shop);
-							i++;
-						}
-					}
+			while(shIt.hasNext()){
+				Shop shop = shIt.next();
+				if(shop.getLocation().getWorld() != null && shop.isSelling() && shop.getRemainingStock() == 0 && shop instanceof ChestShop){
+					ChestShop cs = (ChestShop) shop;
+					if(cs.isDoubleShop()) continue;
+					shIt.remove(); //Is selling, but has no stock, and is a chest shop, but is not a double shop.  Can be deleted safely.
+					i++;
 				}
 			}
-			for(Shop shop : toRemove){
-				plugin.getShopManager().removeShop(shop);
-			}
+			
 			MsgUtil.clean();
 			sender.sendMessage(MsgUtil.getMessage("command.cleaned", ""+i));
 			return;
