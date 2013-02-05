@@ -645,11 +645,22 @@ public class Util{
 	 * @return true if the given location is loaded or not.
 	 */
 	public static boolean isLoaded(Location loc){
-		if(loc.getWorld() == null) return false;
+		//System.out.println("Checking isLoaded(Location loc)");
+		if(loc.getWorld() == null){
+			//System.out.println("Is not loaded. (No world)");
+			return false;
+		}
 		//Calculate the chunks coordinates.  These are 1,2,3 for each chunk, NOT location rounded to the nearest 16.
 		int x = (int) Math.floor((loc.getBlockX()) / 16.0);
 		int z = (int) Math.floor((loc.getBlockZ()) / 16.0);
 		
-		return loc.getWorld().isChunkLoaded(x, z);
+		if(loc.getWorld().isChunkLoaded(x, z)){
+			//System.out.println("Chunk is loaded " + x + ", " + z);
+			return true;
+		}
+		else{
+			//System.out.println("Chunk is NOT loaded " + x + ", " + z);
+			return false;
+		}
 	}
 }

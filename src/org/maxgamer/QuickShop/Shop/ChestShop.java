@@ -456,6 +456,8 @@ public class ChestShop implements Shop{
 	 * Updates signs attached to the shop
 	 */
 	public void setSignText(){
+		if(Util.isLoaded(this.getLocation()) == false) return;
+		
 		String[] lines = new String[4];
 		lines[0] = ChatColor.RED + "[QuickShop]";
 		if(this.isBuying()){
