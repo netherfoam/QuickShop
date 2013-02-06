@@ -587,6 +587,7 @@ public class QS implements CommandExecutor{
 		if(s.hasPermission("quickshop.find")) s.sendMessage(ChatColor.GREEN + "/qs find <item>" + ChatColor.YELLOW + " - "+MsgUtil.getMessage("command.description.find"));
 		if(s.hasPermission("quickshop.refill")) s.sendMessage(ChatColor.GREEN + "/qs refill <amount>" + ChatColor.YELLOW + " - "+MsgUtil.getMessage("command.description.refill"));
 		if(s.hasPermission("quickshop.empty")) s.sendMessage(ChatColor.GREEN + "/qs empty" + ChatColor.YELLOW + " - "+MsgUtil.getMessage("command.description.empty"));
+		if(s.hasPermission("quickshop.export")) s.sendMessage(ChatColor.GREEN + "/qs export mysql|sqlite" + ChatColor.YELLOW + " - Exports the database to SQLite or MySQL");
 		
 	}
 }

@@ -50,3 +50,6 @@ permissions:
     quickshop.debug:
         description: Enables debug info to console
         default: op
+    quickshop.export
+        description: Allows exporting database to mysql or sqlite
+        default: op
