@@ -185,21 +185,6 @@ public class Util{
 	}
 	
 	/**
-	 * Converts an itemstack into a string for database storage.  See makeItem(String itemString) for 
-	 * reversing this.
-	 * @param item The item to model it off of.
-	 * @return A new string with the properties of the item.
-	 */
-	public static String makeString(ItemStack item){
-		String itemString = item.getType().toString() + ":" + item.getData().getData() + ":" + item.getDurability() + ":" + item.getAmount();
-		
-		for(Entry<Enchantment, Integer> ench : item.getEnchantments().entrySet()){
-			itemString += ":" + ench.getKey().getName() + ":" + ench.getValue();
-		}
-		return itemString;
-	}
-	
-	/**
 	 * Converts the given ItemStack into a compound NBT tag, then the tag to an archived byte[], then the byte[] to a String using ISO-LATIN-1. Then returns the string.
 	 * @param i The itemstack to serialize
 	 * @return The String representing the item
