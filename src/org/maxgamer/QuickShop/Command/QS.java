@@ -1,5 +1,7 @@
 package org.maxgamer.QuickShop.Command;
 
+import java.io.File;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -11,12 +13,16 @@ import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.util.BlockIterator;
 import org.maxgamer.QuickShop.MsgUtil;
 import org.maxgamer.QuickShop.QuickShop;
+import org.maxgamer.QuickShop.Database.Database;
+import org.maxgamer.QuickShop.Database.MySQL;
+import org.maxgamer.QuickShop.Database.SQLite;
 import org.maxgamer.QuickShop.Shop.ChestShop;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.ShopType;
@@ -48,6 +54,60 @@ public class QS implements CommandExecutor{
 			sender.sendMessage(MsgUtil.getMessage("no-permission"));
 			return;
 		}
+	}
+	
+	private void export(CommandSender sender, String[] args){
+		if(args.length < 2){
+			sender.sendMessage(ChatColor.RED + "Usage: /qs export mysql|sqlite");
+			return;
+		}
+		String type = args[1].toLowerCase();
+		if(type.startsWith("mysql")){
+			if(plugin.getDB().getCore() instanceof MySQL){
+				sender.sendMessage(ChatColor.RED + "Database is already MySQL");
+				return;
+			}
+			ConfigurationSection cfg = plugin.getConfig().getConfigurationSection("database");
+			String host = cfg.getString("host");
+			String port = cfg.getString("port");
+			String user = cfg.getString("user");
+			String pass = cfg.getString("password");
+			String name = cfg.getString("database");
+			
+			Database target = new Database(host, port, name, user, pass);
+			try {
+				QuickShop.instance.getDB().copyTo(target);
+				sender.sendMessage(ChatColor.GREEN + "Success - Exported to MySQL " + user + "@" + host + "." + name);
+			} catch (SQLException e) {
+				e.printStackTrace();
+				sender.sendMessage(ChatColor.RED + "Failed to export to MySQL " + user + "@" + host + "." + name + ChatColor.DARK_RED + " Reason: " + e.getMessage());
+			}
+			return;
+		}
+	if(type.startsWith("sql") || type.contains("file")){
+			if(plugin.getDB().getCore() instanceof SQLite){
+				sender.sendMessage(ChatColor.RED + "Database is already SQLite");
+				return;
+			}
+			//Database target = new Database(host, port, name, user, pass);
+			File file = new File(plugin.getDataFolder(), "shops.db");
+			if(file.exists()){
+				if(file.delete() == false){
+					sender.sendMessage(ChatColor.RED + "Warning: Failed to delete old shops.db file. This may cause errors.");
+				}
+			}
+			Database target = new Database(file);
+			try {
+				QuickShop.instance.getDB().copyTo(target);
+				sender.sendMessage(ChatColor.GREEN + "Success - Exported to SQLite: " + file.toString());
+			} catch (SQLException e) {
+				e.printStackTrace();
+				sender.sendMessage(ChatColor.RED + "Failed to export to SQLite: " + file.toString() + " Reason: " + e.getMessage());
+			}
+			return;
+		}
+		
+		sender.sendMessage(ChatColor.RED + "No target given. Usage: /qs export mysql|sqlite");
 	}
 	
 	private void setOwner(CommandSender sender, String[] args){
@@ -403,6 +463,10 @@ public class QS implements CommandExecutor{
 			}
 			else if(subArg.equals("reload")){
 				reload(sender);
+				return true;
+			}
+			else if(subArg.equals("export")){
+				export(sender, args);
 				return true;
 			}
 			else if(subArg.equals("debug")){

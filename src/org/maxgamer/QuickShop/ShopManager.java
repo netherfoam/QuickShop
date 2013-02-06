@@ -2,7 +2,6 @@ package org.maxgamer.QuickShop;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -51,43 +50,6 @@ public class ShopManager{
 	 */
 	public HashMap<String, Info> getActions(){
 		return this.actions;
-	}
-	
-	/**
-	 * Creates the database table 'shops'.
-	 * @throws SQLException If the connection is invalid.
-	 */
-	public void createShopsTable() throws SQLException{
-		Statement st = getDatabase().getConnection().createStatement();
-		String createTable = 
-		"CREATE TABLE shops (" + 
-				"owner  TEXT(20) NOT NULL, " +
-				"price  double(32, 2) NOT NULL, " +
-				"item  BLOB NOT NULL, " +
-				"x  INTEGER(32) NOT NULL, " +
-				"y  INTEGER(32) NOT NULL, " +
-				"z  INTEGER(32) NOT NULL, " +
-				"world VARCHAR(32) NOT NULL, " +
-				"unlimited  boolean, " +
-				"type  boolean, " +
-				"PRIMARY KEY (x, y, z, world) " +
-				");";
-		st.execute(createTable);
-	}
-	
-	/**
-	 * Creates the database table 'messages'
-	 * @throws SQLException If the connection is invalid
-	 */
-	public void createMessagesTable() throws SQLException{
-		Statement st = getDatabase().getConnection().createStatement();
-		String createTable = 
-		"CREATE TABLE messages (" + 
-				"owner  TEXT(20) NOT NULL, " +
-				"message  TEXT(200) NOT NULL, " +
-				"time  BIGINT(32) NOT NULL " +
-				");";
-		st.execute(createTable);
 	}
 	
 	/**

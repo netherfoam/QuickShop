@@ -126,7 +126,7 @@ public class QuickShop extends JavaPlugin{
 		/* Creates DB table 'shops' */
 		if(!getDB().hasTable("shops")){
 			try {
-				shopManager.createShopsTable();
+				getDB().createShopsTable();
 			} catch (SQLException e) {
 				e.printStackTrace();
 				getLogger().severe("Could not create shops table");
@@ -134,7 +134,7 @@ public class QuickShop extends JavaPlugin{
 		}
 		if(!getDB().hasTable("messages")){
 			try{
-				shopManager.createMessagesTable();
+				getDB().createMessagesTable();
 			}
 			catch (SQLException e) {
 				e.printStackTrace();
