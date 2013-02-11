@@ -2,6 +2,7 @@ package org.maxgamer.QuickShop.Util;
 
 import java.util.ArrayList;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
@@ -231,31 +232,26 @@ public class NMS{
 	 */
 	private static void validate() throws ClassNotFoundException{
 		if(nms != null) return;
-		for(NMSDependent dep : dependents){
-			if(dep.isValid() == false) continue;
-			nms = dep;
-			return;
+		
+		String packageName = Bukkit.getServer().getClass().getPackage().getName();
+		packageName = packageName.substring(packageName.lastIndexOf(".") + 1);
+		System.out.println("Package: " + packageName);
+		for(NMSDependent dep : dependents){ //TODO I should put this in a map, it would be faster (But is it worth it?)
+			//If this NMS version is the bukkit version, OR, both are for the OLD way of doing things...
+			if(dep.getVersion().equals(packageName) || (dep.getVersion().isEmpty() && (packageName.equals("bukkit") || packageName.equals("craftbukkit")))){ //We could be using either CB or Bukkit.
+				nms = dep;
+				return;
+			}
 		}
 		throw new ClassNotFoundException("This version of QuickShop is incompatible."); //We haven't got code to support your version!
 	}
 	
 	private static abstract class NMSDependent{
 		private String version;
+		public String getVersion(){ return this.version; }
 		public NMSDependent(String version){ this.version = version; }
 		public abstract void safeGuard(Item item);
 		public abstract byte[] getNBTBytes(ItemStack iStack);
 		public abstract ItemStack getItemStack(byte[] bytes);
-		/** Returns true if this can be used as a NMS version */
-		public boolean isValid(){
-			try{
-				//Debug
-				String clazz = "net.minecraft.server"+(version == null || version.isEmpty() ? "" : "."+version)+".ItemStack";
-				System.out.println("Testing: " + clazz);
-				Class.forName(clazz);
-				System.out.println("Valid.");
-				return true; 
-			}
-			catch(ClassNotFoundException e){ return false; }
-		}
 	}
 }
