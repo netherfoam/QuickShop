@@ -522,16 +522,15 @@ public class Util{
 			case 0: return "ANVIL";
 			case 1: return "SLIGHTLY_DAMAGED_ANVIL";
 			case 2: return "VERY_DAMAGED:ANVIL";
-
 			}
 			break;
-		}
 		case 384:
 			return "BOTTLE_O'_ENCHANTING";
 		case 402:
 			return "FIREWORK_STAR";
 		case 385:
 			return "FIREWORK_CHARGE";
+		}
 		
 		if(damage == 0 || isTool(mat)) return mat.toString();
 		return mat.toString()+ ":" + damage;
