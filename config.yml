@@ -20,6 +20,14 @@ database:
     database: quickshop
     user: root
     password: passwd
+    
+# Not working yet.
+limits:
+    #Disable these if you're not using them!
+    use: false
+    default: 10
+    ranks:
+        quickshop.vip: 20 #Players with quickshop.vip can make 20 shops.
 
 shop:
     #Cost to make a stall

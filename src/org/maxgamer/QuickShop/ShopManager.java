@@ -229,6 +229,23 @@ public class ShopManager{
 	 * @return True if they're allowed to place a shop there.
 	 */
 	public boolean canBuildShop(Player p, Block b, BlockFace bf){
+		if(plugin.limit){
+			int owned = 0;
+			Iterator<Shop> it = getShopIterator();
+			while(it.hasNext()){
+				if(it.next().getOwner().equalsIgnoreCase(p.getName())){
+					owned++;
+				}
+			}
+			
+			int max = plugin.getShopLimit(p);
+			if(owned + 1 > max){
+				p.sendMessage(ChatColor.RED + "You have already created a maximum of "+ owned + "/" + max + " shops!");
+				return false;
+			}
+		}
+		
+		
 		PlayerInteractEvent pie = new PlayerInteractEvent(p, Action.RIGHT_CLICK_BLOCK, new ItemStack(Material.AIR), b, bf); //PIE = PlayerInteractEvent - What else?
 		Bukkit.getPluginManager().callEvent(pie);
 		pie.getPlayer().closeInventory(); //If the player has chat open, this will close their chat.
@@ -580,6 +597,7 @@ public class ShopManager{
 				}
 				shops = chunks.next().values().iterator();
 			}
+			if(!shops.hasNext()) return next(); //Skip to the next one (Empty iterator?)
 			current = shops.next();
 			return current;
 		}

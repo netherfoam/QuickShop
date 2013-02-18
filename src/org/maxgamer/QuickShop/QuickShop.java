@@ -9,7 +9,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -17,6 +19,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -68,7 +71,19 @@ public class QuickShop extends JavaPlugin{
 	public boolean display = true;
 	/** Whether we players are charged a fee to change the price on their shop (To help deter endless undercutting */
 	public boolean priceChangeRequiresFee = false;
+	/** Whether or not to limit players shop amounts */
+	public boolean limit = false;
 	
+	private HashMap<String, Integer> limits = new HashMap<String, Integer>();
+	
+	public int getShopLimit(Player p){
+		int max = getConfig().getInt("limits.default");
+		
+		for(Entry<String, Integer> entry : limits.entrySet()){
+			if(entry.getValue() > max && p.hasPermission(entry.getKey())) max = entry.getValue();
+		}
+		return max;
+	}
 	
 	/** Use SpoutPlugin to get item / block names */
 	public boolean useSpout = false;
@@ -106,6 +121,17 @@ public class QuickShop extends JavaPlugin{
 			logWatcher.task = Bukkit.getScheduler().runTaskTimerAsynchronously(this, this.logWatcher, 150, 150);
 		}
 		
+		ConfigurationSection limitCfg = this.getConfig().getConfigurationSection("limits");
+		if(limitCfg != null){
+			getLogger().info("Limit cfg found...");
+			this.limit = limitCfg.getBoolean("use", false);
+			getLogger().info("Limits.use: " + limit);
+			limitCfg = limitCfg.getConfigurationSection("ranks");
+			for(String key : limitCfg.getKeys(true)){
+				limits.put(key, limitCfg.getInt(key));
+			}
+			getLogger().info(limits.toString());
+		}
 		
 		ConfigurationSection dbCfg = getConfig().getConfigurationSection("database");
 		if(dbCfg.getBoolean("mysql")){
