@@ -14,7 +14,6 @@ public class LogWatcher implements Runnable{
 	private PrintStream ps;
 	
 	private ArrayList<String> logs = new ArrayList<String>(5);
-	private boolean lock = false;
 	public BukkitTask task;
 	
 	public LogWatcher(QuickShop plugin, File log){
@@ -35,26 +34,18 @@ public class LogWatcher implements Runnable{
 
 	@Override
 	public void run() {
-		while(lock){
-			//Nothing
+		synchronized(logs){
+			for(String s : logs){
+				ps.println(s);
+			}
+			logs.clear();
 		}
-		lock = true;
-		
-		for(String s : logs){
-			ps.println(s);
-		}
-		logs.clear();
-		
-		lock = false;
 	}
 	
 	public void add(String s){
-		while(lock){
-			//Nothing
+		synchronized(logs){
+			logs.add(s);
 		}
-		lock = true;
-		logs.add(s);
-		lock = false;
 	}
 	
 	public void close(){
