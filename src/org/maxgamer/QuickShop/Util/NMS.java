@@ -96,7 +96,7 @@ public class NMS{
 		
 		/* ***********************
 		 * **      1.4.6      ** *
-		 * ***********************//*
+		 * ***********************/
 		dep = new NMSDependent("v1_4_6"){
 			@Override
 			public void safeGuard(Item item) {
@@ -131,12 +131,12 @@ public class NMS{
 				return org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asBukkitCopy(is);
 			}
 		};
-		dependents.add(dep);*/
+		dependents.add(dep);
 		
 		/* ***********************
 		 * **      1.4.7      ** *
 		 * ***********************/
-		/*
+		
 		dep = new NMSDependent("v1_4_R1"){
 			@Override
 			public void safeGuard(Item item) {
@@ -170,8 +170,8 @@ public class NMS{
 				net.minecraft.server.v1_4_R1.ItemStack is = net.minecraft.server.v1_4_R1.ItemStack.createStack(c);
 				return org.bukkit.craftbukkit.v1_4_R1.inventory.CraftItemStack.asBukkitCopy(is);
 			}
-		};*/
-		//dependents.add(dep);
+		};
+		dependents.add(dep);
 	}
 	
 	/** The known working NMSDependent. This will be null if we haven't found one yet. */
@@ -188,7 +188,6 @@ public class NMS{
 	 */
 	public static void safeGuard(Item item) throws ClassNotFoundException{
 		rename(item.getItemStack());
-		//validate();
 		nms.safeGuard(item);
 		protect(item);
 	}
@@ -201,7 +200,6 @@ public class NMS{
 	private static void rename(ItemStack iStack){
 		//This stops it merging with other items. * Unless they're named funnily... In which case, shit.
 		ItemMeta meta = iStack.getItemMeta();
-		//TODO: Uncomment this when done debugging 25/02/2013
 		meta.setDisplayName(ChatColor.RED + "QuickShop " + Util.getName(iStack));
 		iStack.setItemMeta(meta);
 	}
