@@ -1,4 +1,4 @@
-package org.maxgamer.QuickShop;
+package org.maxgamer.QuickShop.Util;
 
 import java.io.File;
 import java.io.InputStream;
@@ -16,8 +16,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Shop.Shop;
-import org.maxgamer.QuickShop.Util.Util;
 
 public class MsgUtil{
 	private static QuickShop plugin;

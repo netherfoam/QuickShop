@@ -11,13 +11,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.maxgamer.QuickShop.MsgUtil;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Shop.ChestShop;
 import org.maxgamer.QuickShop.Shop.DisplayItem;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.ShopAction;
+import org.maxgamer.QuickShop.Util.MsgUtil;
 import org.maxgamer.QuickShop.Util.Util;
 
 

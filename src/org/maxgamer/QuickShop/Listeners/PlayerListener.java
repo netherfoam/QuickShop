@@ -20,11 +20,11 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockIterator;
-import org.maxgamer.QuickShop.MsgUtil;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Shop.Info;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.ShopAction;
+import org.maxgamer.QuickShop.Util.MsgUtil;
 import org.maxgamer.QuickShop.Util.Util;
 
 

@@ -18,7 +18,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.util.BlockIterator;
-import org.maxgamer.QuickShop.MsgUtil;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Database.Database;
 import org.maxgamer.QuickShop.Database.MySQL;
@@ -27,6 +26,7 @@ import org.maxgamer.QuickShop.Shop.ChestShop;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.ShopType;
 import org.maxgamer.QuickShop.Shop.ShopChunk;
+import org.maxgamer.QuickShop.Util.MsgUtil;
 
 public class QS implements CommandExecutor{
 	QuickShop plugin;

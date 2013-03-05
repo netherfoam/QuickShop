@@ -31,6 +31,7 @@ import org.maxgamer.QuickShop.Metrics.Metrics;
 import org.maxgamer.QuickShop.Metrics.ShopListener;
 import org.maxgamer.QuickShop.Shop.*;
 import org.maxgamer.QuickShop.Util.Converter;
+import org.maxgamer.QuickShop.Util.MsgUtil;
 import org.maxgamer.QuickShop.Util.Util;
 import org.maxgamer.QuickShop.Watcher.*;
 

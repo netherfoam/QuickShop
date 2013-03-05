@@ -18,11 +18,11 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.maxgamer.QuickShop.QuickShop;
-import org.maxgamer.QuickShop.ShopManager;
 import org.maxgamer.QuickShop.Database.Database;
 import org.maxgamer.QuickShop.Shop.ChestShop;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.ShopChunk;
+import org.maxgamer.QuickShop.Shop.ShopManager;
 import org.maxgamer.QuickShop.Shop.ShopType;
 
 public class Converter{

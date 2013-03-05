@@ -19,8 +19,8 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.maxgamer.QuickShop.MsgUtil;
 import org.maxgamer.QuickShop.QuickShop;
+import org.maxgamer.QuickShop.Util.MsgUtil;
 import org.maxgamer.QuickShop.Util.Util;
 
 public class ChestShop implements Shop{

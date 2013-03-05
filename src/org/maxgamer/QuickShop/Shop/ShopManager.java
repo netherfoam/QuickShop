@@ -1,4 +1,4 @@
-package org.maxgamer.QuickShop;
+package org.maxgamer.QuickShop.Shop;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -20,15 +20,9 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Sign;
+import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Database.Database;
-import org.maxgamer.QuickShop.Shop.ChestShop;
-import org.maxgamer.QuickShop.Shop.Info;
-import org.maxgamer.QuickShop.Shop.Shop;
-import org.maxgamer.QuickShop.Shop.ShopAction;
-import org.maxgamer.QuickShop.Shop.ShopChunk;
-import org.maxgamer.QuickShop.Shop.ShopCreateEvent;
-import org.maxgamer.QuickShop.Shop.ShopPreCreateEvent;
-import org.maxgamer.QuickShop.Shop.ShopPurchaseEvent;
+import org.maxgamer.QuickShop.Util.MsgUtil;
 import org.maxgamer.QuickShop.Util.Util;
 
 public class ShopManager{
