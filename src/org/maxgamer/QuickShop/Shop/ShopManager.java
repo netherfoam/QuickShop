@@ -591,7 +591,7 @@ public class ShopManager{
 				}
 				shops = chunks.next().values().iterator();
 			}
-			if(!shops.hasNext()) return next(); //Skip to the next one (Empty iterator?)
+			if(!shops.hasNext()) return this.next(); //Skip to the next one (Empty iterator?)
 			current = shops.next();
 			return current;
 		}
