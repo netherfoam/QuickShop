@@ -209,9 +209,9 @@ public class ChestShop implements Shop{
 		String world = this.getLocation().getWorld().getName();		
 		int unlimited = this.isUnlimited() ? 1 : 0;
 
-		String q = "UPDATE shops SET owner = ?, item = ?, unlimited = ?, type = ?, price = ? WHERE x = ? AND y = ? and z = ? and world = ?";
+		String q = "UPDATE shops SET owner = ?, itemConfig = ?, unlimited = ?, type = ?, price = ? WHERE x = ? AND y = ? and z = ? and world = ?";
 		try{
-			plugin.getDB().execute(q, this.getOwner(), Util.getNBTBytes(this.getItem()), unlimited, shopType.toID(), this.getPrice(), x, y, z, world);
+			plugin.getDB().execute(q, this.getOwner(), Util.serialize(this.getItem()), unlimited, shopType.toID(), this.getPrice(), x, y, z, world);
 		}
 		catch(Exception e){
 			e.printStackTrace();

@@ -1,5 +1,7 @@
 package org.maxgamer.QuickShop.Util;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
@@ -94,7 +96,7 @@ public class NMS{
 		
 		/* ***********************
 		 * **      1.4.6      ** *
-		 * ***********************/
+		 * ***********************//*
 		dep = new NMSDependent("v1_4_6"){
 			@Override
 			public void safeGuard(Item item) {
@@ -129,11 +131,12 @@ public class NMS{
 				return org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack.asBukkitCopy(is);
 			}
 		};
-		dependents.add(dep);
+		dependents.add(dep);*/
 		
 		/* ***********************
 		 * **      1.4.7      ** *
 		 * ***********************/
+		/*
 		dep = new NMSDependent("v1_4_R1"){
 			@Override
 			public void safeGuard(Item item) {
@@ -167,8 +170,8 @@ public class NMS{
 				net.minecraft.server.v1_4_R1.ItemStack is = net.minecraft.server.v1_4_R1.ItemStack.createStack(c);
 				return org.bukkit.craftbukkit.v1_4_R1.inventory.CraftItemStack.asBukkitCopy(is);
 			}
-		};
-		dependents.add(dep);
+		};*/
+		//dependents.add(dep);
 	}
 	
 	/** The known working NMSDependent. This will be null if we haven't found one yet. */
@@ -185,8 +188,9 @@ public class NMS{
 	 */
 	public static void safeGuard(Item item) throws ClassNotFoundException{
 		rename(item.getItemStack());
-		validate();
+		//validate();
 		nms.safeGuard(item);
+		protect(item);
 	}
 	
 	/** 
@@ -197,6 +201,7 @@ public class NMS{
 	private static void rename(ItemStack iStack){
 		//This stops it merging with other items. * Unless they're named funnily... In which case, shit.
 		ItemMeta meta = iStack.getItemMeta();
+		//TODO: Uncomment this when done debugging 25/02/2013
 		meta.setDisplayName(ChatColor.RED + "QuickShop " + Util.getName(iStack));
 		iStack.setItemMeta(meta);
 	}
@@ -222,6 +227,48 @@ public class NMS{
 	public static ItemStack getItemStack(byte[] bytes) throws ClassNotFoundException{
 		validate();
 		return nms.getItemStack(bytes);
+	}
+	
+	public static void protect(Item item){
+		try{
+			Field itemField = item.getClass().getDeclaredField("item");
+			itemField.setAccessible(true);
+			System.out.println("Checkpoitn!");
+			
+			
+			Object nmsEntityItem = itemField.get(item);
+			Object itemStack = nmsEntityItem.getClass().getMethod("getItemStack").invoke(nmsEntityItem);
+			
+			Field countField;
+			
+			try{
+				countField = itemStack.getClass().getDeclaredField("count");
+			}
+			catch(NoSuchFieldException e){
+				countField = itemStack.getClass().getDeclaredField("a"); // It is called 'a' in obfuscated code (...ForgeModLoader)
+			}
+			countField.setAccessible(true);
+			countField.set(itemStack, 0);
+		}
+		catch(NoSuchFieldException e){
+			e.printStackTrace();
+			System.out.println("[QuickShop] Could not protect item from pickup properly! Dupes are now possible.");
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/**

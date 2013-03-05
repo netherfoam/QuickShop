@@ -13,6 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.material.Sign;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
@@ -207,6 +208,18 @@ public class Util{
 	 */
 	public static ItemStack getItemStack(String nbt) throws UnsupportedEncodingException, ClassNotFoundException{
 		return getItemStack((nbt.getBytes(charset)));
+	}
+	
+	public static String serialize(ItemStack iStack){
+		YamlConfiguration cfg = new YamlConfiguration();
+		cfg.set("item", iStack);
+		return cfg.saveToString();
+	}
+	public static ItemStack deserialize(String config) throws InvalidConfigurationException{
+		YamlConfiguration cfg = new YamlConfiguration();
+		cfg.loadFromString(config);
+		ItemStack stack = cfg.getItemStack("item");
+		return stack;
 	}
 	
 	/**

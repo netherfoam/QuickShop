@@ -3,6 +3,7 @@ package org.maxgamer.QuickShop.Listeners;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,6 +16,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockIterator;
@@ -187,5 +189,14 @@ public class PlayerListener implements Listener{
 	public void onPlayerQuit(PlayerQuitEvent e){
 		//Remove them from the menu
 		plugin.getShopManager().getActions().remove(e.getPlayer().getName());
+	}
+	
+	@EventHandler
+	public void onPlayerPickup(PlayerPickupItemEvent e){
+		ItemStack stack = e.getItem().getItemStack();
+		if(stack.getItemMeta().getDisplayName().startsWith(ChatColor.RED + "QuickShop ")){
+			e.setCancelled(true);
+			//You shouldn't be able to pick up that...
+		}
 	}
 }

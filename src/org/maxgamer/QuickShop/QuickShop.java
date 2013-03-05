@@ -202,7 +202,7 @@ public class QuickShop extends JavaPlugin{
 					worldName = rs.getString("world");
 					World world = Bukkit.getWorld(worldName);
 					
-					ItemStack item = Util.getItemStack(rs.getBytes("item"));
+					ItemStack item = Util.deserialize(rs.getString("itemConfig"));
 					
 					String owner = rs.getString("owner");
 					double price = rs.getDouble("price");
@@ -234,10 +234,6 @@ public class QuickShop extends JavaPlugin{
 					}
 					
 					count++;
-				}
-				catch(ClassNotFoundException e){
-					e.printStackTrace();
-					getLogger().severe("This version of QuickShop is incompatible with this version of bukkit!");
 				}
 				catch(Exception e){
 					e.printStackTrace();
