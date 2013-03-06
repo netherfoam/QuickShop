@@ -231,8 +231,6 @@ public class NMS{
 		try{
 			Field itemField = item.getClass().getDeclaredField("item");
 			itemField.setAccessible(true);
-			System.out.println("Checkpoitn!");
-			
 			
 			Object nmsEntityItem = itemField.get(item);
 			Object itemStack = nmsEntityItem.getClass().getMethod("getItemStack").invoke(nmsEntityItem);
