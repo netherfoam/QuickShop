@@ -194,9 +194,12 @@ public class PlayerListener implements Listener{
 	@EventHandler
 	public void onPlayerPickup(PlayerPickupItemEvent e){
 		ItemStack stack = e.getItem().getItemStack();
-		if(stack.getItemMeta().getDisplayName().startsWith(ChatColor.RED + "QuickShop ")){
-			e.setCancelled(true);
-			//You shouldn't be able to pick up that...
+		try{
+			if(stack.getItemMeta().getDisplayName().startsWith(ChatColor.RED + "QuickShop ")){
+				e.setCancelled(true);
+				//You shouldn't be able to pick up that...
+			}
 		}
+		catch(NullPointerException ex){} //if meta/displayname/stack is null. We don't really care in that case.
 	}
 }
