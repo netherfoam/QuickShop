@@ -2,6 +2,7 @@ package org.maxgamer.QuickShop.Util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
@@ -233,7 +234,16 @@ public class NMS{
 			itemField.setAccessible(true);
 			
 			Object nmsEntityItem = itemField.get(item);
-			Object itemStack = nmsEntityItem.getClass().getMethod("getItemStack").invoke(nmsEntityItem);
+			
+			Method getItemStack;
+			try{
+				getItemStack = nmsEntityItem.getClass().getMethod("getItemStack");
+			}
+			catch(NoSuchMethodException e){
+				getItemStack = nmsEntityItem.getClass().getMethod("d"); //Obfuscated for 'getItemStack'
+			}
+			
+			Object itemStack = getItemStack.invoke(nmsEntityItem);
 			
 			Field countField;
 			
@@ -241,7 +251,7 @@ public class NMS{
 				countField = itemStack.getClass().getDeclaredField("count");
 			}
 			catch(NoSuchFieldException e){
-				countField = itemStack.getClass().getDeclaredField("a"); // It is called 'a' in obfuscated code (...ForgeModLoader)
+				countField = itemStack.getClass().getDeclaredField("a"); // 'count' is called 'a' in obfuscated code (...ForgeModLoader)
 			}
 			countField.setAccessible(true);
 			countField.set(itemStack, 0);
