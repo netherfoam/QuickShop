@@ -72,8 +72,8 @@ public class ShopManager{
 		ItemStack item = shop.getItem();
 		try{
 			//Write it to the database
-			String q = "INSERT INTO shops (owner, price, item, x, y, z, world, unlimited, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-			plugin.getDB().execute(q, shop.getOwner(), shop.getPrice(), Util.getNBTBytes(item), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), loc.getWorld().getName(), (shop.isUnlimited() ? 1 : 0), shop.getShopType().toID());
+			String q = "INSERT INTO shops (owner, price, itemConfig, x, y, z, world, unlimited, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			plugin.getDB().execute(q, shop.getOwner(), shop.getPrice(), Util.serialize(item), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), loc.getWorld().getName(), (shop.isUnlimited() ? 1 : 0), shop.getShopType().toID());
 			
 			//Add it to the world
 			addShop(loc.getWorld().getName(), shop);
