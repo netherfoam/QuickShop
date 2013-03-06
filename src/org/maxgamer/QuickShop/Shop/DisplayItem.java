@@ -42,7 +42,6 @@ public class DisplayItem{
 		
 		this.item = shop.getLocation().getWorld().dropItem(dispLoc, this.iStack);
 		this.item.setVelocity(new Vector(0, 0.1, 0));
-		this.item.setPickupDelay(Integer.MAX_VALUE);
 		
 		if(QuickShop.instance.debug){
 			System.out.println("Spawned item. Safeguarding.");

@@ -188,8 +188,8 @@ public class NMS{
 	 */
 	public static void safeGuard(Item item) throws ClassNotFoundException{
 		rename(item.getItemStack());
-		nms.safeGuard(item);
 		protect(item);
+		item.setPickupDelay(Integer.MAX_VALUE);
 	}
 	
 	/** 
