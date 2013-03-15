@@ -572,6 +572,14 @@ public class ShopManager{
 					if(!worlds.hasNext()){
 						return false;
 					}
+					else{
+						chunks = worlds.next().values().iterator();
+						return hasNext();
+					}
+				}
+				else{
+					shops = chunks.next().values().iterator();
+					return hasNext();
 				}
 			}
 			return true;

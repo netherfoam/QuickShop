@@ -53,10 +53,10 @@ public class Converter{
 			ResultSet rs = ps.executeQuery();
 			
 			String colType = rs.getMetaData().getColumnTypeName(3);
-			ps.close();
-			rs.close();
 			
 			if(rs.next()){
+				ps.close();
+				
 				try{
 					rs.getString("item");
 					if(!colType.equalsIgnoreCase("BLOB")){
@@ -84,6 +84,7 @@ public class Converter{
 			e.printStackTrace();
 			return -1;
 		}
+		
 		
 		try{
 			if(database.hasColumn("shops", "item")){

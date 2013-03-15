@@ -57,7 +57,7 @@ public class Database {
 	 * Reschedules the db watcher
 	 */
 	public void scheduleWatcher(){
-		this.task = Bukkit.getScheduler().runTaskLater(QuickShop.instance, this.dbw, 300);
+		this.task = Bukkit.getScheduler().runTaskLaterAsynchronously(QuickShop.instance, this.dbw, 300);
 	}
 	
 	public BukkitTask getTask(){
