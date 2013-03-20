@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockIterator;
 import org.maxgamer.QuickShop.QuickShop;
@@ -172,6 +173,12 @@ public class PlayerListener implements Listener{
 				return;
 			}
 		}
+	}
+	
+	@EventHandler
+	public void onTeleport(PlayerTeleportEvent e){
+		PlayerMoveEvent me = new PlayerMoveEvent(e.getPlayer(), e.getFrom(), e.getTo());
+		onMove(me);
 	}
 	
 	@EventHandler
