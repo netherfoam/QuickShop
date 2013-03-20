@@ -134,6 +134,7 @@ public class Converter{
 				shops++;
 			}
 			catch(Exception e){
+				e.printStackTrace();
 				System.out.println("Error loading a shop! Coords: "+worldName+" (" + x + ", " + y + ", " + z + ") - Skipping it...");
 			}
 		}
