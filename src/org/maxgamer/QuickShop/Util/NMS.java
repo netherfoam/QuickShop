@@ -13,7 +13,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class NMS{
 	private static ArrayList<NMSDependent> dependents = new ArrayList<NMSDependent>();
-	
+	private static int nextId = 0;
 	static{
 		NMSDependent dep;
 		
@@ -281,7 +281,7 @@ public class NMS{
 	private static void rename(ItemStack iStack){
 		//This stops it merging with other items. * Unless they're named funnily... In which case, shit.
 		ItemMeta meta = iStack.getItemMeta();
-		meta.setDisplayName(ChatColor.RED + "QuickShop " + Util.getName(iStack));
+		meta.setDisplayName(ChatColor.RED + "QuickShop " + Util.getName(iStack) + " " + nextId++);
 		iStack.setItemMeta(meta);
 	}
 	
@@ -308,7 +308,7 @@ public class NMS{
 		return nms.getItemStack(bytes);
 	}
 	
-	public static void protect(Item item){
+	private static void protect(Item item){
 		try{
 			Field itemField = item.getClass().getDeclaredField("item");
 			itemField.setAccessible(true);
