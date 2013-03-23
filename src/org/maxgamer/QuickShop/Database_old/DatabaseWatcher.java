@@ -1,4 +1,4 @@
-package org.maxgamer.QuickShop.Database;
+package org.maxgamer.QuickShop.Database_old;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

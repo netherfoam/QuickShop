@@ -25,6 +25,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.maxgamer.QuickShop.Command.QS;
 import org.maxgamer.QuickShop.Database.Database;
+import org.maxgamer.QuickShop.Database.Database.ConnectionException;
+import org.maxgamer.QuickShop.Database.DatabaseCore;
+import org.maxgamer.QuickShop.Database.MySQLCore;
+import org.maxgamer.QuickShop.Database.SQLiteCore;
 import org.maxgamer.QuickShop.Economy.*;
 import org.maxgamer.QuickShop.Listeners.*;
 import org.maxgamer.QuickShop.Metrics.Metrics;
@@ -134,39 +138,58 @@ public class QuickShop extends JavaPlugin{
 			getLogger().info(limits.toString());
 		}
 		
-		ConfigurationSection dbCfg = getConfig().getConfigurationSection("database");
-		if(dbCfg.getBoolean("mysql")){
-			//MySQL database - Required database be created first.
-			String user = dbCfg.getString("user");
-			String pass = dbCfg.getString("password");
-			String host = dbCfg.getString("host");
-			String port = dbCfg.getString("port");
-			String database = dbCfg.getString("database");
+		try{
+			ConfigurationSection dbCfg = getConfig().getConfigurationSection("database");
+			if(dbCfg.getBoolean("mysql")){
+				//MySQL database - Required database be created first.
+				String user = dbCfg.getString("user");
+				String pass = dbCfg.getString("password");
+				String host = dbCfg.getString("host");
+				String port = dbCfg.getString("port");
+				String database = dbCfg.getString("database");
+				
+				DatabaseCore dbCore = new MySQLCore(host, user, pass, database, port);
+				this.database = new Database(dbCore);
+			}
+			else{
+				//SQLite database - Doing this handles file creation
+				DatabaseCore dbCore = new SQLiteCore(new File(this.getDataFolder(), "shops.db"));
+				this.database = new Database(dbCore);
+			}
 			
-			this.database = new Database(host, port, database, user, pass);
-		}
-		else{
-			//SQLite database - Doing this handles file creation
-			this.database = new Database(new File(this.getDataFolder(), "shops.db"));
-		}
-		
-		/* Creates DB table 'shops' */
-		if(!getDB().hasTable("shops")){
-			try {
-				getDB().createShopsTable();
-			} catch (SQLException e) {
-				e.printStackTrace();
-				getLogger().severe("Could not create shops table");
+			/* Creates DB table 'shops' */
+			if(!getDB().hasTable("shops")){
+				try {
+					//getDB().createShopsTable();
+					//shopManager.checkColumns();
+					shopManager.createShopsTable();
+				} catch (SQLException e) {
+					e.printStackTrace();
+					getLogger().severe("Could not create shops table");
+				}
+			}
+			if(!getDB().hasTable("messages")){
+				try{
+					//getDB().createMessagesTable();
+					shopManager.createMessagesTable();
+				}
+				catch (SQLException e) {
+					e.printStackTrace();
+					getLogger().severe("Could not create messages table");
+				}
 			}
 		}
-		if(!getDB().hasTable("messages")){
-			try{
-				getDB().createMessagesTable();
-			}
-			catch (SQLException e) {
-				e.printStackTrace();
-				getLogger().severe("Could not create messages table");
-			}
+		catch(ConnectionException e){
+			e.printStackTrace();
+			getLogger().severe("Error connecting to database. Aborting plugin load.");
+			getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+			getLogger().severe("Error setting up database. Aborting plugin load.");
+			getServer().getPluginManager().disablePlugin(this);
+			return;
 		}
 		
 		//Make the database up to date
@@ -384,7 +407,6 @@ public class QuickShop extends JavaPlugin{
 			itemWatcherTask.cancel();
 		}
 		if(logWatcher != null){
-			//Bukkit.getScheduler().cancelTask(logWatcher.taskId);
 			logWatcher.task.cancel();
 			logWatcher.close(); //Closes the file
 		}
@@ -393,11 +415,7 @@ public class QuickShop extends JavaPlugin{
 		shopManager.clear();
 		
 		/* Empty the buffer */
-		if(database.getTask() != null){
-			this.database.getTask().cancel();
-			this.database.setTask(null);
-			this.database.getDatabaseWatcher().run();
-		}
+		database.close();
 		
 		try {
 			this.database.getConnection().close();

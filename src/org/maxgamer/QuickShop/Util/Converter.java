@@ -33,18 +33,24 @@ public class Converter{
 	public static int convert(){
 		Database database = QuickShop.instance.getDB();
 		
-		if(database.hasColumn("shops", "itemString")){
-			//Convert.
-			try{
-				convertDatabase_2_9();
-				convertDatabase_3_4();
-				convertDatabase_3_8();
-				return 1;
+		try{
+			if(database.hasColumn("shops", "itemString")){
+				//Convert.
+				try{
+					convertDatabase_2_9();
+					convertDatabase_3_4();
+					convertDatabase_3_8();
+					return 1;
+				}
+				catch(Exception e){
+					e.printStackTrace();
+					return -1;
+				}
 			}
-			catch(Exception e){
-				e.printStackTrace();
-				return -1;
-			}
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+			return -1;
 		}
 		
 		try{

@@ -4,17 +4,22 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.LinkedList;
 
-import org.maxgamer.QuickShop.QuickShop;;
-
-public class SQLite implements DatabaseCore{
+public class SQLiteCore implements DatabaseCore{
 	private Connection connection;
 	private File dbFile;
+	private Thread watcher;
+
 	
-	public SQLite(File dbFile){
+	private volatile LinkedList<BufferStatement> queue = new LinkedList<BufferStatement>();
+	
+	public SQLiteCore(File dbFile){
 		this.dbFile = dbFile;
 	}
+	
 	
 	/**
 	 * Gets the database connection for
@@ -30,7 +35,6 @@ public class SQLite implements DatabaseCore{
 		}
 		catch(SQLException e){
 			e.printStackTrace();
-			QuickShop.instance.getLogger().severe("Could not retrieve SQLite connection!");
 		}
 		
 		if(this.dbFile.exists()){
@@ -58,18 +62,59 @@ public class SQLite implements DatabaseCore{
 				return this.getConnection();
 			} catch (IOException e) {
 				e.printStackTrace();
-				QuickShop.instance.getLogger().severe("Could not create database file!");
 				return null;
 			}
 		}
 	}
 
-	/**
-	 * Prepares a query for the database by fixing 's (Only works for SQLite)
-	 * @param s The string to escape E.g. can't do that :\
-	 * @return The escaped string. E.g. can''t do that :\
-	 */
-	public String escape(String s) {
-		return s.replace("'", "''");
+
+	@Override
+	public void queue(BufferStatement bs) {
+		synchronized(queue){
+			queue.add(bs);
+		}
+		
+		if(watcher == null || !watcher.isAlive()){
+			startWatcher();
+		}
+	}
+	
+	@Override
+	public void flush(){
+		while(queue.isEmpty() == false){
+			BufferStatement bs;
+			synchronized(queue){
+				bs = queue.removeFirst();
+			}
+			
+			try{
+				PreparedStatement ps = bs.prepareStatement(getConnection());
+				ps.execute();
+				ps.close();
+			}
+			catch(SQLException e){
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	@Override
+	public void close(){
+		flush();
+	}
+
+	private void startWatcher(){
+		watcher = new Thread(){
+			@Override
+			public void run(){
+				try{
+					Thread.sleep(30000);
+				}
+				catch(InterruptedException e){}
+				
+				flush();
+			}
+		};
+		watcher.start();
 	}
 }
