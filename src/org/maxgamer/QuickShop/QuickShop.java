@@ -27,6 +27,7 @@ import org.maxgamer.QuickShop.Command.QS;
 import org.maxgamer.QuickShop.Database.Database;
 import org.maxgamer.QuickShop.Database.Database.ConnectionException;
 import org.maxgamer.QuickShop.Database.DatabaseCore;
+import org.maxgamer.QuickShop.Database.DatabaseHelper;
 import org.maxgamer.QuickShop.Database.MySQLCore;
 import org.maxgamer.QuickShop.Database.SQLiteCore;
 import org.maxgamer.QuickShop.Economy.*;
@@ -157,27 +158,8 @@ public class QuickShop extends JavaPlugin{
 				this.database = new Database(dbCore);
 			}
 			
-			/* Creates DB table 'shops' */
-			if(!getDB().hasTable("shops")){
-				try {
-					//getDB().createShopsTable();
-					//shopManager.checkColumns();
-					shopManager.createShopsTable();
-				} catch (SQLException e) {
-					e.printStackTrace();
-					getLogger().severe("Could not create shops table");
-				}
-			}
-			if(!getDB().hasTable("messages")){
-				try{
-					//getDB().createMessagesTable();
-					shopManager.createMessagesTable();
-				}
-				catch (SQLException e) {
-					e.printStackTrace();
-					getLogger().severe("Could not create messages table");
-				}
-			}
+			//Make the database up to date
+			DatabaseHelper.setup(getDB());
 		}
 		catch(ConnectionException e){
 			e.printStackTrace();
@@ -192,8 +174,6 @@ public class QuickShop extends JavaPlugin{
 			return;
 		}
 		
-		//Make the database up to date
-		shopManager.checkColumns();
 		
 		/* Load shops from database to memory */
 		int count = 0; //Shops count

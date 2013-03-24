@@ -19,8 +19,13 @@ public class Database{
 	 */
 	public Database(DatabaseCore core) throws ConnectionException{
 		try{
-			if(!core.getConnection().isValid(10)){
-				throw new ConnectionException("Database doesn not appear to be valid!");
+			try{
+				if(!core.getConnection().isValid(10)){
+					throw new ConnectionException("Database doesn not appear to be valid!");
+				}
+			}
+			catch(AbstractMethodError e){
+				System.out.println("Could not validate: " + core.getClass());
 			}
 		}
 		catch(SQLException e){
