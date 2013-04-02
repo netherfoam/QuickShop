@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Properties;
 
 
@@ -11,8 +12,9 @@ public class MySQLCore implements DatabaseCore{
 	private String url;
 	/** The connection properties... user, pass, autoReconnect.. */
 	private Properties info;
-	/** The actual connection... possibly expired. */
-	private Connection connection;
+	
+	private static final int MAX_CONNECTIONS = 8;
+	private static ArrayList<Connection> pool = new ArrayList<Connection>();
 	
 	public MySQLCore(String host, String user, String pass, String database, String port){
 		info = new Properties();
@@ -22,6 +24,8 @@ public class MySQLCore implements DatabaseCore{
 		info.put("useUnicode", "true");
 		info.put("characterEncoding", "utf8");
 		this.url = "jdbc:mysql://"+host+":"+port+"/"+database;
+		
+		for(int i = 0; i < MAX_CONNECTIONS; i++) pool.add(null);
 	}
 	
 	
@@ -31,39 +35,41 @@ public class MySQLCore implements DatabaseCore{
 	 * @return The database connection
 	 */
 	public Connection getConnection(){
-		try{
-			//If we have a current connection, fetch it
-			if(this.connection != null && !this.connection.isClosed()){
-				if(this.connection.isValid(10)){
-					return this.connection;
+		for(int i = 0; i < MAX_CONNECTIONS; i++){
+			Connection connection = pool.get(i);
+			try{
+				//If we have a current connection, fetch it
+				if(connection != null && !connection.isClosed()){
+					if(connection.isValid(10)){
+						return connection;
+					}
+					//Else, it is invalid, so we return another connection.
 				}
-				//Else, it is invalid, so we return another connection.
+				connection = DriverManager.getConnection(this.url, info);
+				
+				if(i >= MAX_CONNECTIONS) pool.add(connection);
+				else pool.set(i, connection);
+				
+				return connection;
 			}
-			this.connection = DriverManager.getConnection(this.url, info);
-			return this.connection;
-		}
-		catch(SQLException e){
-			e.printStackTrace();
+			catch(SQLException e){
+				e.printStackTrace();
+			}
 		}
 		return null;
 	}
 
-	/**
-	 * Prepares a query for the database by fixing 's (Only works for SQLite)
-	 * @param s The string to escape E.g. can't do that :\
-	 * @return The escaped string. E.g. can''t do that :\
-	 */
-	public String escape(String s) {
-		s = s.replace("\\", "\\\\");
-		s = s.replace("'", "\\'");
-		return s;
-	}
-
-
 	@Override
 	public void queue(BufferStatement bs) {
 		try{
-			PreparedStatement ps = bs.prepareStatement(this.getConnection());
+			Connection con = this.getConnection();
+			while(con == null){
+				try{ Thread.sleep(15);}
+				catch(InterruptedException e){}
+				//Try again
+				this.getConnection();
+			}
+			PreparedStatement ps = bs.prepareStatement(con);
 			ps.execute();
 			ps.close();
 		}
