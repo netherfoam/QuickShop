@@ -84,7 +84,6 @@ public class DisplayItem{
 				//if its the same its a dupe
 				if(this.shop.matches(near)){
 					e.remove();
-					qs.log("[Debug] Removed dupe @" + near.getType());
 					removed = true;
 					if(qs.debug){
 						System.out.println("Removed rogue item: " + near.getType());
