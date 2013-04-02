@@ -18,12 +18,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Util.MsgUtil;
 import org.maxgamer.QuickShop.Util.Util;
 
-public class ChestShop implements Shop{
+public class ContainerShop implements Shop{
 	private Location loc;
 	private double price;
 	private String owner;
@@ -43,11 +44,11 @@ public class ChestShop implements Shop{
 	 * 
 	 * **NOT A DEEP CLONE**
 	 */
-	public ChestShop clone(){
-		return new ChestShop(this);
+	public ContainerShop clone(){
+		return new ContainerShop(this);
 	}
 	
-	private ChestShop(ChestShop s){
+	private ContainerShop(ContainerShop s){
 		this.displayItem = s.displayItem;
 		this.shopType = s.shopType;
 		this.item = s.item;
@@ -65,7 +66,7 @@ public class ChestShop implements Shop{
 	 * @param item The itemstack with the properties we want. This is .cloned, no need to worry about references
 	 * @param owner The player who owns this shop.
 	 */
-	public ChestShop(Location loc, double price, ItemStack item, String owner){
+	public ContainerShop(Location loc, double price, ItemStack item, String owner){
 		this.loc = loc;
 		this.price = price;
 		this.owner = owner;
@@ -85,7 +86,7 @@ public class ChestShop implements Shop{
 	 */
 	public int getRemainingStock(){
 		if(this.unlimited) return 10000;
-		return Util.countItems(this.getChest().getInventory(), this.getItem());
+		return Util.countItems(this.getInventory(), this.getItem());
 	}
 	
 	/**
@@ -95,7 +96,7 @@ public class ChestShop implements Shop{
 	 */
 	public int getRemainingSpace(){
 		if(this.unlimited) return 10000;
-		return Util.countSpace(this.getChest().getInventory(), item);
+		return Util.countSpace(this.getInventory(), item);
 	}
 	/**
 	 * Returns true if the ItemStack matches what this shop is selling/buying
@@ -111,7 +112,7 @@ public class ChestShop implements Shop{
 	 * @return the shop that shares it's inventory with this one.
 	 * Will return null if this shop is not attached to another.
 	 */
-	public ChestShop getAttachedShop(){
+	public ContainerShop getAttachedShop(){
 		if(this.getLocation().getBlock().getType() != Material.CHEST){
 			return null; // Oh, fuck.
 		}
@@ -120,7 +121,7 @@ public class ChestShop implements Shop{
 		
 		if(chest == null) return null;
 		
-		return (ChestShop) plugin.getShopManager().getShop(chest.getLocation());
+		return (ContainerShop) plugin.getShopManager().getShop(chest.getLocation());
 	}
 	
 	/**
@@ -132,7 +133,7 @@ public class ChestShop implements Shop{
 			return null; // Oh, fuck.
 		}
 		
-		if(!(this.getChest().getInventory() instanceof DoubleChestInventory)){
+		if(!(this.getInventory() instanceof DoubleChestInventory)){
 			return null; //Not a double inventory. Not a double chest.
 		}
 		
@@ -149,7 +150,7 @@ public class ChestShop implements Shop{
 	 * @return true if this shop is a double chest, and the other half is selling/buying the same as this is buying/selling.
 	 */
 	public boolean isDoubleShop(){
-		ChestShop nextTo = this.getAttachedShop();
+		ContainerShop nextTo = this.getAttachedShop();
 		if(nextTo == null){
 			return false;
 		}
@@ -228,8 +229,10 @@ public class ChestShop implements Shop{
 	/**
 	 * @return The chest this shop is based on.
 	 */
-	public Chest getChest(){
-		return (Chest) this.loc.getBlock().getState();
+
+	public Inventory getInventory(){
+		InventoryHolder container = (InventoryHolder) this.loc.getBlock().getState();
+		return container.getInventory();
 	}
 	/**
 	 * @return The name of the player who owns the shop.
@@ -256,7 +259,7 @@ public class ChestShop implements Shop{
 	 */
 	public void remove(ItemStack item, int amount){
 		if(this.unlimited) return;
-		Inventory inv = this.getChest().getInventory();
+		Inventory inv = this.getInventory();
 		
 		int remains = amount;
 		
@@ -276,7 +279,7 @@ public class ChestShop implements Shop{
 	public void add(ItemStack item, int amount){
 		if(this.unlimited) return;
 		
-		Inventory inv = this.getChest().getInventory();
+		Inventory inv = this.getInventory();
 		
 		int remains = amount;
 		
@@ -310,7 +313,7 @@ public class ChestShop implements Shop{
 			}
 		}
 		else{
-			ItemStack[] chestContents = this.getChest().getInventory().getContents();
+			ItemStack[] chestContents = this.getInventory().getContents();
 			for(int i = 0; amount > 0 && i < chestContents.length; i++){
 				//Can't clone it here, it could be null
 				ItemStack item = chestContents[i];
@@ -337,7 +340,7 @@ public class ChestShop implements Shop{
 			}
 			
 			//We now have to update the chests inventory manually.
-			this.getChest().getInventory().setContents(chestContents);
+			this.getInventory().setContents(chestContents);
 		}
 		
 		for(int i = 0; i < floor.size(); i++){
@@ -377,7 +380,7 @@ public class ChestShop implements Shop{
 		}
 		else{
 			ItemStack[] playerContents = p.getInventory().getContents();
-			Inventory chestInv = this.getChest().getInventory();
+			Inventory chestInv = this.getInventory();
 			
 			for(int i = 0; amount > 0 && i < playerContents.length; i++){
 				ItemStack item = playerContents[i];
@@ -610,7 +613,7 @@ public class ChestShop implements Shop{
 			}
 		}
 		
-		return this.getLocation().getBlock().getType() == Material.CHEST;
+		return Util.canBeShop(this.getLocation().getBlock());
 	}
 	
 	public void onUnload(){

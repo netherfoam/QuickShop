@@ -13,10 +13,12 @@ import org.bukkit.Material;
 import org.bukkit.material.Sign;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.material.MaterialData;
@@ -27,12 +29,30 @@ import org.maxgamer.QuickShop.QuickShop;
 public class Util{
 	private static HashSet<Material> tools = new HashSet<Material>();
 	private static HashSet<Material> blacklist = new HashSet<Material>();
+	private static HashSet<Material> shoppables = new HashSet<Material>();
+	
 	private static QuickShop plugin;
 	
 	private final static String charset = "ISO-8859-1";
 	
 	static{
 		plugin = QuickShop.instance;
+		
+		for(String s : plugin.getConfig().getStringList("shop-blocks")){
+			Material mat = Material.getMaterial(s.toUpperCase());
+			if(mat == null){
+				try{
+					mat = Material.getMaterial(Integer.parseInt(s));
+				}
+				catch(NumberFormatException e){}
+			}
+			if(mat == null){
+				plugin.getLogger().info("Invalid shop-block: " + s);
+			}
+			else{
+				shoppables.add(mat);
+			}
+		}
 	
 		tools.add(Material.BOW);
 		tools.add(Material.SHEARS);
@@ -120,6 +140,17 @@ public class Util{
 		}
 	}
 	
+	/**
+	 * Returns true if the given block could be used to make a shop out of.
+	 * @param b The block to check. Possibly a chest, dispenser, etc.
+	 * @return True if it can be made into a shop, otherwise false.
+	 */
+	public static boolean canBeShop(Block b){
+		BlockState bs = b.getState();
+		if(bs instanceof InventoryHolder == false) return false;
+		return shoppables.contains(bs.getType());
+	}
+	
 	 /**
 	  * Gets the percentage (Without trailing %) damage on a tool.
 	  * @param item The ItemStack of tools to check
@@ -139,6 +170,8 @@ public class Util{
 	 * @return the block which is also a chest and connected to b.
 	 */
 	public static Block getSecondHalf(Block b){
+		if(b.getType().toString().contains("CHEST") == false) return null;
+		
 		Block[] blocks = new Block[4];
 		blocks[0] = b.getRelative(1, 0, 0);
 		blocks[1] = b.getRelative(-1, 0, 0);
@@ -146,7 +179,7 @@ public class Util{
 		blocks[3] = b.getRelative(0, 0, -1);
 		
 		for(Block c : blocks){
-			if(c.getType() == Material.CHEST){
+			if(c.getType() == b.getType()){
 				return c;
 			}
 		}

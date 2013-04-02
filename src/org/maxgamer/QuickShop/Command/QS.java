@@ -21,7 +21,7 @@ import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Database.Database;
 import org.maxgamer.QuickShop.Database.MySQLCore;
 import org.maxgamer.QuickShop.Database.SQLiteCore;
-import org.maxgamer.QuickShop.Shop.ChestShop;
+import org.maxgamer.QuickShop.Shop.ContainerShop;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.ShopType;
 import org.maxgamer.QuickShop.Shop.ShopChunk;
@@ -184,9 +184,9 @@ public class QS implements CommandExecutor{
 				Block b = bIt.next();
 				Shop shop = plugin.getShopManager().getShop(b.getLocation());
 				if(shop != null){
-					if(shop instanceof ChestShop){
-						ChestShop cs = (ChestShop) shop;
-						cs.getChest().getInventory().clear();
+					if(shop instanceof ContainerShop){
+						ContainerShop cs = (ContainerShop) shop;
+						cs.getInventory().clear();
 						sender.sendMessage(MsgUtil.getMessage("empty-success"));
 						return;
 					}
@@ -360,8 +360,8 @@ public class QS implements CommandExecutor{
 					sender.sendMessage(MsgUtil.getMessage("price-is-now", plugin.getEcon().format(shop.getPrice())));
 				
 					//Chest shops can be double shops.
-					if(shop instanceof ChestShop){
-						ChestShop cs = (ChestShop) shop;
+					if(shop instanceof ContainerShop){
+						ContainerShop cs = (ContainerShop) shop;
 						if(cs.isDoubleShop()){
 							Shop nextTo = cs.getAttachedShop();
 							
@@ -395,8 +395,8 @@ public class QS implements CommandExecutor{
 			int i = 0;
 			while(shIt.hasNext()){
 				Shop shop = shIt.next();
-				if(shop.getLocation().getWorld() != null && shop.isSelling() && shop.getRemainingStock() == 0 && shop instanceof ChestShop){
-					ChestShop cs = (ChestShop) shop;
+				if(shop.getLocation().getWorld() != null && shop.isSelling() && shop.getRemainingStock() == 0 && shop instanceof ContainerShop){
+					ContainerShop cs = (ContainerShop) shop;
 					if(cs.isDoubleShop()) continue;
 					shIt.remove(); //Is selling, but has no stock, and is a chest shop, but is not a double shop.  Can be deleted safely.
 					i++;
@@ -492,7 +492,7 @@ public class QS implements CommandExecutor{
 									selling++;
 								}
 								
-								if(shop instanceof ChestShop && ((ChestShop) shop).isDoubleShop()){
+								if(shop instanceof ContainerShop && ((ContainerShop) shop).isDoubleShop()){
 									doubles++;
 								}
 								else if(shop.isSelling() && shop.getRemainingStock() == 0){

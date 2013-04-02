@@ -24,6 +24,6 @@ public class HeroChatListener implements Listener{
 	public void onHeroChat(ChannelChatEvent e){
 		if(!plugin.getShopManager().getActions().containsKey(e.getSender().getName())) return;
 		plugin.getShopManager().handleChat(e.getSender().getPlayer(), e.getMessage());
-		e.setResult(Result.BAD_PASSWORD);
+		e.setResult(Result.FAIL);
 	}
 }

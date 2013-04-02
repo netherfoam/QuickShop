@@ -19,7 +19,7 @@ import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Database.Database;
-import org.maxgamer.QuickShop.Shop.ChestShop;
+import org.maxgamer.QuickShop.Shop.ContainerShop;
 import org.maxgamer.QuickShop.Shop.Shop;
 import org.maxgamer.QuickShop.Shop.ShopChunk;
 import org.maxgamer.QuickShop.Shop.ShopManager;
@@ -132,7 +132,7 @@ public class Converter{
 				Location loc = new Location(world, x, y, z);
 				
 				int type = rs.getInt("type");
-				Shop shop = new ChestShop(loc, price, item, owner);
+				Shop shop = new ContainerShop(loc, price, item, owner);
 				shop.setUnlimited(rs.getBoolean("unlimited"));
 				shop.setShopType(ShopType.fromID(type));
 				
@@ -252,7 +252,7 @@ public class Converter{
 				Location loc = new Location(world, x, y, z);
 				
 				int type = rs.getInt("type");
-				Shop shop = new ChestShop(loc, price, item, owner);
+				Shop shop = new ContainerShop(loc, price, item, owner);
 				shop.setUnlimited(rs.getBoolean("unlimited"));
 				shop.setShopType(ShopType.fromID(type));
 				
@@ -374,7 +374,7 @@ public class Converter{
 				Location loc = new Location(world, x, y, z);
 				
 				int type = rs.getInt("type");
-				Shop shop = new ChestShop(loc, price, item, owner);
+				Shop shop = new ContainerShop(loc, price, item, owner);
 				shop.setUnlimited(rs.getBoolean("unlimited"));
 				shop.setShopType(ShopType.fromID(type));
 				

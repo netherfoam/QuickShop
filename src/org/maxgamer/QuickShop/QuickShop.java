@@ -16,10 +16,10 @@ import java.util.Map.Entry;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -69,8 +69,6 @@ public class QuickShop extends JavaPlugin{
 	private BukkitTask itemWatcherTask;
 	private LogWatcher logWatcher;
 	
-	/** Whether shops should be locked from other players opening them */
-	public boolean lock;
 	/** Whether players are required to sneak to create a shop */
 	public boolean sneak;
 	/** Whether we should use display items or not */
@@ -125,6 +123,11 @@ public class QuickShop extends JavaPlugin{
 			//Logger Handler
 			this.logWatcher = new LogWatcher(this, new File(this.getDataFolder(), "qs.log"));
 			logWatcher.task = Bukkit.getScheduler().runTaskTimerAsynchronously(this, this.logWatcher, 150, 150);
+		}
+		
+		if(getConfig().getBoolean("shop.lock")){
+			LockListener ll = new LockListener(this);
+			getServer().getPluginManager().registerEvents(ll, this);
 		}
 		
 		ConfigurationSection limitCfg = this.getConfig().getConfigurationSection("limits");
@@ -212,8 +215,8 @@ public class QuickShop extends JavaPlugin{
 					double price = rs.getDouble("price");
 					Location loc = new Location(world, x, y, z);
 					/* Skip invalid shops, if we know of any */
-					if(world != null && loc.getBlock().getType() != Material.CHEST){
-						getLogger().info("Shop is not a chest in " +rs.getString("world") + " at: " + x + ", " + y + ", " + z + ".  Deleting.");
+					if(world != null && loc.getBlock().getState() instanceof InventoryHolder == false){
+						getLogger().info("Shop is not an InventoryHolder in " +rs.getString("world") + " at: " + x + ", " + y + ", " + z + ".  Deleting.");
 						PreparedStatement delps = getDB().getConnection().prepareStatement("DELETE FROM shops WHERE x = ? AND y = ? and z = ? and world = ?");
 						delps.setInt(1, x);
 						delps.setInt(2, y);
@@ -226,7 +229,7 @@ public class QuickShop extends JavaPlugin{
 					
 					int type = rs.getInt("type");
 					
-					Shop shop = new ChestShop(loc, price, item, owner);
+					Shop shop = new ContainerShop(loc, price, item, owner);
 					shop.setUnlimited(rs.getBoolean("unlimited"));
 					
 					shop.setShopType(ShopType.fromID(type));
@@ -320,7 +323,7 @@ public class QuickShop extends JavaPlugin{
 		//Load quick variables
 		this.display = this.getConfig().getBoolean("shop.display-items"); 
 		this.sneak = this.getConfig().getBoolean("shop.sneak-only");
-		this.lock = this.getConfig().getBoolean("shop.lock");
+		//this.lock = this.getConfig().getBoolean("shop.lock");
 		this.priceChangeRequiresFee = this.getConfig().getBoolean("shop.price-change-requires-fee");
 		
 		MsgUtil.loadCfgMessages();

@@ -29,6 +29,18 @@ limits:
     ranks:
         quickshop.vip: 20 #Players with quickshop.vip can make 20 shops.
 
+#A list of block (materials) which can be used to create shops.
+#By default, chests are added to this list.
+#This will only work for blocks which implement InventoryHolder
+#in other words, no enderchest shops, no shops on dirt blocks, etc.
+#May cause unexpected behaviour with some blocks... Eg don't make a 
+#shop on a hopper (It sucks the display item in) and furnace shops
+#allow players to put whatever item they want in all 3 slots and
+#dispenser shops aren't protected from redstone... Etc.
+shop-blocks:
+    - CHEST
+    - TRAPPED_CHEST
+
 shop:
     #Cost to make a stall
     cost: 10

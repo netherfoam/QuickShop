@@ -268,7 +268,7 @@ public class ShopManager{
 							return;
 						}
 						
-						if(info.getLocation().getBlock().getType() != Material.CHEST){
+						if(Util.canBeShop(info.getLocation().getBlock()) == false){
 							p.sendMessage(MsgUtil.getMessage("chest-was-removed"));
 							return;
 						}
@@ -288,7 +288,7 @@ public class ShopManager{
 						}
 						
 						//Create the sample shop.
-						Shop shop = new ChestShop(info.getLocation(), price, info.getItem(), p.getName());
+						Shop shop = new ContainerShop(info.getLocation(), price, info.getItem(), p.getName());
 						shop.onLoad();
 						
 						ShopCreateEvent e = new ShopCreateEvent(shop, p);
@@ -338,8 +338,8 @@ public class ShopManager{
 							
 							shop.setSignText();
 						}
-						if(shop instanceof ChestShop){
-							ChestShop cs = (ChestShop) shop;
+						if(shop instanceof ContainerShop){
+							ContainerShop cs = (ContainerShop) shop;
 							if(cs.isDoubleShop()){
 								Shop nextTo = cs.getAttachedShop();
 								
@@ -371,7 +371,7 @@ public class ShopManager{
 					Shop shop = plugin.getShopManager().getShop(info.getLocation());
 					
 					//It's not valid anymore
-					if(shop == null || info.getLocation().getBlock().getType() != Material.CHEST){
+					if(shop == null || Util.canBeShop(info.getLocation().getBlock()) == false){
 						p.sendMessage(MsgUtil.getMessage("chest-was-removed"));
 						return;
 					}

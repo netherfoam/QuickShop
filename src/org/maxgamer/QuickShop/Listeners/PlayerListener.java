@@ -1,6 +1,7 @@
 package org.maxgamer.QuickShop.Listeners;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -8,6 +9,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -35,43 +37,39 @@ public class PlayerListener implements Listener{
 		this.plugin = plugin;
 	}
 	
+	private LinkedList<String> getParents(Class<?> clazz){
+		LinkedList<String> classes = new LinkedList<String>();
+		
+		while(clazz != null){
+			classes.add("Extends " + ChatColor.GREEN + clazz.getCanonicalName());
+			for(Class<?> iface : clazz.getInterfaces()){
+				classes.add("Implements " + ChatColor.RED + iface.getCanonicalName());
+				classes.addAll(getParents(iface));
+			}
+			
+			clazz = clazz.getSuperclass();
+		}
+		return classes;
+	}
+	
 	/**
 	 * Handles players left clicking a chest.
 	 * Left click a NORMAL chest with item	: Send creation menu
 	 * Left click a SHOP   chest			: Send purchase menu
 	 */
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void onClick(PlayerInteractEvent e){
-		if(e.isCancelled()) return;
+		if(e.getAction() != Action.LEFT_CLICK_BLOCK) return;
+		
 		Block b = e.getClickedBlock();
-		if(b == null) return; //Interacted with air
-		if(b.getType() != Material.CHEST && b.getType() != Material.WALL_SIGN) return;
+		BlockState bs = b.getState();
+
 		
-		if(plugin.lock && e.getAction() == Action.RIGHT_CLICK_BLOCK && e.getClickedBlock().getType() == Material.CHEST){
-			Shop shop = plugin.getShopManager().getShop(e.getClickedBlock().getLocation());
-			
-			//Make sure they're not using the non-shop half of a double chest.
-			if(shop == null){
-				b = Util.getSecondHalf(b);
-				if(b != null){
-					shop = plugin.getShopManager().getShop(b.getLocation());
-				}
-			}
-			
-			if(shop != null && !shop.getOwner().equalsIgnoreCase(e.getPlayer().getName())){
-				if(e.getPlayer().hasPermission("quickshop.other.open")){
-					e.getPlayer().sendMessage(MsgUtil.getMessage("bypassing-lock"));
-					return;
-				}
-				e.getPlayer().sendMessage(MsgUtil.getMessage("that-is-locked"));
-				e.setCancelled(true);
-				return;
-			}
-		}
-		if(e.getAction() != Action.LEFT_CLICK_BLOCK){
-			return;
+		for(String s : getParents(bs.getClass())){
+			e.getPlayer().sendMessage(s);
 		}
 		
+		if(!Util.canBeShop(b) && b.getType() != Material.WALL_SIGN) return;
 		Player p = e.getPlayer();
 		
 		if(plugin.sneak && !p.isSneaking()){
@@ -114,7 +112,7 @@ public class PlayerListener implements Listener{
 			return;
 		}
 		//Handles creating shops
-		else if(shop == null && item != null && item.getType() != Material.AIR && p.hasPermission("quickshop.create.sell") && b.getType() == Material.CHEST && p.getGameMode() != GameMode.CREATIVE){
+		else if(shop == null && item != null && item.getType() != Material.AIR && p.hasPermission("quickshop.create.sell") && Util.canBeShop(b) && p.getGameMode() != GameMode.CREATIVE){
 			if(!plugin.getShopManager().canBuildShop(p, b, e.getBlockFace())){
 				//As of the new checking system, most plugins will tell the player why they can't create a shop there.
 				//So telling them a message would cause spam etc.
