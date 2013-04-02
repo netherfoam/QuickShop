@@ -22,7 +22,6 @@ public class DisplayItem{
 	
 	/**
 	 * Creates a new display item.
-	 * @param plugin The plugin creating the display item.
 	 * @param shop The shop (See Shop)
 	 * @param iStack The item stack to clone properties of the display item from.
 	 */

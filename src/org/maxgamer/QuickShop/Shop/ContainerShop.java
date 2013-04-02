@@ -613,6 +613,11 @@ public class ContainerShop implements Shop{
 			}
 		}
 		
+		if(this.getDisplayItem().getDisplayLocation().getBlock().getType().isSolid()){
+			this.getDisplayItem().remove();
+			this.displayItem = null; //You are in a solid block.
+		}
+		
 		return Util.canBeShop(this.getLocation().getBlock());
 	}
 	
@@ -625,6 +630,11 @@ public class ContainerShop implements Shop{
 	public void onLoad(){
 		if(plugin.display){
 			this.displayItem = new DisplayItem(this, this.getItem());
+			if(this.getDisplayItem().getDisplayLocation().getBlock().getType().isSolid()){
+				this.displayItem = null;
+				return; //You are in a solid block.
+			}
+			
 			this.getDisplayItem().removeDupe();
 			this.getDisplayItem().respawn();
 		}
