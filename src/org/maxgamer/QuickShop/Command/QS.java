@@ -35,7 +35,7 @@ public class QS implements CommandExecutor{
 	
 	private void setUnlimited(CommandSender sender){
 		if(sender instanceof Player && sender.hasPermission("quickshop.unlimited")){
-			BlockIterator bIt = new BlockIterator((LivingEntity) (Player) sender, 10);
+			BlockIterator bIt = new BlockIterator((Player) sender, 10);
 			while(bIt.hasNext()){
 				Block b = bIt.next();
 				Shop shop = plugin.getShopManager().getShop(b.getLocation());
@@ -53,6 +53,34 @@ public class QS implements CommandExecutor{
 			sender.sendMessage(MsgUtil.getMessage("no-permission"));
 			return;
 		}
+	}
+	
+	private void remove(CommandSender sender, String[] args){
+		if(sender instanceof Player == false){
+			sender.sendMessage(ChatColor.RED + "Only players may use that command.");
+			return;
+		}
+		if(!sender.hasPermission("quickshop.delete")){
+			sender.sendMessage(ChatColor.RED + "You do not have permission to use that command. Try break the shop instead?");
+			return;
+		}
+		Player p = (Player) sender;
+		BlockIterator bIt = new BlockIterator(p, 10);
+		while(bIt.hasNext()){
+			Block b = bIt.next();
+			Shop shop = plugin.getShopManager().getShop(b.getLocation());
+			if(shop != null){
+				if(shop.getOwner().equalsIgnoreCase(p.getName())){
+					shop.delete();
+					sender.sendMessage(ChatColor.GREEN + "Success. Deleted shop.");
+				}
+				else{
+					p.sendMessage(ChatColor.RED + "That's not your shop!");
+				}
+				return;
+			}
+		}
+		p.sendMessage(ChatColor.RED + "No shop found!");
 	}
 	
 	private void export(CommandSender sender, String[] args){
@@ -86,7 +114,7 @@ public class QS implements CommandExecutor{
 			}
 			return;
 		}
-	if(type.startsWith("sql") || type.contains("file")){
+		if(type.startsWith("sql") || type.contains("file")){
 			if(plugin.getDB().getCore() instanceof SQLiteCore){
 				sender.sendMessage(ChatColor.RED + "Database is already SQLite");
 				return;
@@ -447,12 +475,13 @@ public class QS implements CommandExecutor{
 				setSell(sender);
 				return true;
 			}
-			
 			else if(subArg.startsWith("price")){
 				setPrice(sender, args);
 				return true;
 			}
-			
+			else if(subArg.equals("remove")){
+				remove(sender, args);
+			}
 			else if(subArg.equals("refill")){
 				refill(sender, args);
 				return true;
