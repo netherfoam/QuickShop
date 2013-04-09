@@ -47,8 +47,7 @@ public class MySQLCore implements DatabaseCore{
 				}
 				connection = DriverManager.getConnection(this.url, info);
 				
-				if(i >= MAX_CONNECTIONS) pool.add(connection);
-				else pool.set(i, connection);
+				pool.set(i, connection);
 				
 				return connection;
 			}
