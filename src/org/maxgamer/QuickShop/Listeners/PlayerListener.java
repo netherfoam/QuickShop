@@ -1,7 +1,6 @@
 package org.maxgamer.QuickShop.Listeners;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -9,7 +8,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -36,7 +34,7 @@ public class PlayerListener implements Listener{
 	public PlayerListener(QuickShop plugin){
 		this.plugin = plugin;
 	}
-	
+	/* Could be useful one day
 	private LinkedList<String> getParents(Class<?> clazz){
 		LinkedList<String> classes = new LinkedList<String>();
 		
@@ -50,7 +48,7 @@ public class PlayerListener implements Listener{
 			clazz = clazz.getSuperclass();
 		}
 		return classes;
-	}
+	}*/
 	
 	/**
 	 * Handles players left clicking a chest.
@@ -62,12 +60,12 @@ public class PlayerListener implements Listener{
 		if(e.getAction() != Action.LEFT_CLICK_BLOCK) return;
 		
 		Block b = e.getClickedBlock();
-		BlockState bs = b.getState();
+		//BlockState bs = b.getState();
 
-		
+		/*
 		for(String s : getParents(bs.getClass())){
 			e.getPlayer().sendMessage(s);
-		}
+		}*/
 		
 		if(!Util.canBeShop(b) && b.getType() != Material.WALL_SIGN) return;
 		Player p = e.getPlayer();

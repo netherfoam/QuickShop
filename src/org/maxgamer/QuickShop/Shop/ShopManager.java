@@ -274,7 +274,13 @@ public class ShopManager{
 						}
 						
 						//Price per item
-						double price = Double.parseDouble(message);
+						double price;
+						if(plugin.getConfig().getBoolean("whole-number-prices-only")){
+							price = Integer.parseInt(message);
+						}
+						else{
+							price = Double.parseDouble(message);
+						}
 						if(price < 0.01){
 							p.sendMessage(MsgUtil.getMessage("price-too-cheap"));
 							return;

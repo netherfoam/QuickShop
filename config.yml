@@ -13,6 +13,9 @@ log-actions: true
 # Want yours added? Contact me (Netherfoam) on dev.bukkit.org
 economy: Vault
 
+#For item-item based economies that don't use virtual coins.
+whole-number-prices-only: false
+
 database:
     mysql: false
     host: localhost
