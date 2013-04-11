@@ -560,7 +560,7 @@ public class ContainerShop implements Shop{
 	public void delete(boolean fromMemory){
 		//Delete the display item
 		
-		if(plugin.display){
+		if(plugin.display && this.getDisplayItem() != null){
 			this.getDisplayItem().remove();
 		}
 		
