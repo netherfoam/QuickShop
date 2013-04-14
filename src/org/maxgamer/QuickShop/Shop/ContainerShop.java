@@ -613,7 +613,7 @@ public class ContainerShop implements Shop{
 			}
 		}
 		
-		if(this.getDisplayItem() != null && this.getDisplayItem().getDisplayLocation().getBlock().getType().isSolid()){
+		if(this.getDisplayItem() != null && this.getDisplayItem().getDisplayLocation().getBlock().getType().isOccluding()){
 			this.getDisplayItem().remove();
 			this.displayItem = null; //You are in a solid block.
 		}
