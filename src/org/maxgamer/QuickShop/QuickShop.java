@@ -197,6 +197,7 @@ public class QuickShop extends JavaPlugin{
 			PreparedStatement ps = con.prepareStatement("SELECT * FROM shops");
 			ResultSet rs = ps.executeQuery();
 			
+			int errors = 0;
 			while(rs.next()){
 				int x = 0;
 				int y = 0;
@@ -243,8 +244,23 @@ public class QuickShop extends JavaPlugin{
 					count++;
 				}
 				catch(Exception e){
+					errors++;
 					e.printStackTrace();
-					getLogger().severe("Error loading a shop! Coords: "+worldName+" (" + x + ", " + y + ", " + z + ") - Skipping it...");
+					getLogger().severe("Error loading a shop! Coords: "+worldName+" (" + x + ", " + y + ", " + z + ")...");
+					if(errors < 3){
+						getLogger().info("Deleting the shop...");
+						PreparedStatement delps = getDB().getConnection().prepareStatement("DELETE FROM shops WHERE x = ? AND y = ? and z = ? and world = ?");
+						delps.setInt(1, x);
+						delps.setInt(2, y);
+						delps.setInt(3, z);
+						delps.setString(4, worldName);
+						
+						delps.execute();
+					}
+					else{
+						getLogger().severe("Multiple errors in shops - Something seems to be wrong with your shops database! Please check it out immediately!");
+						e.printStackTrace();
+					}
 				}
 			}
 			
