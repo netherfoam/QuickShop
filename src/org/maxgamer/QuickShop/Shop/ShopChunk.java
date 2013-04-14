@@ -4,10 +4,12 @@ public class ShopChunk {
 	private String world;
 	private int x;
 	private int z;
+	private int hash = 0;
 	public ShopChunk(String world, int x, int z){
 		this.world = world;
 		this.x = x;
 		this.z = z;
+		this.hash = this.x * this.z + world.hashCode();
 	}
 	
 	public int getX(){
@@ -33,7 +35,7 @@ public class ShopChunk {
 	
 	@Override
 	public int hashCode(){
-		return this.x * this.z + world.hashCode();
+		return hash;
 	}
 
 }
