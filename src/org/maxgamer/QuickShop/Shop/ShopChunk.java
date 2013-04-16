@@ -9,7 +9,7 @@ public class ShopChunk {
 		this.world = world;
 		this.x = x;
 		this.z = z;
-		this.hash = this.x * this.z + world.hashCode();
+		this.hash = this.x * this.z; //We don't need to use the world's hash, as these are seperated by world in memory
 	}
 	
 	public int getX(){
