@@ -11,7 +11,7 @@ import java.util.LinkedList;
 public class SQLiteCore implements DatabaseCore{
 	private Connection connection;
 	private File dbFile;
-	private Thread watcher;
+	private volatile Thread watcher;
 
 	
 	private volatile LinkedList<BufferStatement> queue = new LinkedList<BufferStatement>();
@@ -87,13 +87,15 @@ public class SQLiteCore implements DatabaseCore{
 				bs = queue.removeFirst();
 			}
 			
-			try{
-				PreparedStatement ps = bs.prepareStatement(getConnection());
-				ps.execute();
-				ps.close();
-			}
-			catch(SQLException e){
-				e.printStackTrace();
+			synchronized(dbFile){
+				try{
+					PreparedStatement ps = bs.prepareStatement(getConnection());
+					ps.execute();
+					ps.close();
+				}
+				catch(SQLException e){
+					e.printStackTrace();
+				}
 			}
 		}
 	}
