@@ -10,13 +10,11 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -113,36 +111,9 @@ public class ContainerShop implements Shop{
 	 * Will return null if this shop is not attached to another.
 	 */
 	public ContainerShop getAttachedShop(){
-		if(this.getLocation().getBlock().getType() != Material.CHEST){
-			return null; // Oh, fuck.
-		}
+		Block c = Util.getSecondHalf(this.getLocation().getBlock());
 		
-		Chest chest = getOtherHalf();
-		
-		if(chest == null) return null;
-		
-		return (ContainerShop) plugin.getShopManager().getShop(chest.getLocation());
-	}
-	
-	/**
-	 * Returns the other half of this shops double chest, or null if it is a single chest.
-	 * @return the other half of this shops double chest, or null if it is a single chest.
-	 */
-	public Chest getOtherHalf(){
-		if(this.getLocation().getBlock().getType() != Material.CHEST){
-			return null; // Oh, fuck.
-		}
-		
-		if(!(this.getInventory() instanceof DoubleChestInventory)){
-			return null; //Not a double inventory. Not a double chest.
-		}
-		
-		Block b = Util.getSecondHalf(this.loc.getBlock());
-		if(b == null){
-			return null; //You're a double chest in a single block, you say? That's nice.
-		}
-		
-		return (Chest) b.getState();
+		return (ContainerShop) plugin.getShopManager().getShop(c.getLocation());
 	}
 	
 	/**
