@@ -92,7 +92,11 @@ public class ShopManager{
 	 * @return
 	 */
 	public HashMap<Location, Shop> getShops(Chunk c){
-		return getShops(c.getWorld().getName(), c.getX(), c.getZ());
+		//long start = System.nanoTime();
+		HashMap<Location, Shop> shops = getShops(c.getWorld().getName(), c.getX(), c.getZ());
+		//long end = System.nanoTime();
+		//System.out.println("Chunk lookup in " + ((end - start)/1000000.0) + "ms.");
+		return shops;
 	}
 	
 	public HashMap<Location, Shop> getShops(String world, int chunkX, int chunkZ){

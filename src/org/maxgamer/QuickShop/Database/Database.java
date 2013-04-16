@@ -25,7 +25,7 @@ public class Database{
 				}
 			}
 			catch(AbstractMethodError e){
-				System.out.println("Could not validate: " + core.getClass());
+				//You don't need to validate this core.
 			}
 		}
 		catch(SQLException e){
