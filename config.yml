@@ -24,12 +24,15 @@ database:
     user: root
     password: passwd
     
-# Not working yet.
+#Limits the number of shops a person can create and own at a single time.
 limits:
-    #Disable these if you're not using them!
+    #Disable these if you're not using them! If this is false, the rest of this section is ignored
     use: false
+    #The default number of shops players can make
     default: 10
+    #Players with these permissions can create these amounts of shops.
     ranks:
+        #Anyone with 'quickshop.vip' permissions, can create 20 shops instead of 10.
         quickshop.vip: 20 #Players with quickshop.vip can make 20 shops.
 
 #A list of block (materials) which can be used to create shops.
