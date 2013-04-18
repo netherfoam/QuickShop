@@ -233,7 +233,8 @@ public class Util{
 	}
 	
 	public static boolean isTransparent(Material m){
-		return transparent.contains(m);
+		boolean trans = transparent.contains(m); 
+		return trans;
 	}
 	
 	public static void addTransparentBlock(Material m){

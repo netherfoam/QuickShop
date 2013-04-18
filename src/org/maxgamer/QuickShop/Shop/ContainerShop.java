@@ -566,31 +566,46 @@ public class ContainerShop implements Shop{
 	}
 	
 	public boolean isValid(){
-		if(plugin.display && this.getDisplayItem() != null){
-			DisplayItem disItem = this.getDisplayItem();
-			Location dispLoc = disItem.getDisplayLocation();
-			
-			if(dispLoc.getBlock().getType() == Material.WATER){ //Flowing water.  Stationery water does not move items.
-				disItem.remove();
-			}
-			if(disItem.getItem() != null){
-				Item item = disItem.getItem();
-				if(item.getLocation().distanceSquared(dispLoc) > 1){
-					item.teleport(dispLoc, TeleportCause.PLUGIN);
-				}
-				if(item.getTicksLived() > 5000 || disItem.getItem().isDead()){
-					if(disItem.removeDupe()) plugin.log("[Debug] Item watcher was forced to remove that!");
-					disItem.respawn();
-				}
-			}
-		}
-		
-		if(this.getDisplayItem() != null && Util.isTransparent(this.getDisplayItem().getDisplayLocation().getBlock().getType()) == false){
-			this.getDisplayItem().remove();
-			this.displayItem = null; //You are in a solid block.
-		}
+		checkDisplay();
 		
 		return Util.canBeShop(this.getLocation().getBlock());
+	}
+	
+	private void checkDisplay(){
+		System.out.println("Checking " + getItem().getType());
+		boolean trans = Util.isTransparent(getLocation().clone().add(0.5, 1.2, 0.5).getBlock().getType());
+		
+		if(this.getDisplayItem() != null){
+			if(!trans){ //We have a display item in a block... delete it
+				this.getDisplayItem().remove();
+				this.displayItem = null;
+			}
+			else{
+				DisplayItem disItem = this.getDisplayItem();
+				Location dispLoc = disItem.getDisplayLocation();
+				
+				if(dispLoc.getBlock().getType() == Material.WATER){ //Flowing water.  Stationery water does not move items.
+					disItem.remove();
+				}
+				if(disItem.getItem() != null){
+					Item item = disItem.getItem();
+					if(item.getLocation().distanceSquared(dispLoc) > 1){
+						item.teleport(dispLoc, TeleportCause.PLUGIN);
+					}
+					if(item.getTicksLived() > 5000 || disItem.getItem().isDead()){
+						disItem.respawn();
+					}
+				}
+			}
+		}
+		if(plugin.display && trans){
+			if(this.getDisplayItem() == null){
+				this.displayItem = new DisplayItem(this, this.getItem());
+			}
+			if(this.getDisplayItem().getItem() == null){
+				this.getDisplayItem().spawn();
+			}
+		}
 	}
 	
 	public void onUnload(){
@@ -600,16 +615,7 @@ public class ContainerShop implements Shop{
 		}
 	}
 	public void onLoad(){
-		if(plugin.display){
-			this.displayItem = new DisplayItem(this, this.getItem());
-			if(this.getDisplayItem().getDisplayLocation().getBlock().getType().isSolid()){
-				this.displayItem = null;
-				return; //You are in a solid block.
-			}
-			
-			this.getDisplayItem().removeDupe();
-			this.getDisplayItem().respawn();
-		}
+		checkDisplay();
 	}
 	public void onClick(){
 		this.setSignText();
