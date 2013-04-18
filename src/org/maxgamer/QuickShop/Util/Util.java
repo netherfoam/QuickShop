@@ -30,6 +30,7 @@ public class Util{
 	private static HashSet<Material> tools = new HashSet<Material>();
 	private static HashSet<Material> blacklist = new HashSet<Material>();
 	private static HashSet<Material> shoppables = new HashSet<Material>();
+	private static HashSet<Material> transparent = new HashSet<Material>();
 	
 	private static QuickShop plugin;
 	
@@ -125,6 +126,121 @@ public class Util{
 			}
 			blacklist.add(mat);
 		}
+		
+		transparent.clear();
+		//ToDo: add extras to config file
+		addTransparentBlock(Material.AIR);
+		/* Misc */
+		addTransparentBlock(Material.CAKE_BLOCK);
+		
+		/* Redstone Material */
+		addTransparentBlock(Material.REDSTONE_WIRE);
+		
+		/* Redstone Torches */
+		addTransparentBlock(Material.REDSTONE_TORCH_OFF);
+		addTransparentBlock(Material.REDSTONE_TORCH_ON);
+		
+		/* Diodes (Repeaters) */
+		addTransparentBlock(Material.DIODE_BLOCK_OFF);
+		addTransparentBlock(Material.DIODE_BLOCK_ON);
+		
+		/* Power Sources */
+		addTransparentBlock(Material.DETECTOR_RAIL);
+		addTransparentBlock(Material.LEVER);
+		addTransparentBlock(Material.STONE_BUTTON);
+		addTransparentBlock(Material.WOOD_BUTTON);
+		addTransparentBlock(Material.STONE_PLATE);
+		addTransparentBlock(Material.WOOD_PLATE);
+		
+		/* Nature Material */
+		addTransparentBlock(Material.RED_MUSHROOM);
+		addTransparentBlock(Material.BROWN_MUSHROOM);
+		
+		addTransparentBlock(Material.RED_ROSE);
+		addTransparentBlock(Material.YELLOW_FLOWER);
+		
+		addTransparentBlock(Material.FLOWER_POT);
+
+		/* Greens */
+		addTransparentBlock(Material.LONG_GRASS);
+		addTransparentBlock(Material.VINE);
+		addTransparentBlock(Material.WATER_LILY);
+
+		/* Seedy things */
+		addTransparentBlock(Material.MELON_STEM);
+		addTransparentBlock(Material.PUMPKIN_STEM);
+		addTransparentBlock(Material.CROPS);
+		addTransparentBlock(Material.NETHER_WARTS);
+		
+		/* Semi-nature */
+		addTransparentBlock(Material.SNOW);
+		addTransparentBlock(Material.FIRE);
+		addTransparentBlock(Material.WEB);
+		addTransparentBlock(Material.TRIPWIRE);
+		addTransparentBlock(Material.TRIPWIRE_HOOK);
+		
+		/* Stairs */
+		addTransparentBlock(Material.COBBLESTONE_STAIRS);
+		addTransparentBlock(Material.BRICK_STAIRS);
+		addTransparentBlock(Material.SANDSTONE_STAIRS);
+		addTransparentBlock(Material.NETHER_BRICK_STAIRS);
+		addTransparentBlock(Material.SMOOTH_STAIRS);
+		
+		/* Wood Stairs */
+		addTransparentBlock(Material.BIRCH_WOOD_STAIRS);
+		addTransparentBlock(Material.WOOD_STAIRS);
+		addTransparentBlock(Material.JUNGLE_WOOD_STAIRS);
+		addTransparentBlock(Material.SPRUCE_WOOD_STAIRS);
+		
+		/* Lava & Water */
+		addTransparentBlock(Material.LAVA);
+		addTransparentBlock(Material.STATIONARY_LAVA);
+		addTransparentBlock(Material.WATER);
+		addTransparentBlock(Material.STATIONARY_WATER);
+		
+		/* Saplings and bushes */
+		addTransparentBlock(Material.SAPLING);
+		addTransparentBlock(Material.DEAD_BUSH);
+		
+		/* Construction Material */
+		/* Fences */
+		addTransparentBlock(Material.FENCE);
+		addTransparentBlock(Material.FENCE_GATE);
+		addTransparentBlock(Material.IRON_FENCE);
+		addTransparentBlock(Material.NETHER_FENCE);
+		
+		/* Ladders, Signs */
+		addTransparentBlock(Material.LADDER);
+		addTransparentBlock(Material.SIGN_POST);
+		addTransparentBlock(Material.WALL_SIGN);
+		
+		/* Bed */
+		addTransparentBlock(Material.BED_BLOCK);
+		
+		/* Pistons */
+		addTransparentBlock(Material.PISTON_EXTENSION);
+		addTransparentBlock(Material.PISTON_MOVING_PIECE);
+		addTransparentBlock(Material.RAILS);
+		
+		/* Torch & Trapdoor */		
+		addTransparentBlock(Material.TORCH);
+		addTransparentBlock(Material.TRAP_DOOR);
+		
+		/* New */
+		addTransparentBlock(Material.BREWING_STAND);
+		addTransparentBlock(Material.WOODEN_DOOR);
+		addTransparentBlock(Material.WOOD_STEP);
+	}
+	
+	public static boolean isTransparent(Material m){
+		return transparent.contains(m);
+	}
+	
+	public static void addTransparentBlock(Material m){
+		if(transparent.add(m) == false){
+			System.out.println("Already added as transparent: " + m.toString());
+		}
+		if(!m.isBlock()) System.out.println(m + " is not a block!");
 	}
 	
 	public static void parseColours(YamlConfiguration config){

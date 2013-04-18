@@ -112,8 +112,9 @@ public class ContainerShop implements Shop{
 	 */
 	public ContainerShop getAttachedShop(){
 		Block c = Util.getSecondHalf(this.getLocation().getBlock());
-		
-		return (ContainerShop) plugin.getShopManager().getShop(c.getLocation());
+		if(c == null) return null;
+		Shop shop = plugin.getShopManager().getShop(c.getLocation());
+		return shop == null ? null : (ContainerShop) shop;
 	}
 	
 	/**
@@ -584,7 +585,7 @@ public class ContainerShop implements Shop{
 			}
 		}
 		
-		if(this.getDisplayItem() != null && this.getDisplayItem().getDisplayLocation().getBlock().getType().isOccluding()){
+		if(this.getDisplayItem() != null && Util.isTransparent(this.getDisplayItem().getDisplayLocation().getBlock().getType()) == false){
 			this.getDisplayItem().remove();
 			this.displayItem = null; //You are in a solid block.
 		}

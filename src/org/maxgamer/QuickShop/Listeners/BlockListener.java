@@ -50,13 +50,13 @@ public class BlockListener implements Listener{
 	/**
 	 * Removes chests when they're destroyed.
 	 */
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onBreak(BlockBreakEvent e){
 		Block b = e.getBlock();
 		Player p = e.getPlayer();
 		
 		//If the shop was a chest
-		if(b instanceof InventoryHolder){
+		if(b.getState() instanceof InventoryHolder){
 			Shop shop = plugin.getShopManager().getShop(b.getLocation());
 			if(shop == null) return;
 			

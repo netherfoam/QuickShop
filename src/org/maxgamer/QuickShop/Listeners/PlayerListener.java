@@ -87,7 +87,6 @@ public class PlayerListener implements Listener{
 				shop = plugin.getShopManager().getShop(attached.getLocation());
 			}
 		}
-
 		//Purchase handling
 		if(shop != null && p.hasPermission("quickshop.use")){
 			shop.onClick();
