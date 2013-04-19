@@ -572,6 +572,8 @@ public class ContainerShop implements Shop{
 	}
 	
 	private void checkDisplay(){
+		if(getLocation().getWorld() == null) return; //not loaded
+		
 		boolean trans = Util.isTransparent(getLocation().clone().add(0.5, 1.2, 0.5).getBlock().getType());
 		
 		if(this.getDisplayItem() != null){
