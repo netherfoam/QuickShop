@@ -18,7 +18,7 @@ public class DisplayItem{
 	private Shop shop;
 	private ItemStack iStack;
 	private Item item;
-	private Location displayLoc;
+	//private Location displayLoc;
 	
 	/**
 	 * Creates a new display item.
@@ -28,7 +28,7 @@ public class DisplayItem{
 	public DisplayItem(Shop shop, ItemStack iStack){
 		this.shop = shop;
 		this.iStack = iStack.clone();
-		this.displayLoc = shop.getLocation().clone().add(0.5, 1.2, 0.5);
+		//this.displayLoc = shop.getLocation().clone().add(0.5, 1.2, 0.5);
 	}
 	
 	/**
@@ -106,7 +106,7 @@ public class DisplayItem{
 	 * @return Returns the exact location of the display item.  (1 above shop block, in the center)
 	 */
 	public Location getDisplayLocation(){
-		return this.displayLoc;
+		return this.shop.getLocation().clone().add(0.5, 1.2, 0.5);
 	}
 	
 	/**
