@@ -621,4 +621,15 @@ public class ContainerShop implements Shop{
 	public void onClick(){
 		this.setSignText();
 	}
+	
+	@Override
+	public String toString(){
+		StringBuilder sb = new StringBuilder("Shop " + (loc.getWorld() == null ? "unloaded world" : loc.getWorld().getName()) + "(" + loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ() + ")");
+		sb.append(" Owner: " + getOwner());
+		if(isUnlimited()) sb.append(" Unlimited: true");
+		sb.append(" Price: " + getPrice());
+		sb.append( "Item: " + getItem().toString());
+		
+		return sb.toString();
+	}
 }

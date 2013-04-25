@@ -479,8 +479,7 @@ public class ShopManager{
 						//Transfers the item from A to B
 						shop.sell(p, amount);
 						MsgUtil.sendPurchaseSuccess(p, shop, amount);
-						Location loc = shop.getLocation();
-						plugin.log(p.getName() + " bought " + amount + " " +shop.getDataName()+" from shop at ("+loc.getWorld().getName()+" - "+loc.getX()+","+loc.getY()+","+loc.getZ()+") for " + (shop.getPrice() * amount));
+						plugin.log(p.getName() + " bought " + amount + " for " + (shop.getPrice() * amount) + " from " + shop.toString());
 					}
 					else if(shop.isBuying()){
 						int space = shop.getRemainingSpace();
@@ -545,9 +544,7 @@ public class ShopManager{
 						
 						shop.buy(p, amount);
 						MsgUtil.sendSellSuccess(p, shop, amount);
-						
-						Location loc = shop.getLocation();
-						plugin.log(p.getName() + " sold " + amount + " " +shop.getDataName()+" to shop at ("+loc.getWorld().getName()+" - "+loc.getX()+","+loc.getY()+","+loc.getZ()+") for " + (shop.getPrice() * amount));
+						plugin.log(p.getName() + " sold " + amount + " for " + (shop.getPrice() * amount) + " to " + shop.toString());
 					}
 					shop.setSignText(); //Update the signs count
 				}
