@@ -50,7 +50,7 @@ public class BlockListener implements Listener{
 	/**
 	 * Removes chests when they're destroyed.
 	 */
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onBreak(BlockBreakEvent e){
 		Block b = e.getBlock();
 		Player p = e.getPlayer();
