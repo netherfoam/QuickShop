@@ -114,7 +114,7 @@ public class LockListener implements Listener{
 			if(shop == null) return;
 			
 			//If they're the shop owner or have bypass perms, they can destroy it.
-			if(!shop.getOwner().equalsIgnoreCase(p.getName()) && p.hasPermission("quickshop.other.destroy")){
+			if(!shop.getOwner().equalsIgnoreCase(p.getName()) && !p.hasPermission("quickshop.other.destroy")){
 				e.setCancelled(true);
 				p.sendMessage(MsgUtil.getMessage("no-permission"));
 				return;
