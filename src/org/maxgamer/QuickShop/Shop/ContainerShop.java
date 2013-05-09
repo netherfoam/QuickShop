@@ -576,6 +576,15 @@ public class ContainerShop implements Shop{
 		
 		boolean trans = Util.isTransparent(getLocation().clone().add(0.5, 1.2, 0.5).getBlock().getType());
 		
+		if(plugin.display && trans && this.getDisplayItem() == null){
+			if(this.getDisplayItem() == null){
+				this.displayItem = new DisplayItem(this, this.getItem());
+			}
+			if(this.getDisplayItem().getItem() == null){
+				this.getDisplayItem().spawn();
+			}
+		}
+		
 		if(this.getDisplayItem() != null){
 			if(!trans){ //We have a display item in a block... delete it
 				this.getDisplayItem().remove();
@@ -597,14 +606,6 @@ public class ContainerShop implements Shop{
 						disItem.respawn();
 					}
 				}
-			}
-		}
-		if(plugin.display && trans){
-			if(this.getDisplayItem() == null){
-				this.displayItem = new DisplayItem(this, this.getItem());
-			}
-			if(this.getDisplayItem().getItem() == null){
-				this.getDisplayItem().spawn();
 			}
 		}
 	}

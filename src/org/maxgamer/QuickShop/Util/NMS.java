@@ -13,6 +13,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class NMS{
 	private static ArrayList<NMSDependent> dependents = new ArrayList<NMSDependent>();
+	/** The ID for shop item names */
 	private static int nextId = 0;
 	static{
 		NMSDependent dep;
@@ -250,6 +251,46 @@ public class NMS{
 				net.minecraft.server.v1_5_R2.NBTTagCompound c = net.minecraft.server.v1_5_R2.NBTCompressedStreamTools.a(bytes);
 				net.minecraft.server.v1_5_R2.ItemStack is = net.minecraft.server.v1_5_R2.ItemStack.createStack(c);
 				return org.bukkit.craftbukkit.v1_5_R2.inventory.CraftItemStack.asBukkitCopy(is);
+			}
+		};
+		dependents.add(dep);
+		
+		/* ***********************
+		 * **      1.5.2      ** *
+		 * ***********************/
+		
+		dep = new NMSDependent("v1_5_R3"){
+			@Override
+			public void safeGuard(Item item) {
+				ItemStack iStack = item.getItemStack();
+				
+				//Fetch the NMS item
+				net.minecraft.server.v1_5_R3.ItemStack nmsI = org.bukkit.craftbukkit.v1_5_R3.inventory.CraftItemStack.asNMSCopy(iStack);
+				//Force the count to 0, don't notify anything though.
+				nmsI.count = 0;
+				//Get the itemstack back as a bukkit stack
+				iStack = org.bukkit.craftbukkit.v1_5_R3.inventory.CraftItemStack.asBukkitCopy(nmsI);
+				
+				//Set the display item to the stack.
+				item.setItemStack(iStack);
+			}
+			
+			@Override
+			public byte[] getNBTBytes(ItemStack iStack) {
+				net.minecraft.server.v1_5_R3.ItemStack is = org.bukkit.craftbukkit.v1_5_R3.inventory.CraftItemStack.asNMSCopy(iStack);
+				//Save the NMS itemstack to a new NBT tag
+				net.minecraft.server.v1_5_R3.NBTTagCompound itemCompound = new net.minecraft.server.v1_5_R3.NBTTagCompound();
+				itemCompound = is.save(itemCompound);
+				
+				//Convert the NBT tag to a byte[]
+				return net.minecraft.server.v1_5_R3.NBTCompressedStreamTools.a(itemCompound);
+			}
+			
+			@Override
+			public ItemStack getItemStack(byte[] bytes) {
+				net.minecraft.server.v1_5_R3.NBTTagCompound c = net.minecraft.server.v1_5_R3.NBTCompressedStreamTools.a(bytes);
+				net.minecraft.server.v1_5_R3.ItemStack is = net.minecraft.server.v1_5_R3.ItemStack.createStack(c);
+				return org.bukkit.craftbukkit.v1_5_R3.inventory.CraftItemStack.asBukkitCopy(is);
 			}
 		};
 		dependents.add(dep);
