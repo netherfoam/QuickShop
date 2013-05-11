@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.getspout.spoutapi.material.MaterialData;
 import org.maxgamer.QuickShop.QuickShop;
 import org.maxgamer.QuickShop.Util.MsgUtil;
 import org.maxgamer.QuickShop.Util.Util;
@@ -467,7 +468,7 @@ public class ContainerShop implements Shop{
 	 * @return a list of signs that are attached to this shop (QuickShop and blank signs only)
 	 */
 	public List<Sign> getSigns(){
-		ArrayList<Sign> signs = new ArrayList<Sign>(4);
+		ArrayList<Sign> signs = new ArrayList<Sign>(1);
 		
 		if(this.getLocation().getWorld() == null) return signs;
 		
@@ -525,26 +526,20 @@ public class ContainerShop implements Shop{
 	}
 	
 	/**
-	 * Delete sthe shop from the list of shops
+	 * Deletes the shop from the list of shops
 	 * and queues it for database deletion
 	 * @param fromMemory True if you are *NOT* iterating over this currently, *false if you are iterating*
 	 */
 	public void delete(boolean fromMemory){
 		//Delete the display item
 		
-		if(plugin.display && this.getDisplayItem() != null){
+		if(this.getDisplayItem() != null){
 			this.getDisplayItem().remove();
 		}
 		
 		//Delete the signs around it
-		Block[] blocks = new Block[4];
-		blocks[0] = loc.getBlock().getRelative(1, 0, 0);
-		blocks[1] = loc.getBlock().getRelative(-1, 0, 0);
-		blocks[2] = loc.getBlock().getRelative(0, 0, 1);
-		blocks[3] = loc.getBlock().getRelative(0, 0, -1);
-
 		for(Sign s : this.getSigns()){
-			s.setType(Material.AIR);
+			s.getBlock().setType(Material.AIR);
 		}
 		
 		//Delete it from the database

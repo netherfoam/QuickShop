@@ -87,6 +87,7 @@ public class BlockListener implements Listener{
 			}
 			
 			if(e.isCancelled()) return;
+			
 			e.setCancelled(true); //Cancel the event so that the sign does not drop.. TODO: Find a better way.
 			b.setType(Material.AIR);
 		}
@@ -112,7 +113,8 @@ public class BlockListener implements Listener{
 	 * @return The shop
 	 */
 	private Shop getShopNextTo(Location loc){
-		Block b = Util.getSecondHalf(loc.getBlock());
+		Block b = Util.getAttached(loc.getBlock());
+		//Util.getAttached(b)
 		if(b == null) return null;
 		return plugin.getShopManager().getShop(b.getLocation());
 	}

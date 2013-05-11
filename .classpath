@@ -20,5 +20,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="F:/lib/craftbukkit-1.5-R0.1-20130315.192915-2.jar"/>
+	<classpathentry kind="lib" path="F:/lib/craftbukkit-1.5.2-R0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
