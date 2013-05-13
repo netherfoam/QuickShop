@@ -339,7 +339,6 @@ public class QuickShop extends JavaPlugin{
 		//Load quick variables
 		this.display = this.getConfig().getBoolean("shop.display-items"); 
 		this.sneak = this.getConfig().getBoolean("shop.sneak-only");
-		//this.lock = this.getConfig().getBoolean("shop.lock");
 		this.priceChangeRequiresFee = this.getConfig().getBoolean("shop.price-change-requires-fee");
 		
 		MsgUtil.loadCfgMessages();

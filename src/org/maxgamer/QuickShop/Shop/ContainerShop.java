@@ -566,40 +566,42 @@ public class ContainerShop implements Shop{
 	}
 	
 	private void checkDisplay(){
+		if(plugin.display == false) return;
 		if(getLocation().getWorld() == null) return; //not loaded
 		
 		boolean trans = Util.isTransparent(getLocation().clone().add(0.5, 1.2, 0.5).getBlock().getType());
 		
-		if(plugin.display && trans && this.getDisplayItem() == null){
-			if(this.getDisplayItem() == null){
-				this.displayItem = new DisplayItem(this, this.getItem());
-			}
-			if(this.getDisplayItem().getItem() == null){
-				this.getDisplayItem().spawn();
-			}
+		if(trans && this.getDisplayItem() == null){
+			this.displayItem = new DisplayItem(this, this.getItem());
+			this.getDisplayItem().spawn();
 		}
 		
 		if(this.getDisplayItem() != null){
 			if(!trans){ //We have a display item in a block... delete it
 				this.getDisplayItem().remove();
 				this.displayItem = null;
+				return;
 			}
-			else{
-				DisplayItem disItem = this.getDisplayItem();
-				Location dispLoc = disItem.getDisplayLocation();
-				
-				if(dispLoc.getBlock() != null && dispLoc.getBlock().getType() == Material.WATER){ //Flowing water.  Stationery water does not move items.
-					disItem.remove();
-				}
-				if(disItem.getItem() != null){
-					Item item = disItem.getItem();
-					if(item.getLocation().distanceSquared(dispLoc) > 1){
-						item.teleport(dispLoc, TeleportCause.PLUGIN);
-					}
-					if(item.getTicksLived() > 5000 || disItem.getItem().isDead()){
-						disItem.respawn();
-					}
-				}
+		
+			DisplayItem disItem = this.getDisplayItem();
+			Location dispLoc = disItem.getDisplayLocation();
+			
+			if(dispLoc.getBlock() != null && dispLoc.getBlock().getType() == Material.WATER){ //Flowing water.  Stationery water does not move items.
+				disItem.remove();
+				return;
+			}
+			if(disItem.getItem() == null){
+				disItem.spawn();
+				return;
+			}
+			
+			Item item = disItem.getItem();
+			
+			if(item.getTicksLived() > 5000 || !item.isValid() || item.isDead()){
+				disItem.respawn();
+			}
+			else if(item.getLocation().distanceSquared(dispLoc) > 1){
+				item.teleport(dispLoc, TeleportCause.PLUGIN);
 			}
 		}
 	}
