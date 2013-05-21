@@ -599,6 +599,7 @@ public class ContainerShop implements Shop{
 			
 			if(item.getTicksLived() > 5000 || !item.isValid() || item.isDead()){
 				disItem.respawn();
+				disItem.removeDupe();
 			}
 			else if(item.getLocation().distanceSquared(dispLoc) > 1){
 				item.teleport(dispLoc, TeleportCause.PLUGIN);

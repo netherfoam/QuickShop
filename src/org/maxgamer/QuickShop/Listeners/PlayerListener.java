@@ -60,12 +60,6 @@ public class PlayerListener implements Listener{
 		if(e.getAction() != Action.LEFT_CLICK_BLOCK) return;
 		
 		Block b = e.getClickedBlock();
-		//BlockState bs = b.getState();
-
-		/*
-		for(String s : getParents(bs.getClass())){
-			e.getPlayer().sendMessage(s);
-		}*/
 		
 		if(!Util.canBeShop(b) && b.getType() != Material.WALL_SIGN) return;
 		Player p = e.getPlayer();
@@ -88,7 +82,7 @@ public class PlayerListener implements Listener{
 			}
 		}
 		//Purchase handling
-		if(shop != null && p.hasPermission("quickshop.use")){
+		if(shop != null && p.hasPermission("quickshop.use") && (plugin.sneakTrade == false || p.isSneaking())){
 			shop.onClick();
 			//Text menu
 			MsgUtil.sendShopInfo(p, shop);
@@ -109,7 +103,7 @@ public class PlayerListener implements Listener{
 			return;
 		}
 		//Handles creating shops
-		else if(shop == null && item != null && item.getType() != Material.AIR && p.hasPermission("quickshop.create.sell") && Util.canBeShop(b) && p.getGameMode() != GameMode.CREATIVE){
+		else if(shop == null && item != null && item.getType() != Material.AIR && p.hasPermission("quickshop.create.sell") && Util.canBeShop(b) && p.getGameMode() != GameMode.CREATIVE && (plugin.sneakCreate == false || p.isSneaking())){
 			if(!plugin.getShopManager().canBuildShop(p, b, e.getBlockFace())){
 				//As of the new checking system, most plugins will tell the player why they can't create a shop there.
 				//So telling them a message would cause spam etc.

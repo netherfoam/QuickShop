@@ -61,7 +61,9 @@ shop:
     #Should we try and lock their shops from other players, so people can't steal from them?
     lock: true
     #Should we require players be sneaking to create and use shops?
-    sneak-only: false
+    sneak-to-create: false
+    sneak-to-trade: false
+    
     #Should we automatically create the sign for the chest?
     auto-sign: true
     #If a player owns an unlimited shop, should they receive the cash from it or not?

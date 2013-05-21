@@ -30,15 +30,27 @@ import org.maxgamer.QuickShop.Database.DatabaseCore;
 import org.maxgamer.QuickShop.Database.DatabaseHelper;
 import org.maxgamer.QuickShop.Database.MySQLCore;
 import org.maxgamer.QuickShop.Database.SQLiteCore;
-import org.maxgamer.QuickShop.Economy.*;
-import org.maxgamer.QuickShop.Listeners.*;
+import org.maxgamer.QuickShop.Economy.Economy;
+import org.maxgamer.QuickShop.Economy.EconomyCore;
+import org.maxgamer.QuickShop.Economy.Economy_Vault;
+import org.maxgamer.QuickShop.Listeners.BlockListener;
+import org.maxgamer.QuickShop.Listeners.ChatListener;
+import org.maxgamer.QuickShop.Listeners.ChunkListener;
+import org.maxgamer.QuickShop.Listeners.HeroChatListener;
+import org.maxgamer.QuickShop.Listeners.LockListener;
+import org.maxgamer.QuickShop.Listeners.PlayerListener;
+import org.maxgamer.QuickShop.Listeners.WorldListener;
 import org.maxgamer.QuickShop.Metrics.Metrics;
 import org.maxgamer.QuickShop.Metrics.ShopListener;
-import org.maxgamer.QuickShop.Shop.*;
+import org.maxgamer.QuickShop.Shop.ContainerShop;
+import org.maxgamer.QuickShop.Shop.Shop;
+import org.maxgamer.QuickShop.Shop.ShopManager;
+import org.maxgamer.QuickShop.Shop.ShopType;
 import org.maxgamer.QuickShop.Util.Converter;
 import org.maxgamer.QuickShop.Util.MsgUtil;
 import org.maxgamer.QuickShop.Util.Util;
-import org.maxgamer.QuickShop.Watcher.*;
+import org.maxgamer.QuickShop.Watcher.ItemWatcher;
+import org.maxgamer.QuickShop.Watcher.LogWatcher;
 
 public class QuickShop extends JavaPlugin{
 	/** The active instance of QuickShop */
@@ -69,8 +81,13 @@ public class QuickShop extends JavaPlugin{
 	private BukkitTask itemWatcherTask;
 	private LogWatcher logWatcher;
 	
-	/** Whether players are required to sneak to create a shop */
+	/** Whether players are required to sneak to create/buy from a shop */
 	public boolean sneak;
+	/** Whether players are required to sneak to create a shop */
+	public boolean sneakCreate;
+	/** Whether players are required to sneak to trade with a shop */
+	public boolean sneakTrade;
+	
 	/** Whether we should use display items or not */
 	public boolean display = true;
 	/** Whether we players are charged a fee to change the price on their shop (To help deter endless undercutting */
@@ -339,6 +356,9 @@ public class QuickShop extends JavaPlugin{
 		//Load quick variables
 		this.display = this.getConfig().getBoolean("shop.display-items"); 
 		this.sneak = this.getConfig().getBoolean("shop.sneak-only");
+		this.sneakCreate = this.getConfig().getBoolean("shop.sneak-to-create");
+		this.sneakTrade = this.getConfig().getBoolean("shop.sneak-to-trade");
+		
 		this.priceChangeRequiresFee = this.getConfig().getBoolean("shop.price-change-requires-fee");
 		
 		MsgUtil.loadCfgMessages();

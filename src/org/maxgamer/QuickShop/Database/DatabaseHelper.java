@@ -46,7 +46,7 @@ public class DatabaseHelper{
 		"CREATE TABLE shops (" + 
 				"owner  TEXT(20) NOT NULL, " +
 				"price  double(32, 2) NOT NULL, " +
-				"itemConfig  BLOB NOT NULL, " +
+				"itemConfig TEXT CHARSET utf8 NOT NULL, " +
 				"x  INTEGER(32) NOT NULL, " +
 				"y  INTEGER(32) NOT NULL, " +
 				"z  INTEGER(32) NOT NULL, " +
