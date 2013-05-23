@@ -262,6 +262,9 @@ public class MsgUtil{
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.successfully-sold"));
 		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.item-name-and-price", ""+amount, shop.getDataName(), Util.format((amount * shop.getPrice()))));
+		double tax = plugin.getConfig().getDouble("tax");
+		double total = amount * shop.getPrice();
+		p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.sell-tax", ""+Util.format((tax * total))));
 		
 		Map<Enchantment, Integer> enchs = shop.getItem().getItemMeta().getEnchants();
 		if(enchs != null && !enchs.isEmpty()){
