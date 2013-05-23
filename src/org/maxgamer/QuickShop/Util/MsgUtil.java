@@ -267,7 +267,12 @@ public class MsgUtil{
 			double tax = plugin.getConfig().getDouble("tax");
 			double total = amount * shop.getPrice();
 			if (tax != 0) {
-			p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.sell-tax", ""+Util.format((tax * total))));
+				if(!p.getName().equalsIgnoreCase(shop.getOwner())){
+					p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.sell-tax", ""+Util.format((tax * total))));
+					}
+				else {
+					p.sendMessage(ChatColor.DARK_PURPLE + "| " + MsgUtil.getMessage("menu.sell-tax-self"));
+				}
 			}
 		}
 		
@@ -299,7 +304,7 @@ public class MsgUtil{
 			//They don't have an up to date enough build of CB to do this.
 			//TODO: Remove this when it becomes redundant
 		}
-		
+
 		p.sendMessage(ChatColor.DARK_PURPLE + "+---------------------------------------------------+");
 	}
 	
