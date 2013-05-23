@@ -2,6 +2,8 @@
 tax: 0.05
 #The fake player who money from taxing people goes to
 tax-account: tax
+#Whether or not to show taxes paid when selling to a shop
+show-tax: false
 
 #Should we log transactions/creations to Bukkit\Plugins\QuickShop\qs.log?
 log-actions: true
