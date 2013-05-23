@@ -44,7 +44,7 @@ menu:
     successful-purchase: "&aSuccessfully Purchased:"
     successfully-sold: "&aSuccessfully Sold:"
     item-name-and-price: "&e{0} {1} &afor &e{2}"
-    sell-tax: "&aYou paid &e{0} &ain taxes"
+    sell-tax: "&aYou paid &e{0} &ain taxes."
     enchants: "&5Enchants"
     stored-enchants: "&5Stored Enchants"
     
