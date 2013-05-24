@@ -471,10 +471,17 @@ public class ShopManager{
 							}
 							
 							//Notify the shop owner
-							String msg = MsgUtil.getMessage("player-bought-from-your-store", p.getName(), ""+amount, shop.getDataName());
-							if(stock == amount) msg += "\n" + MsgUtil.getMessage("shop-out-of-stock", ""+shop.getLocation().getBlockX(), ""+shop.getLocation().getBlockY(), ""+shop.getLocation().getBlockZ(), shop.getDataName());
+							if (plugin.getConfig().getBoolean("show-tax")) {
+								String msg = MsgUtil.getMessage("player-bought-from-your-store-tax", p.getName(), ""+amount, shop.getDataName(), Util.format((tax * total)));
+								if(stock == amount) msg += "\n" + MsgUtil.getMessage("shop-out-of-stock", ""+shop.getLocation().getBlockX(), ""+shop.getLocation().getBlockY(), ""+shop.getLocation().getBlockZ(), shop.getDataName());
+    								MsgUtil.send(shop.getOwner(), msg);
+							}
+							else {
+								String msg = MsgUtil.getMessage("player-bought-from-your-store", p.getName(), ""+amount, shop.getDataName());
+								if(stock == amount) msg += "\n" + MsgUtil.getMessage("shop-out-of-stock", ""+shop.getLocation().getBlockX(), ""+shop.getLocation().getBlockY(), ""+shop.getLocation().getBlockZ(), shop.getDataName());
+								MsgUtil.send(shop.getOwner(), msg);
+							}
 							
-							MsgUtil.send(shop.getOwner(), msg);
 						}
 						//Transfers the item from A to B
 						shop.sell(p, amount);
