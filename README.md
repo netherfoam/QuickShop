@@ -1,3 +1,7 @@
+A plug-in for the open-source Minecraft server framework, Bukkit. QuickShop was designed to combine concepts from a number of expired "shop" plugins which had become inactive. The goal of the project was to provide something user friendly to allow players to trade items through the Minecraft server via an economy. It had to be simple, given the target audience and quick to use. 
+
+The plugin was conceptually done through inspiration from other plugins which had unique ways of displaying sales, interfacing with shops and monitoring stock. The implementation of this plugin managed to successfully combine these ideals and became a hit with 117,000 downloads at time of writing. The project has now been discontinued, and only works on older versions of Bukkit due to changes in the framework.
+
 The Predecessors
 ========
 Showcase was abandoned. Chestshop needed a display, with signs whose order you could never remember. SCS has too many commands. I'm yet to find someone who uses essentials shops.
