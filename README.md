@@ -59,6 +59,8 @@ See it in action: http://maxgamer.org or play.maxgamer.org:25571 and /warp marke
 
 
 Commands
+========
+<pre>
 /qs unlimited - Makes the shop you're looking at become unlimited.
 /qs setowner <player> - Changes shop owner to <player>.
 /qs buy - Changes your shop you're looking at to one that buys items
@@ -67,6 +69,11 @@ Commands
 /qs clean - Removes any existing shop that has 0 stock.
 /qs find <item> - Use to find the nearest shop that begins with <item> - E.g. '/qs find dia' will find the nearest diamond shop.
 /shop - Alias (Optional) of /qs
+</pre>
+
+Permissions
+========
+<pre>
 Player Nodes
 quickshop.use - Required to use ANY quickshop
 quickshop.create.sell - Required to make a QuickShop (At all)
@@ -84,3 +91,4 @@ quickshop.other.price - Allow changing price of other people's shops
 quickshop.refill - Ability to refill chests using a command (=Unlimited items)
 quickshop.empty - Ability to empty chests of all items
 quickshop.clean - Permission to purge any shops that have 0 stock.
+</pre>  
